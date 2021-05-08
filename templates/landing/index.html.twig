@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello LandingController!{% endblock %}
+
+{% block body %}
+    <section class="hero-section">
+        <div class="hero-slider owl-carousel">
+            <div class="hs-item">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hs-text">
+                                <h2><span>Kredite</span> vergeben</h2>
+                                <p>Behalte die Übersicht über Geld, das du Freunden und Verwandten geliehen hast. </p>
+                                <a href="{{ path('app_login') }}" class="site-btn">Einloggen</a>
+                                <a href="{{path('registration')}}" class="site-btn sb-c2">Registrieren</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="hr-img">
+                                <img src="{{ asset ('img/money.png') }}" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hs-item">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hs-text">
+                                <h2><span>Schulden </span> organisieren.</h2>
+                                <p>Du weißt nicht mehr wie viel du wem für den letzten Saufabend mit deinen Kumpels schuldest? Kein Problem! Die Server von Debes verlieren ihr Gedächtnis nicht nach Alkoholkonsum.</p>
+                                <a href="#" class="site-btn">Download Now</a>
+                                <a href="#" class="site-btn sb-c2">Start free trial</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="hr-img">
+                                <img src="{{ asset ('img/money2.png') }}" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
