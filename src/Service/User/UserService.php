@@ -36,10 +36,12 @@ class UserService
      *
      * @param UserData $userData
      *
+     * @return void
+     *
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function storeUser(UserData $userData)
+    public function storeUser(UserData $userData): void
     {
         $user = $this->userFactory->createByData($userData);
 

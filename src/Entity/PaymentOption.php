@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\PaymentOptionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\MappedSuperclass;
 
 /**
- * @ORM\Entity(repositoryClass=PaymentOptionRepository::class)
+ * @MappedSuperclass
  */
 abstract class PaymentOption
 {

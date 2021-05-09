@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\BankAccount;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -14,9 +16,24 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class BankAccountRepository extends ServiceEntityRepository
 {
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, BankAccount::class);
+    }
+
+    /**
+     * persist
+     *
+     * @param BankAccount $bankAccount
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function persist(BankAccount $bankAccount): void
+    {
+        $this->_em->persist($bankAccount);
+        $this->_em->flush();
     }
 
     // /**

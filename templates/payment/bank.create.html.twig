@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Registrierung{% endblock %}
+{% block title %}Hello PaymentController!{% endblock %}
 
 {% block body %}
     <section class="hero-section">
@@ -20,46 +20,50 @@
                                 <div class="row">
                                     <div class="col">
                                         <div>
-                                            {{ form_label(form.username, 'Benutzername', {'label_attr': {'class': 'h2'}}) }}
+                                            {{ form_label(form.accountName, 'Kontoinhaber', {'label_attr': {'class': 'h2'}}) }}
                                         </div>
-                                        {{ form_widget(form.username, {'attr': {'class': 'earch-form input'}}) }}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <br>
-                                    <div class="col">
-                                        {{ form_label(form.password, 'Passwort', {'label_attr': {'class': 'h2'}}) }}
-                                        {{ form_widget(form.password, {'attr': {'class': 'earch-form input'}}) }}
-                                        {{ form_help(form.password) }}
+                                        {{ form_widget(form.accountName, {'attr': {'class': 'earch-form input'}}) }}
                                     </div>
                                     <br>
                                     <div class="col">
                                         <div>
-                                            {{ form_label(form.email, 'Email', {'label_attr': {'class': 'h2'}}) }}
+                                            {{ form_label(form.bankName, 'Name der Bank', {'label_attr': {'class': 'h2'}}) }}
                                         </div>
-                                        {{ form_widget(form.email, {'attr': {'class': 'earch-form input'}}) }}
+                                        {{ form_widget(form.bankName, {'attr': {'class': 'earch-form input'}}) }}
+                                    </div>
+                                    <br>
+                                    <div class="col">
+                                        <div>
+                                            {{ form_label(form.iban, 'IBAN', {'label_attr': {'class': 'h2'}}) }}
+                                        </div>
+                                        {{ form_widget(form.iban, {'attr': {'class': 'earch-form input'}}) }}
                                     </div>
                                     <br>
 
                                     <div class="col">
                                         <div>
-                                            {{ form_label(form.firstName, 'Vorname', {'label_attr': {'class': 'h2'}}) }}
+                                            {{ form_label(form.bic, 'BIC', {'label_attr': {'class': 'h2'}}) }}
                                         </div>
-                                        {{ form_widget(form.firstName, {'attr': {'class': 'earch-form input'}}) }}
+                                        {{ form_widget(form.bic, {'attr': {'class': 'earch-form input'}}) }}
+
+                                        <br>
                                     </div>
-                                    <br>
 
                                     <div class="col">
                                         <div>
-                                            {{ form_label(form.lastName, 'Nachname', {'label_attr': {'class': 'h2'}}) }}
-
-                                            {{ form_widget(form.lastName, {'attr': {'class': 'earch-form input'}}) }}
+                                            {{ form_label(form.enabled, 'Als verfügbar anzeigen', {'label_attr': {'class': 'h2'}}) }}
                                         </div>
+                                        {{ form_widget(form.enabled, {'attr': {'class': 'earch-form input'}}) }}
                                         <br>
                                     </div>
 
                                     {{ form_row(form._token) }}
-                                    {{ form_widget(form.submit, {'attr': {'class': 'site-btn'}}) }}
+
+                                    <div>
+                                        <br>
+                                        {{ form_widget(form.submit, {'attr': {'class': 'site-btn'}}) }}
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -68,5 +72,4 @@
             </div>
         </div>
     </section>
-
 {% endblock %}

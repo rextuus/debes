@@ -13,6 +13,11 @@ abstract class PaymentOptionData
     private $owner;
 
     /**
+     * @boolean
+     */
+    private $enabled;
+
+    /**
      * @return User
      */
     public function getOwner(): User
@@ -26,5 +31,35 @@ abstract class PaymentOptionData
     public function setOwner(User $owner): void
     {
         $this->owner = $owner;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param mixed $enabled
+     */
+    public function setEnabled($enabled): void
+    {
+        $this->enabled = $enabled;
+    }
+
+    /**
+     * initFromUser
+     *
+     * @param User $owner
+     *
+     * @return $this
+     */
+    public function initFromUser(User $owner): self
+    {
+        $this->setOwner($owner);
+
+        return $this;
     }
 }

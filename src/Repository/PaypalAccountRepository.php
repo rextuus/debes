@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\PaypalAccount;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -14,9 +16,24 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PaypalAccountRepository extends ServiceEntityRepository
 {
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, PaypalAccount::class);
+    }
+
+    /**
+     * persist
+     *
+     * @param PaypalAccount $paypalAccount
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function persist(PaypalAccount $paypalAccount): void
+    {
+        $this->_em->persist($paypalAccount);
+        $this->_em->flush();
     }
 
     // /**

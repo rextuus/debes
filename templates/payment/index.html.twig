@@ -3,18 +3,70 @@
 {% block title %}Hello PaymentController!{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ '/var/www/html/debes/src/Controller/PaymentController.php'|file_link(0) }}">src/Controller/PaymentController.php</a></code></li>
-        <li>Your template at <code><a href="{{ '/var/www/html/debes/templates/payment/index.html.twig'|file_link(0) }}">templates/payment/index.html.twig</a></code></li>
-    </ul>
-</div>
+    <section class="hero-section">
+        <div class="hero-slider owl-carousel">
+            <div class="hs-item">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hs-text">
+                                <h2><span>Bankkonten</span> verwalten</h2>
+                                <p>Hier siehst du deine verwendeten Bank- und Paypal-Konten und kannst neue anlegen</p>
+                                <a href="{{ path('payment_create_bank') }}" class="site-btn">Neues Bankkonto
+                                    hinzufügen</a>
+                                <a href="{{ path('payment_create_paypal') }}" class="site-btn sb-c2">Neues Paypal
+                                    hinzufügen</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+
+                            <table class="table table-hover table-dark">
+                                <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Typ</th>
+                                    <th scope="col">Öffentlich</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for account in accounts %}
+                                    <tr>
+                                    {% if  account.isPaypalAccount %}
+                                        <td>
+                                            <a href="{{ path('payment_update_paypal', {id: account.accountId}) }}">{{ loop.index }}</a>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <a href="{{ path('payment_update_bank', {id: account.accountId}) }}">{{ loop.index }}</a>
+                                        </td>
+                                    {% endif %}
+
+
+
+                                    {% if  account.isPaypalAccount %}
+                                        <td>Paypal</td>
+                                    {% else %}
+                                        <td>Bankkonto</td>
+                                    {% endif %}
+
+                                    {% if  account.enabled %}
+                                        <td>&#10003;</td>
+                                    {% else %}
+                                        <td>&#10008;</td>
+                                    {% endif %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
 {% endblock %}

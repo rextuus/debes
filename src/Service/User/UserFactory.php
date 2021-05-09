@@ -41,15 +41,17 @@ class UserFactory
      * mapData
      *
      * @param User     $user
-     * @param UserData $userData
+     * @param UserData $data
+     *
+     * @return void
      */
-    public function mapData(User $user, UserData $userData): void
+    public function mapData(User $user, UserData $data): void
     {
-        $user->setUsername($userData->getUserName());
-        $user->setEmail($userData->getEmail());
-        $user->setFirstName($userData->getFirstName());
-        $user->setLastName($userData->getLastName());
-        $user->setPassword($this->passwordEncoder->encodePassword($user, $userData->getPassword()));
+        $user->setUsername($data->getUserName());
+        $user->setEmail($data->getEmail());
+        $user->setFirstName($data->getFirstName());
+        $user->setLastName($data->getLastName());
+        $user->setPassword($this->passwordEncoder->encodePassword($user, $data->getPassword()));
     }
 
     /**
