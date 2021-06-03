@@ -2,6 +2,7 @@
 
 namespace App\Service\User;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -46,5 +47,15 @@ class UserService
         $user = $this->userFactory->createByData($userData);
 
         $this->userRepository->persist($user);
+    }
+
+    /**
+     * @param User $requester
+     *
+     * @return array
+     */
+    public function findAllOther(User $requester): array
+    {
+        return $this->userRepository->findAllUserExcept($requester->getId());
     }
 }

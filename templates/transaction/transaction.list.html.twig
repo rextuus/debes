@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PaymentController!{% endblock %}
+
+{% block body %}
+    <section class="hero-section">
+        <div class="hero-slider owl-carousel">
+            {% for transaction in transactions %}
+                <div class="hs-item">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="hs-text">
+                                    {% if  transaction.direction == 0 %}
+                                        {% if  transaction.state == 1 %}
+                                            <h2><span>Es ist nicht </span> deine Schuld</h2>
+                                            <p>Aber {{ transaction.transactionPartner }} behauptet du hast dir </p>
+                                            <h3><span>{{ transaction.amount }} € </span></h3> <p>geliehen</p>
+                                        {% elseif transaction.state == 2 %}
+                                            <h2><span>Es ist nicht </span> deine Schuld</h2>
+                                            <p>Aber {{ transaction.transactionPartner }} bekommt noch </p>
+                                            <h3><span>{{ transaction.amount }} € </span></h3> <p>von dir</p>
+                                        {% elseif transaction.state == 4 %}
+                                            <h2><span>Es war nicht </span> deine Schuld</h2>
+                                            <p>{{ transaction.transactionPartner }} sieht das nun auch so und hat den
+                                                Erhalt von </p>
+                                            <h3><span>{{ transaction.amount }} € </span></h3> <p>bestätigt</p>
+                                        {% endif %}
+                                        <a href="#" class="site-btn debt">Zur Schuld</a>
+                                    {% else %}
+                                        {% if  transaction.state == 1 %}
+                                            <h2><span>Oben auf der</span> hohen Kante</h2>
+                                            <p>hat {{ transaction.transactionPartner }} die Schuldlast von </p>
+                                            <h2>{{ transaction.amount }} €</h2> <p> zwar noch
+                                            nicht akzeptiert, aber ist informiert</p>
+                                        {% elseif transaction.state == 2 %}
+                                            <h2><span>Oben auf der</span> hohen Kante</h2>
+                                            <p>liegen noch </p> <h2>{{ transaction.amount }} €</h2> <p> die du
+                                            von {{ transaction.transactionPartner }} bekommst</p>
+                                        {% elseif transaction.state == 3 %}
+                                            <h2><span>Oben auf der</span> hohen Kante</h2>
+                                            <p>sind</p> <h2>{{ transaction.amount }} €</h2> <p> eingetroffen, die
+                                            {{ transaction.transactionPartner }} dir überwiesen hat</p>
+                                        {% endif %}
+                                        <a href="#" class="site-btn loan">Zur Leihe</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="hero-slider owl-carousel">
+            <div class="hs-item-own">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hs-text">
+                                <h2>Deine Bilanz:</h2>
+                                {% if balance < 0 %}
+                                    <h3><span>{{ balance }} €</span></h3>
+                                {% else %}
+                                    <h4><span>{{ balance }} €</span></h4>
+                                {% endif %}
+                                <p></p>
+                                <a href="{{ path ('account_loans') }}" class="site-btn loan">{{ loanAmount }} €</a>
+                                <a href="{{ path ('account_debts') }}" class="site-btn debt">{{ -1 *debtAmount }} €</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+{% endblock %}

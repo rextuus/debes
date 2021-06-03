@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PaymentController!{% endblock %}
+
+{% block body %}
+    <section class="hero-section">
+        <div class="hs-item-own">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="hs-text">
+                            <h2><span>Details</span> zum Schluss</h2>
+                            <br>
+                            {{ form_start(form, {'method': 'POST'}) }}
+                            <div class="my-custom-class-for-errors">
+                                {{ form_errors(form) }}
+                            </div>
+
+                            <div class="row">
+                                <div>
+                                    {% include 'transaction/subs/sub1.html.twig' %}
+                                </div>
+                                <br>
+
+                                <div>
+                                    {% include 'transaction/subs/sub2.html.twig' %}
+                                </div>
+                                <br>
+
+                                <div>
+                                    {% include 'transaction/subs/sub3.html.twig' %}
+                                </div>
+                                <br>
+
+                                <div>
+                                    {% include 'transaction/subs/sub4.html.twig' %}
+                                </div>
+                                <br>
+
+                                <div>
+                                    {% include 'transaction/subs/sub5.html.twig' %}
+                                </div>
+                                <br>
+
+                                {{ form_row(form._token) }}
+                                <div>
+                                    <br>
+                                    {{ form_widget(form.submit, {'attr': {'class': 'site-btn'}}) }}
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        (function(val) {
+            console.log(val);
+        })('test');
+    </script>
+
+
+
+{% endblock %}

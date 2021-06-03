@@ -1,0 +1,19 @@
+{% if  numberOfDebtors >= 2 %}
+    <div class="col">
+    <div>
+        <h3>Schuldner 2</h3>
+    </div>
+    <div>
+        <div>
+            {{ form_label(form.debtor2.amount, 'Betrag', {'label_attr': {'class': 'h2'}}) }}
+        </div>
+        {{ form_widget(form.debtor2.amount, {'attr': {'class': 'earch-form input'}}) }}
+
+        <div>
+            {{ form_label(form.debtor2.owner, 'Name', {'label_attr': {'class': 'h2'}}) }}
+        </div>
+        {{ form_widget(form.debtor2.owner, {'attr': {'class': 'earch-form input'}}) }}
+        <br>
+    </div>
+    <p style="border: 1px solid black;"><p></p>
+{% endif %}

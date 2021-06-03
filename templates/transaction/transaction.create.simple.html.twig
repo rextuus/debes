@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PaymentController!{% endblock %}
+
+{% block body %}
+    <section class="hero-section">
+        <div class="hero-slider owl-carousel">
+            <div class="hs-item">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hs-text">
+                                <h2><span>Das Wichtigste</span> zuerst</h2>
+
+                                {{ form_start(form, {'method': 'POST'}) }}
+                                <div class="my-custom-class-for-errors">
+                                    {{ form_errors(form) }}
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div>
+                                            {{ form_label(form.reason, 'Beschreibung', {'label_attr': {'class': 'h2'}}) }}
+                                        </div>
+                                        {{ form_widget(form.reason, {'attr': {'class': 'earch-form input'}}) }}
+
+                                    <br>
+
+                                        <div>
+                                            {{ form_label(form.amount, 'Betrag', {'label_attr': {'class': 'h2'}}) }}
+                                        </div>
+                                        {{ form_widget(form.amount, {'attr': {'class': 'earch-form input'}}) }}
+
+                                    <br>
+
+                                        <div>
+                                            {{ form_label(form.owner, 'Schuldner', {'label_attr': {'class': 'h2'}}) }}
+                                        </div>
+                                        {{ form_widget(form.owner, {'attr': {'class': 'earch-form input'}}) }}
+
+                                    <br>
+
+
+                                    {{ form_row(form._token) }}
+
+                                    <div>
+                                        <br>
+                                        {{ form_widget(form.submit, {'attr': {'class': 'site-btn'}}) }}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PaymentController!{% endblock %}
+
+{% block body %}
+    {{ render_debt_or_loan_list(user, true) }}
+{% endblock %}

@@ -56,9 +56,21 @@ class User implements UserInterface
      */
     private $PaymentOptions;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Debt::class, mappedBy="owner")
+     */
+    private $debts;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Loan::class, mappedBy="owner")
+     */
+    private $loans;
+
     public function __construct()
     {
         $this->PaymentOptions = new ArrayCollection();
+        $this->debts = new ArrayCollection();
+        $this->loans = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -73,7 +85,7 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->username;
+        return (string)$this->username;
     }
 
     public function setUsername(string $username): self
@@ -107,7 +119,7 @@ class User implements UserInterface
      */
     public function getPassword(): string
     {
-        return (string) $this->password;
+        return (string)$this->password;
     }
 
     public function setPassword(string $password): self
@@ -201,5 +213,75 @@ class User implements UserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection|Debt[]
+     */
+    public function getDebts(): Collection
+    {
+        return $this->debts;
+    }
+
+    public function addDebt(Debt $debt): self
+    {
+        if (!$this->debts->contains($debt)) {
+            $this->debts[] = $debt;
+            $debt->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDebt(Debt $debt): self
+    {
+        if ($this->debts->removeElement($debt)) {
+            // set the owning side to null (unless already changed)
+            if ($debt->getOwner() === $this) {
+                $debt->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Loan[]
+     */
+    public function getLoans(): Collection
+    {
+        return $this->loans;
+    }
+
+    public function addLoan(Loan $loan): self
+    {
+        if (!$this->loans->contains($loan)) {
+            $this->loans[] = $loan;
+            $loan->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLoan(Loan $loan): self
+    {
+        if ($this->loans->removeElement($loan)) {
+            // set the owning side to null (unless already changed)
+            if ($loan->getOwner() === $this) {
+                $loan->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * getFullName
+     *
+     * @return string
+     */
+    public function getFullName(): string
+    {
+        return $this->getFirstName() . ' ' . $this->getLastName();
     }
 }

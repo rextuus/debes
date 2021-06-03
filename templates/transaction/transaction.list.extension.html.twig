@@ -1,0 +1,127 @@
+<section class="hero-section">
+    <div class="hero-slider owl-carousel">
+        <div class="hs-item-own">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="hs-text">
+                            {% if debtVariant %}
+                                <h2><span>Schulden</span> sind nicht schön</h2>
+                                <p>Also versuch sie loszuwerden! Indem du hier den Überblick behältst</p>
+                            {% else %}
+                                <h2><span>Geld zu verleihen</span> ist wie Sparen</h2>
+                                <p>Zeit sich was schönes zu kaufen. Organisiere hier das Geldeintreiben</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        {% if debtVariant %}
+                            <h2>Noch nicht akzeptiert</h2>
+                        {% else %}
+                            <h2>Noch nicht akzeptiert</h2>
+                        {% endif %}
+                        <table class="table table-hover table-dark">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Betrag</th>
+                                {% if debtVariant %}
+                                    <th scope="col">Schuldner</th>
+                                {% else %}
+                                    <th scope="col">Gläubiger</th>
+                                {% endif %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for entry in ready %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ path('payment_update_paypal', {id: loop.index}) }}">{{ loop.index }}</a>
+                                    </td>
+                                    <td>
+                                        {{ entry.amount }}
+                                    </td>
+                                    <td>
+                                        {{ entry.transactionPartner }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <p></p>
+                        {% if debtVariant %}
+                            <h2>Akzeptiert</h2>
+                        {% else %}
+                            <h2>Akzeptiert</h2>
+                        {% endif %}
+                        <table class="table table-hover table-dark">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Betrag</th>
+                                {% if debtVariant %}
+                                    <th scope="col">Schuldner</th>
+                                {% else %}
+                                    <th scope="col">Gläubiger</th>
+                                {% endif %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for entry in accepted %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ path('payment_update_paypal', {id: loop.index}) }}">{{ loop.index }}</a>
+                                    </td>
+                                    <td>
+                                        {{ entry.amount }}
+                                    </td>
+                                    <td>
+                                        {{ entry.transactionPartner }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <p></p>
+                        {% if debtVariant %}
+                            <h2>Beglichen, aber von der Gegenpartei nicht bestätigt</h2>
+                        {% else %}
+                            <h2>Von dir noch nicht bestätigt</h2>
+                        {% endif %}
+
+                        <table class="table table-hover table-dark">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Betrag</th>
+                                {% if debtVariant %}
+                                    <th scope="col">Schuldner</th>
+                                {% else %}
+                                    <th scope="col">Gläubiger</th>
+                                {% endif %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for entry in cleared %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ path('payment_update_paypal', {id: loop.index}) }}">{{ loop.index }}</a>
+                                    </td>
+                                    <td>
+                                        {{ entry.amount }}
+                                    </td>
+                                    <td>
+                                        {{ entry.transactionPartner }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>

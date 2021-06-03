@@ -50,18 +50,19 @@
         </div>
     </div>
     <ul class="main-menu">
-        <li><a href="{{path('landing')}}">Home</a></li>
-        <li><a href="#">About</a></li>
         <li><a href="{{ path('account_overview') }}">Mein Bereich</a>
             <ul class="sub-menu">
-                <li><a href="playlist.html">Kredite</a></li>
-                <li><a href="artist.html">Darlehen</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="contact.html">Contact</a></li>
+                <li><a href="playlist.html">Darlehen</a></li>
+                <li><a href="artist.html">Kredite</a></li>
+                <li><a href="artist.html">Chronik</a></li>
                 <li><a href="{{ path('payment_overview') }}">Konten</a></li>
             </ul>
         </li>
+        <li><a href="{{path('landing')}}">Home</a></li>
+
+
         <li><a href="blog.html">News</a></li>
+        <li><a href="#">About</a></li>
         <li><a href="contact.html">Contact</a></li>
     </ul>
 </header>
