@@ -18,6 +18,16 @@ abstract class PaymentOptionData
     private $enabled;
 
     /**
+     * @boolean
+     */
+    private $preferred;
+
+    /**
+     * @var string
+     */
+    private $description;
+
+    /**
      * @return User
      */
     public function getOwner(): User
@@ -61,5 +71,37 @@ abstract class PaymentOptionData
         $this->setOwner($owner);
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPreferred()
+    {
+        return $this->preferred;
+    }
+
+    /**
+     * @param mixed $preferred
+     */
+    public function setPreferred($preferred): void
+    {
+        $this->preferred = $preferred;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
     }
 }

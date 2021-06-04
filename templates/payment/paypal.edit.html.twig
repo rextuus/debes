@@ -5,44 +5,44 @@
 {% block body %}
     <section class="hero-section">
         <div class="hero-slider owl-carousel">
-            <div class="hs-item">
+            <div class="hs-item-own">
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="hs-text">
-                                <h2><span>Änderungen</span> an deinem Paypalkonto</h2>
+                                <h2><span>Paypal-Konto</span> bearbeiten</h2>
 
+                                <p>Du nutzt Paypal online sowieso schon für alles? Dann lass dir Schulden doch einfach
+                                    direkt aufs Paypal-Konto überweisen</p>
                                 {{ form_start(form, {'method': 'POST'}) }}
                                 <div class="my-custom-class-for-errors">
                                     {{ form_errors(form) }}
                                 </div>
 
-                                <div class="row">
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th><p>Paypal Email: </p></th>
+                                        <td>{{ form_widget(form.email, {'attr': {'class': 'earch-form input'}}) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><p>Beschreibung: </p></th>
+                                        <td>{{ form_widget(form.description, {'attr': {'class': 'earch-form input'}}) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><p>Als verfügbar anzeigen: </p></th>
+                                        <td>{{ form_widget(form.enabled, {'attr': {'class': 'earch-form input'}}) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><p>Bevorzugtes Konto für Geldeingänge: </p></th>
+                                        <td>{{ form_widget(form.preferred, {'attr': {'class': 'earch-form input'}}) }}</td>
+                                    </tr>
+                                </table>
+                                {{ form_row(form._token) }}
 
-                                    <div class="col">
-                                        <div>
-                                            {{ form_label(form.email, 'Paypal Email', {'label_attr': {'class': 'h2'}}) }}
-                                        </div>
-                                        {{ form_widget(form.email, {'attr': {'class': 'earch-form input'}}) }}
-
-                                        <br>
-                                    </div>
-
-                                    <div class="col">
-                                        <div>
-                                            {{ form_label(form.enabled, 'Als verfügbar anzeigen', {'label_attr': {'class': 'h2'}}) }}
-                                        </div>
-                                        {{ form_widget(form.enabled, {'attr': {'class': 'earch-form input'}}) }}
-                                        <br>
-                                    </div>
-
-                                    {{ form_row(form._token) }}
-
-                                    <div>
-                                        <br>
-                                        {{ form_widget(form.submit, {'attr': {'class': 'site-btn'}}) }}
-                                    </div>
-
+                                <div>
+                                    <br>
+                                    {{ form_widget(form.submit, {'attr': {'class': 'site-btn 2'}}) }}
                                 </div>
                             </div>
                         </div>

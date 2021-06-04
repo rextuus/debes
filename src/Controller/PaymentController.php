@@ -69,6 +69,7 @@ class PaymentController extends AbstractController
 
         return $this->render('payment/bank.create.html.twig', [
             'form' => $form->createView(),
+            'descriptionValue' => $bankAccountService->getCurrentPaypalAccountDescriptionHint($requester)
         ]);
     }
 
@@ -123,6 +124,7 @@ class PaymentController extends AbstractController
 
         return $this->render('payment/paypal.create.html.twig', [
             'form' => $form->createView(),
+            'descriptionValue' => $paypalAccountService->getCurrentPaypalAccountDescriptionHint($requester)
         ]);
     }
 

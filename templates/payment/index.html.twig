@@ -27,35 +27,42 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Typ</th>
-                                    <th scope="col">Öffentlich</th>
+                                    <th scope="col">Aktiv</th>
+                                    <th scope="col">Standard</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for account in accounts %}
                                     <tr>
-                                    {% if  account.isPaypalAccount %}
-                                        <td>
-                                            <a href="{{ path('payment_update_paypal', {id: account.accountId}) }}">{{ loop.index }}</a>
-                                        </td>
-                                    {% else %}
-                                        <td>
-                                            <a href="{{ path('payment_update_bank', {id: account.accountId}) }}">{{ loop.index }}</a>
-                                        </td>
-                                    {% endif %}
+                                        {% if  account.isPaypalAccount %}
+                                            <td>
+                                                <a href="{{ path('payment_update_paypal', {id: account.accountId}) }}">{{ loop.index }}</a>
+                                            </td>
+                                        {% else %}
+                                            <td>
+                                                <a href="{{ path('payment_update_bank', {id: account.accountId}) }}">{{ loop.index }}</a>
+                                            </td>
+                                        {% endif %}
 
 
 
-                                    {% if  account.isPaypalAccount %}
-                                        <td>Paypal</td>
-                                    {% else %}
-                                        <td>Bankkonto</td>
-                                    {% endif %}
+                                        {% if  account.isPaypalAccount %}
+                                            <td>Paypal</td>
+                                        {% else %}
+                                            <td>Bankkonto</td>
+                                        {% endif %}
 
-                                    {% if  account.enabled %}
-                                        <td>&#10003;</td>
-                                    {% else %}
-                                        <td>&#10008;</td>
-                                    {% endif %}
+                                        {% if  account.enabled %}
+                                            <td>&#10003;</td>
+                                        {% else %}
+                                            <td>&#10008;</td>
+                                        {% endif %}
+
+                                        {% if  account.isPrioritised %}
+                                            <td>&#10003;</td>
+                                        {% else %}
+                                            <td>&#10008;</td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                                 </tbody>

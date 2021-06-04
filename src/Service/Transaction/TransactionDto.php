@@ -53,11 +53,17 @@ class TransactionDto
      */
     private $transactionPartner;
 
+    /**
+     * @var int
+     */
+    private $transactionId;
+
     public static function create(Transaction $transaction, bool $useDebt): TransactionDto
     {
         $dto = new self();
         $dto->setState($transaction->getState());
         $dto->setEdited($transaction->getEdited());
+        $dto->setTransactionId($transaction->getId());
 
         $debt = $transaction->getDebts()[0];
         $loan = $transaction->getLoans()[0];
@@ -200,5 +206,21 @@ class TransactionDto
     public function setTransactionPartner(string $transactionPartner): void
     {
         $this->transactionPartner = $transactionPartner;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTransactionId(): int
+    {
+        return $this->transactionId;
+    }
+
+    /**
+     * @param int $transactionId
+     */
+    public function setTransactionId(int $transactionId): void
+    {
+        $this->transactionId = $transactionId;
     }
 }

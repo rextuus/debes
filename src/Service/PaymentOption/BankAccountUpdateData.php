@@ -22,6 +22,8 @@ class BankAccountUpdateData extends BankAccountData
         $this->setBic($bankAccount->getBic());
         $this->setAccountName($bankAccount->getAccountName());
         $this->setBankName($bankAccount->getBankName());
+        $this->setDescription($bankAccount->getDescription());
+        $this->setPreferred($bankAccount->getIsPrioritised());
         return $this;
     }
 }

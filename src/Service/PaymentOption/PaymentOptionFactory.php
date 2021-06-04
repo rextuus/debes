@@ -36,6 +36,7 @@ class PaymentOptionFactory
      */
     public function mapData(PaymentOption $paymentOption, PaymentOptionData $data): void
     {
+        //TODO there should only be one payment method of each variant that has value standard = true
         if ($data instanceof BankAccountData) {
             /** @var BankAccount $paymentOption */
             $paymentOption->setBankName($data->getBankName());
@@ -49,6 +50,8 @@ class PaymentOptionFactory
 
         $paymentOption->setOwner($data->getOwner());
         $paymentOption->setEnabled($data->getEnabled());
+        $paymentOption->setIsPrioritised($data->getPreferred());
+        $paymentOption->setDescription($data->getDescription());
     }
 
     /**

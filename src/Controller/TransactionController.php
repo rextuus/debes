@@ -4,14 +4,17 @@ namespace App\Controller;
 
 use App\Entity\Transaction;
 use App\Entity\User;
+use App\Form\ChoiceType;
 use App\Form\TransactionCreateDebtorType;
 use App\Form\TransactionCreateSimpleType;
 use App\Form\TransactionCreateType;
-use App\Service\Transaction\DebtorsTrait;
+use App\Service\Debt\DebtDto;
+use App\Service\Loan\LoanDto;
 use App\Service\Transaction\TransactionCreateData;
 use App\Service\Transaction\TransactionCreateDebtorData;
 use App\Service\Transaction\TransactionData;
 use App\Service\Transaction\TransactionService;
+use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +28,9 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class TransactionController extends AbstractController
 {
+    const DEBTOR_VIEW = 'debtor';
+    const LOANER_VIEW = 'loaner';
+
     /**
      * @Route("/create/simple", name="transaction_create_simple")
      */
@@ -69,22 +75,140 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route('/accept/{transaction}', name='transaction_list')
+     * @Route("/accept/{transaction}", name="transaction_accept")
      */
-    public function acceptTransaction(Transaction $transaction, TransactionService $transactionService): Response
+    public function acceptTransaction(Transaction $transaction, Request $request, TransactionService $transactionService): Response
     {
         /** @var User $requester */
         $requester = $this->getUser();
 
-        $transactions = $transactionService->getAllTransactionBelongingUser($requester);
+        $isDebtor = $this->checkRequestForVariant($requester, $request->get('variant'), $transaction);
+        if ($isDebtor) {
+            $dto = DebtDto::create($transaction);
+            $labels = ['label' => ['submit' => 'akzeptieren', 'decline' => 'ablehnen']];
+        } else {
+            $dto = LoanDto::create($transaction);
+            $labels = ['label' => ['submit' => 'Zurückziehen', 'decline' => 'Zurückziehen']];
+        }
 
-        return $this->render('transaction/transaction.list.html.twig', [
-            'debtAmount' => 345.77,
-            'loanAmount' => 666.77,
-            'transactions' => $transactions,
+        $form = $this->createForm(ChoiceType::class, null, $labels);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $isAccepted = (bool)$form->get('submit')->isClicked();
+
+            if ($isDebtor) {
+                if ($isAccepted) {
+                    // TODO set Transaction to next state and send loaner notification
+                    $transactionService->acceptDebt($transaction);
+                } else {
+                    // TODO decline debt => send loaner notification
+                }
+                return $this->redirectToRoute('account_debts', []);
+            } else {
+                if ($isAccepted) {
+                    // TODO remove Transaction and send loaner notification
+                }
+                return $this->redirectToRoute('account_loans', []);
+            }
+        }
+
+        return $this->render('transaction/transaction.accept.html.twig', [
+            'debtVariant' => $isDebtor,
+            'dto' => $dto,
+            'form' => $form->createView(),
         ]);
     }
 
+    /**
+     * @Route("/process/{transaction}", name="transaction_process")
+     */
+    public function processTransaction(Transaction $transaction, Request $request): Response
+    {
+        /** @var User $requester */
+        $requester = $this->getUser();
+
+        $isDebtor = $this->checkRequestForVariant($requester, $request->get('variant'), $transaction);
+        if ($isDebtor) {
+            $dto = DebtDto::create($transaction);
+            $labels = ['label' => ['submit' => 'Überweisen', 'decline' => 'Überweisen']];
+        } else {
+            $dto = LoanDto::create($transaction);
+            $labels = ['label' => ['submit' => 'Mahn-Mail senden', 'decline' => 'Mahn-Mail senden']];
+        }
+
+        $form = $this->createForm(ChoiceType::class, null, $labels);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $isAccepted = (bool)$form->get('submit')->isClicked();
+
+            if ($isDebtor) {
+                if ($isAccepted) {
+                    return $this->redirect($this->generateUrl('transfer_prepare', ['transaction' => $transaction->getId()]));
+                } else {
+                    // TODO decline debt => send loaner notification
+                }
+                return $this->redirectToRoute('account_debts', []);
+            } else {
+                if ($isAccepted) {
+                    // TODO remove Transaction and send loaner notification
+                }
+                return $this->redirectToRoute('account_loans', []);
+            }
+        }
+
+        return $this->render('transaction/transaction.process.html.twig', [
+            'debtVariant' => $isDebtor,
+            'dto' => $dto,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/confirm/{transaction}", name="transaction_confirm")
+     */
+    public function confirmTransaction(Transaction $transaction, Request $request): Response
+    {
+        /** @var User $requester */
+        $requester = $this->getUser();
+
+        $isDebtor = $this->checkRequestForVariant($requester, $request->get('variant'), $transaction);
+        if ($isDebtor) {
+            $dto = DebtDto::create($transaction);
+            $labels = ['label' => ['submit' => 'Bestätigen', 'decline' => 'Bestätigen']];
+        } else {
+            $dto = LoanDto::create($transaction);
+            $labels = ['label' => ['submit' => 'Bestätigen', 'decline' => 'Bestätigen']];
+        }
+
+        $form = $this->createForm(ChoiceType::class, null, $labels);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $isAccepted = (bool)$form->get('submit')->isClicked();
+
+            if ($isDebtor) {
+                if ($isAccepted) {
+                    // TODO
+                } else {
+                    // TODO send loaner notification to remind him that transaction was succeeded
+                }
+                return $this->redirectToRoute('account_debts', []);
+            } else {
+                if ($isAccepted) {
+                    // TODO set transaction to history state and inform debtor that all is fine
+                }
+                return $this->redirectToRoute('account_loans', []);
+            }
+        }
+
+        return $this->render('transaction/transaction.confirm.html.twig', [
+            'debtVariant' => $isDebtor,
+            'dto' => $dto,
+            'form' => $form->createView(),
+        ]);
+    }
 
     /**
      * @Route("/edit", name="transaction_edit")
@@ -96,35 +220,13 @@ class TransactionController extends AbstractController
         ]);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * @Route("/create", name="transaction_create")
      */
-    public function createTransaction(Request $request, TransactionService $transactionService): Response
-    {
+    public function createTransaction(
+        Request $request,
+        TransactionService $transactionService
+    ): Response {
         $transactionData = (new TransactionCreateData());
         $form = $this->createForm(TransactionCreateType::class, $transactionData);
 
@@ -164,12 +266,14 @@ class TransactionController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-    
+
     /**
      * @Route("/create/debtors", name="transaction_create_debtors")
      */
-    public function createTransactionDebtors(Request $request, TransactionService $transactionService): Response
-    {
+    public function createTransactionDebtors(
+        Request $request,
+        TransactionService $transactionService
+    ): Response {
         $transactionData = (new TransactionCreateDebtorType());
         $form = $this->createForm(TransactionCreateDebtorType::class, $transactionData);
 
@@ -187,5 +291,32 @@ class TransactionController extends AbstractController
         return $this->render('transaction/transaction.create.details.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * checkRequestForVariant
+     *
+     * @param User        $requester
+     * @param string      $variant
+     * @param Transaction $transaction
+     *
+     * @return bool
+     * @throws Exception
+     */
+    private function checkRequestForVariant(User $requester, string $variant, Transaction $transaction): bool
+    {
+        if ($variant === self::DEBTOR_VIEW) {
+            if ($requester !== $transaction->getDebts()[0]->getOwner()) {
+                throw new Exception('User is not the debtor of this transaction');
+            }
+            return true;
+        } elseif ($variant === self::LOANER_VIEW) {
+            if ($requester !== $transaction->getLoans()[0]->getOwner()) {
+                throw new Exception('User is not the loaner of this transaction');
+            }
+            return false;
+        } else {
+            throw new Exception('User is not involved in this transaction');
+        }
     }
 }

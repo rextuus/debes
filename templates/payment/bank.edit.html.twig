@@ -5,71 +5,61 @@
 {% block body %}
     <section class="hero-section">
         <div class="hero-slider owl-carousel">
-            <div class="hs-item">
+            <div class="hs-item-own">
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="hs-text">
-                                <h2><span>Änderungen</span> an deinem Bankkonto</h2>
+                                <h2><span>Bank-Konto</span> bearbeiten</h2>
 
                                 {{ form_start(form, {'method': 'POST'}) }}
                                 <div class="my-custom-class-for-errors">
                                     {{ form_errors(form) }}
                                 </div>
 
-                                <div class="row">
-                                    <div class="col">
-                                        <div>
-                                            {{ form_label(form.accountName, 'Kontoinhaber', {'label_attr': {'class': 'h2'}}) }}
-                                        </div>
-                                        {{ form_widget(form.accountName, {'attr': {'class': 'earch-form input'}}) }}
-                                    </div>
-                                    <br>
-                                    <div class="col">
-                                        <div>
-                                            {{ form_label(form.bankName, 'Name der Bank', {'label_attr': {'class': 'h2'}}) }}
-                                        </div>
-                                        {{ form_widget(form.bankName, {'attr': {'class': 'earch-form input'}}) }}
-                                    </div>
-                                    <br>
-                                    <div class="col">
-                                        <div>
-                                            {{ form_label(form.iban, 'IBAN', {'label_attr': {'class': 'h2'}}) }}
-                                        </div>
-                                        {{ form_widget(form.iban, {'attr': {'class': 'earch-form input'}}) }}
-                                    </div>
-                                    <br>
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th><p>Kontoinhaber: </p></th>
+                                        <td>{{ form_widget(form.accountName, {'attr': {'class': 'earch-form input'}}) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><p>Name der Bank: </p></th>
+                                        <td>{{ form_widget(form.bankName, {'attr': {'class': 'earch-form input'}}) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><p>IBAN: </p></th>
+                                        <td>{{ form_widget(form.iban, {'attr': {'class': 'earch-form input'}}) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><p>BIC: </p></th>
+                                        <td>{{ form_widget(form.bic, {'attr': {'class': 'earch-form input'}}) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><p>Beschreibung: </p></th>
+                                        <td>{{ form_widget(form.description, {'attr': {'class': 'earch-form input'}}) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><p>Als verfügbar anzeigen: </p></th>
+                                        <td>{{ form_widget(form.enabled, {'attr': {'class': 'earch-form input'}}) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><p>Bevorzugtes Konto für Geldeingänge: </p></th>
+                                        <td>{{ form_widget(form.preferred, {'attr': {'class': 'earch-form input'}}) }}</td>
+                                    </tr>
+                                </table>
 
-                                    <div class="col">
-                                        <div>
-                                            {{ form_label(form.bic, 'BIC', {'label_attr': {'class': 'h2'}}) }}
-                                        </div>
-                                        {{ form_widget(form.bic, {'attr': {'class': 'earch-form input'}}) }}
+                                {{ form_row(form._token) }}
+                                {{ form_widget(form.submit, {'attr': {'class': 'site-btn'}}) }}
 
-                                        <br>
-                                    </div>
 
-                                    <div class="col">
-                                        <div>
-                                            {{ form_label(form.enabled, 'Als verfügbar anzeigen', {'label_attr': {'class': 'h2'}}) }}
-                                        </div>
-                                        {{ form_widget(form.enabled, {'attr': {'class': 'earch-form input'}}) }}
-                                        <br>
-                                    </div>
-
-                                    {{ form_row(form._token) }}
-
-                                    <div>
-                                        <br>
-                                        {{ form_widget(form.submit, {'attr': {'class': 'site-btn'}}) }}
-                                    </div>
-
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 {% endblock %}

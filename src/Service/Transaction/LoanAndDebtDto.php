@@ -45,6 +45,11 @@ abstract class LoanAndDebtDto
     private $reason;
 
     /**
+     * @var int
+     */
+    private $transactionId;
+
+    /**
      * create
      *
      * @param Transaction    $transaction
@@ -58,6 +63,7 @@ abstract class LoanAndDebtDto
         $dto->setEdited($transaction->getEdited());
         $dto->setState($transaction->getState());
         $dto->setReason($transaction->getReason());
+        $dto->setTransactionId($transaction->getId());
     }
 
     /**
@@ -77,11 +83,11 @@ abstract class LoanAndDebtDto
     }
 
     /**
-     * @return DateTimeInterface
+     * @return string
      */
-    public function getCreated(): DateTimeInterface
+    public function getCreated(): string
     {
-        return $this->created;
+        return $this->created->format("d.m.Y");
     }
 
     /**
@@ -165,5 +171,21 @@ abstract class LoanAndDebtDto
     public function setReason(string $reason): void
     {
         $this->reason = $reason;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTransactionId(): int
+    {
+        return $this->transactionId;
+    }
+
+    /**
+     * @param int $transactionId
+     */
+    public function setTransactionId(int $transactionId): void
+    {
+        $this->transactionId = $transactionId;
     }
 }

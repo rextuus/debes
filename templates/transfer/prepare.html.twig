@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello TransferController!{% endblock %}
+
+{% block body %}
+    <section class="hero-section">
+        <div class="hero-slider owl-carousel">
+            <div class="hs-item-own">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hs-text">
+                                <h2><span>Zahl es</span> zurück!</h2>
+
+
+                                <h2><span>Schuld vom</span></h2>
+                                <h2> {{ dto.created }}</h2>
+
+
+                                <table class="table table-hover table-dark">
+                                    <tr>
+                                        <th scope="col">Darlehensgeber</th>
+
+                                        <td>{{ dto.transactionPartner }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="col">Betrag</th>
+                                        <td>{{ dto.amount }} €</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="col">Grund</th>
+                                        <td>{{ dto.reason }}</td>
+                                    </tr>
+                                </table>
+                                <p>Über welche Zahlungsmethode möchtest du das Geld überweisen?</p>
+
+                                {{ form_start(form, {'method': 'POST'}) }}
+                                <div class="my-custom-class-for-errors">
+                                    {{ form_errors(form) }}
+                                </div>
+
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th><p>Kontoauswahl: </p></th>
+                                        <td>{{ form_widget(form.paymentOption, {'attr': {'class': 'earch-form input'}}) }}</td>
+                                    </tr>
+                                </table>
+
+                                {{ form_row(form._token) }}
+                                {{ form_widget(form.submit, {'attr': {'class': 'site-btn'}}) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+{% endblock %}
+

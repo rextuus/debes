@@ -202,4 +202,20 @@ class TransactionService
         }
         return $dtos;
     }
+
+    /**
+     * acceptDebt
+     *
+     * @param Transaction $transaction
+     *
+     * @return void
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function acceptDebt(Transaction $transaction): void
+    {
+        $transactionData = (new TransactionUpdateData())->initFrom($transaction);
+        $transactionData->setState(Transaction::STATE_ACCEPTED);
+        $this->update($transaction, $transactionData);
+    }
 }

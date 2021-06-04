@@ -20,7 +20,9 @@ class BankAccountUpdateType extends AbstractType
             ->add('bic', TextType::class)
             ->add('accountName', TextType::class)
             ->add('bankName', TextType::class)
+            ->add('description', TextType::class)
             ->add('enabled', CheckboxType::class, ['required' => false])
+            ->add('preferred', CheckboxType::class, ['required' => false])
             ->add('submit', SubmitType::class, ['label' => 'Änderungen speichern']);
     }
 

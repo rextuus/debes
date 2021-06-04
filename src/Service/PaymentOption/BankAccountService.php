@@ -79,7 +79,7 @@ class BankAccountService
     {
         $accounts = $this->bankAccountRepository->findBy(['owner' => $user]);
         $dtos = array();
-        foreach ($accounts as $account){
+        foreach ($accounts as $account) {
             $dtos[] = $this->createDtoFromEntity($account);
         }
         return $dtos;
@@ -99,6 +99,19 @@ class BankAccountService
         $dto->setIsPaypalAccount(false);
         $dto->setEnabled($account->getEnabled());
         $dto->setAccountId($account->getId());
+        $dto->setIsPrioritised($account->getIsPrioritised());
         return $dto;
+    }
+
+    /**
+     * getCurrentPaypalAccountDescriptionHint
+     *
+     * @param User $requester
+     *
+     * @return string
+     */
+    public function getCurrentPaypalAccountDescriptionHint(User $requester): string
+    {
+        return 'Bank_Konto_' . ($this->bankAccountRepository->getPaypalAccountCountForUser($requester)+1);
     }
 }

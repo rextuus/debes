@@ -5,7 +5,7 @@ namespace App\Service\Transaction;
 use App\Entity\Debt;
 use App\Entity\Loan;
 use App\Entity\User;
-use DateTime;
+use Doctrine\Common\Collections\Collection;
 
 class TransactionData
 {
@@ -16,12 +16,12 @@ class TransactionData
     private $amount;
 
     /**
-     * @var Debt[]
+     * @var Collection|Debt[]
      */
     private $debts;
 
     /**
-     * @var Loan[]
+     * @var Collection|Loan[]
      */
     private $loans;
 
@@ -65,9 +65,9 @@ class TransactionData
     }
 
     /**
-     * @param Debt[] $debts
+     * @param Collection|Debt[] $debts
      */
-    public function setDebts(array $debts): void
+    public function setDebts(Collection $debts): void
     {
         $this->debts = $debts;
     }
@@ -81,9 +81,9 @@ class TransactionData
     }
 
     /**
-     * @param Loan[] $loans
+     * @param Collection|Loan[] $loans
      */
-    public function setLoans(array $loans): void
+    public function setLoans(Collection $loans): void
     {
         $this->loans = $loans;
     }
@@ -135,6 +135,4 @@ class TransactionData
     {
         $this->state = $state;
     }
-
-
 }

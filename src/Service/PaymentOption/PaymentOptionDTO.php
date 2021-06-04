@@ -26,6 +26,12 @@ class PaymentOptionDTO
     private $accountId;
 
     /**
+     * @boolean
+     */
+    private $isPrioritised;
+
+
+    /**
      * @return mixed
      */
     public function getIsBankAccount()
@@ -87,5 +93,21 @@ class PaymentOptionDTO
     public function setAccountId($accountId): void
     {
         $this->accountId = $accountId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsPrioritised()
+    {
+        return $this->isPrioritised;
+    }
+
+    /**
+     * @param mixed $isPrioritised
+     */
+    public function setIsPrioritised($isPrioritised): void
+    {
+        $this->isPrioritised = $isPrioritised;
     }
 }

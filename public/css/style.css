@@ -440,6 +440,27 @@ Hero section
 	opacity: 0;
 }
 
+.hs-item-own table {
+	display: table;
+}
+
+.hs-item-own row {
+	display: table-row;
+}
+
+.hs-item-own cell {
+	display: table-cell;
+	padding: 10px;
+}
+
+.hs-item-own row:hover {
+	background-color: #000000;
+}
+
+.hs-item-own cell:hover {
+	background-color: #000000;
+}
+
 .hs-item h2 {
 	color: #fff;
 	font-size: 70px;
@@ -541,6 +562,7 @@ Hero section
 .owl-item.active .hs-item-own h2,
 .owl-item.active .hs-item-own h3,
 .owl-item.active .hs-item-own h4,
+.owl-item.active .hs-item-own table,
 .owl-item.active .hs-item img,
 .owl-item.active .hs-item h2,
 .owl-item.active .hs-item h3,
@@ -586,6 +608,11 @@ Hero section
 }
 
 .owl-item.active .hs-item-own h4 {
+	-webkit-transition: all 0.5s ease 0.4s;
+	transition: all 0.5s ease 0.4s;
+}
+
+.owl-item.active .hs-item-own table {
 	-webkit-transition: all 0.5s ease 0.4s;
 	transition: all 0.5s ease 0.4s;
 }

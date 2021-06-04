@@ -19,6 +19,8 @@ class PaypalAccountUpdateData extends PaypalAccountData
         $this->setEnabled($paypalAccount->getEnabled());
         $this->setOwner($paypalAccount->getOwner());
         $this->setEmail($paypalAccount->getEmail());
+        $this->setDescription($paypalAccount->getDescription());
+        $this->setPreferred($paypalAccount->getIsPrioritised());
         return $this;
     }
 }

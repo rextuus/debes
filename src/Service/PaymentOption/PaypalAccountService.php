@@ -70,6 +70,18 @@ class PaypalAccountService
     }
 
     /**
+     * getPaypalAccountCountForUser
+     *
+     * @param User $requester
+     *
+     * @return string
+     */
+    public function getCurrentPaypalAccountDescriptionHint(User $requester): string
+    {
+        return 'Paypal_Konto_'.($this->paypalAccountRepository->getPaypalAccountCountForUser($requester)+1);
+    }
+
+    /**
      * update
      *
      * @param PaypalAccount           $paypalAccount
@@ -100,6 +112,7 @@ class PaypalAccountService
         $dto->setIsPaypalAccount(true);
         $dto->setEnabled($account->getEnabled());
         $dto->setAccountId($account->getId());
+        $dto->setIsPrioritised($account->getIsPrioritised());
         return $dto;
     }
 }

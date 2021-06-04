@@ -2,7 +2,9 @@
 
 namespace App\Service\Transaction;
 
+use App\Entity\Transaction;
 use DateTime;
+use DateTimeInterface;
 
 class TransactionUpdateData extends TransactionData
 {
@@ -12,7 +14,7 @@ class TransactionUpdateData extends TransactionData
     private $created;
 
     /**
-     * @var DateTime|null
+     * @var DateTimeInterface|null
      */
     private $edited;
 
@@ -22,9 +24,9 @@ class TransactionUpdateData extends TransactionData
     private $state;
 
     /**
-     * @return DateTime
+     * @return DateTimeInterface
      */
-    public function getCreated(): DateTime
+    public function getCreated(): DateTimeInterface
     {
         return $this->created;
     }
@@ -32,23 +34,23 @@ class TransactionUpdateData extends TransactionData
     /**
      * @param DateTime $created
      */
-    public function setCreated(DateTime $created): void
+    public function setCreated(DateTimeInterface $created): void
     {
         $this->created = $created;
     }
 
     /**
-     * @return DateTime|null
+     * @return DateTimeInterface|null
      */
-    public function getEdited(): ?DateTime
+    public function getEdited(): ?DateTimeInterface
     {
         return $this->edited;
     }
 
     /**
-     * @param DateTime|null $edited
+     * @param DateTimeInterface|null $edited
      */
-    public function setEdited(?DateTime $edited): void
+    public function setEdited(?DateTimeInterface $edited): void
     {
         $this->edited = $edited;
     }
@@ -67,5 +69,24 @@ class TransactionUpdateData extends TransactionData
     public function setState(?string $state): void
     {
         $this->state = $state;
+    }
+
+    /**
+     * initFrom
+     *
+     * @param Transaction $transaction
+     *
+     * @return TransactionUpdateData
+     */
+    public function initFrom(Transaction $transaction): TransactionUpdateData
+    {
+        $this->setReason($transaction->getReason());
+        $this->setState($transaction->getState());
+        $this->setAmount($transaction->getAmount());
+        $this->setDebts($transaction->getDebts());
+        $this->setLoans($transaction->getLoans());
+        $this->setCreated($transaction->getCreated());
+        $this->setEdited($transaction->getEdited());
+        return $this;
     }
 }

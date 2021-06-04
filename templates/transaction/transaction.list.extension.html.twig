@@ -36,7 +36,11 @@
                             {% for entry in ready %}
                                 <tr>
                                     <td>
-                                        <a href="{{ path('payment_update_paypal', {id: loop.index}) }}">{{ loop.index }}</a>
+                                        {% if debtVariant %}
+                                            <a href="{{ path('transaction_accept', {transaction: entry.transactionId, variant: 'debtor'}) }}">{{ loop.index }}</a>
+                                        {% else %}
+                                            <a href="{{ path('transaction_accept', {transaction: entry.transactionId, variant: 'loaner'}) }}">{{ loop.index }}</a>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {{ entry.amount }}
@@ -70,7 +74,11 @@
                             {% for entry in accepted %}
                                 <tr>
                                     <td>
-                                        <a href="{{ path('payment_update_paypal', {id: loop.index}) }}">{{ loop.index }}</a>
+                                        {% if debtVariant %}
+                                            <a href="{{ path('transaction_process', {transaction: entry.transactionId, variant: 'debtor'}) }}">{{ loop.index }}</a>
+                                        {% else %}
+                                            <a href="{{ path('transaction_process', {transaction: entry.transactionId, variant: 'loaner'}) }}">{{ loop.index }}</a>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {{ entry.amount }}
@@ -105,7 +113,11 @@
                             {% for entry in cleared %}
                                 <tr>
                                     <td>
-                                        <a href="{{ path('payment_update_paypal', {id: loop.index}) }}">{{ loop.index }}</a>
+                                        {% if debtVariant %}
+                                            <a href="{{ path('transaction_confirm', {transaction: entry.transactionId, variant: 'debtor'}) }}">{{ loop.index }}</a>
+                                        {% else %}
+                                            <a href="{{ path('transaction_confirm', {transaction: entry.transactionId, variant: 'loaner'}) }}">{{ loop.index }}</a>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {{ entry.amount }}
