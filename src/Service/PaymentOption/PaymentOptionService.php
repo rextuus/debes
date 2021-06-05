@@ -115,7 +115,7 @@ class PaymentOptionService
         );
 
         if (!$default){
-            $this->paypalAccountRepository->findOneBy(
+            $default = $this->paypalAccountRepository->findOneBy(
                 [
                     'owner' => $user,
                     'enabled' => true,
@@ -125,7 +125,7 @@ class PaymentOptionService
         }
 
         if (!$default){
-            $this->bankAccountRepository->findOneBy(
+            $default = $this->bankAccountRepository->findOneBy(
                 [
                     'owner' => $user,
                     'enabled' => true
@@ -134,7 +134,7 @@ class PaymentOptionService
         }
 
         if (!$default){
-            $this->paypalAccountRepository->findOneBy(
+            $default = $this->paypalAccountRepository->findOneBy(
                 [
                     'owner' => $user,
                     'enabled' => true

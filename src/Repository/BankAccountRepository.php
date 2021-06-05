@@ -40,7 +40,7 @@ class BankAccountRepository extends ServiceEntityRepository
     }
 
     /**
-     * getPaypalAccountCountForUser
+     * getBankAccountCountForUser
      *
      * @param User $owner
      *
@@ -48,7 +48,7 @@ class BankAccountRepository extends ServiceEntityRepository
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getPaypalAccountCountForUser(User $owner): int
+    public function getBankAccountCountForUser(User $owner): int
     {
         $qb = $this->createQueryBuilder('b')
             ->select('count(b.id)')

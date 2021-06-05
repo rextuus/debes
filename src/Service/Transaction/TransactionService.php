@@ -11,6 +11,7 @@ use App\Service\Debt\DebtService;
 use App\Service\Loan\LoanCreateData;
 use App\Service\Loan\LoanDto;
 use App\Service\Loan\LoanService;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
@@ -18,6 +19,8 @@ use Doctrine\ORM\ORMException;
 
 class TransactionService
 {
+    const DEBTOR_VIEW = 'debtor';
+    const LOANER_VIEW = 'loaner';
 
     /**
      * @var TransactionFactory
@@ -212,10 +215,42 @@ class TransactionService
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function acceptDebt(Transaction $transaction): void
+    public function acceptTransaction(Transaction $transaction): void
     {
         $transactionData = (new TransactionUpdateData())->initFrom($transaction);
         $transactionData->setState(Transaction::STATE_ACCEPTED);
         $this->update($transaction, $transactionData);
+    }
+
+    /**
+     * checkRequestForVariant
+     *
+     * @param User        $requester
+     * @param Transaction $transaction
+     * @param string      $variant
+     * @param string      $state
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function checkRequestForVariant(User $requester, Transaction $transaction, string $variant, string $state): bool
+    {
+        if ($transaction->getState() !== $state){
+            throw new Exception('Transaction is not in correct sate');
+        }
+
+        if ($variant === self::DEBTOR_VIEW) {
+            if ($requester !== $transaction->getDebts()[0]->getOwner()) {
+                throw new Exception('User is not the debtor of this transaction');
+            }
+            return true;
+        } elseif ($variant === self::LOANER_VIEW) {
+            if ($requester !== $transaction->getLoans()[0]->getOwner()) {
+                throw new Exception('User is not the loaner of this transaction');
+            }
+            return false;
+        } else {
+            throw new Exception('User is not involved in this transaction');
+        }
     }
 }

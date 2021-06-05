@@ -5,6 +5,8 @@ namespace App\Service\PaymentOption;
 use App\Entity\BankAccount;
 use App\Entity\User;
 use App\Repository\BankAccountRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Exception;
@@ -109,9 +111,40 @@ class BankAccountService
      * @param User $requester
      *
      * @return string
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getCurrentPaypalAccountDescriptionHint(User $requester): string
     {
-        return 'Bank_Konto_' . ($this->bankAccountRepository->getPaypalAccountCountForUser($requester)+1);
+        return 'Bank_Konto_' . ($this->bankAccountRepository->getBankAccountCountForUser($requester) + 1);
+    }
+
+    /**
+     * getActiveBankAccountForUser
+     *
+     * @param User $user
+     *
+     * @return BankAccount
+     */
+    public function getActiveBankAccountForUser(User $user): BankAccount
+    {
+        $default = $this->bankAccountRepository->findOneBy(
+            [
+                'owner' => $user,
+                'enabled' => true,
+                'isPrioritised' => true,
+            ]
+        );
+
+        if (!$default) {
+            $default = $this->bankAccountRepository->findOneBy(
+                [
+                    'owner' => $user,
+                    'enabled' => true,
+                ]
+            );
+        }
+
+        return $default;
     }
 }

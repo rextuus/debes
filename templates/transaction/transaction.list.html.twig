@@ -22,6 +22,11 @@
                                             <p>Aber {{ transaction.transactionPartner }} bekommt noch </p>
                                             <h3><span>{{ transaction.amount }} € </span></h3> <p>von dir</p>
                                             <a href="{{ path('transaction_process', {transaction: transaction.transactionId, variant: 'debtor'}) }}" class="site-btn debt">Zur Schuld</a>
+                                        {% elseif transaction.state == 3 %}
+                                            <h2><span>Es ist nicht </span> deine Schuld</h2>
+                                            <p>{{ transaction.transactionPartner }} hat den Eingang von </p>
+                                            <h3><span>{{ transaction.amount }} € </span></h3> <p>wohl noch nicht bemerkt</p>
+                                            <a href="{{ path('transaction_confirm', {transaction: transaction.transactionId, variant: 'debtor'}) }}" class="site-btn debt">Zur Schuld</a>
                                         {% elseif transaction.state == 4 %}
                                             <h2><span>Es war nicht </span> deine Schuld</h2>
                                             <p>{{ transaction.transactionPartner }} sieht das nun auch so und hat den

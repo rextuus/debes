@@ -28,13 +28,23 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class TransactionController extends AbstractController
 {
-    const DEBTOR_VIEW = 'debtor';
-    const LOANER_VIEW = 'loaner';
+    /**
+     * @var TransactionService
+     */
+    private $transactionService;
+
+    /**
+     * TransactionController constructor.
+     */
+    public function __construct(TransactionService $transactionService)
+    {
+        $this->transactionService = $transactionService;
+    }
 
     /**
      * @Route("/create/simple", name="transaction_create_simple")
      */
-    public function createSimpleTransaction(Request $request, TransactionService $transactionService): Response
+    public function createSimpleTransaction(Request $request): Response
     {
         /** @var User $requester */
         $requester = $this->getUser();
@@ -48,7 +58,7 @@ class TransactionController extends AbstractController
             /** @var TransactionData $data */
             $data = $form->getData();
 
-            $transactionService->storeSimpleTransaction($data, $requester);
+            $this->transactionService->storeSimpleTransaction($data, $requester);
             return $this->redirect($this->generateUrl('transaction_overview'));
         }
 
@@ -60,12 +70,12 @@ class TransactionController extends AbstractController
     /**
      * @Route("/", name="transaction_list")
      */
-    public function listTransactionsForUser(TransactionService $transactionService): Response
+    public function listTransactionsForUser(): Response
     {
         /** @var User $requester */
         $requester = $this->getUser();
 
-        $transactions = $transactionService->getAllTransactionBelongingUser($requester);
+        $transactions = $this->transactionService->getAllTransactionBelongingUser($requester);
 
         return $this->render('transaction/transaction.list.html.twig', [
             'debtAmount' => 345.77,
@@ -77,12 +87,18 @@ class TransactionController extends AbstractController
     /**
      * @Route("/accept/{transaction}", name="transaction_accept")
      */
-    public function acceptTransaction(Transaction $transaction, Request $request, TransactionService $transactionService): Response
+    public function acceptTransaction(Transaction $transaction, Request $request): Response
     {
         /** @var User $requester */
         $requester = $this->getUser();
 
-        $isDebtor = $this->checkRequestForVariant($requester, $request->get('variant'), $transaction);
+        $isDebtor = $this->transactionService->checkRequestForVariant(
+            $requester,
+            $transaction,
+            $request->get('variant'),
+            Transaction::STATE_READY
+        );
+
         if ($isDebtor) {
             $dto = DebtDto::create($transaction);
             $labels = ['label' => ['submit' => 'akzeptieren', 'decline' => 'ablehnen']];
@@ -100,7 +116,7 @@ class TransactionController extends AbstractController
             if ($isDebtor) {
                 if ($isAccepted) {
                     // TODO set Transaction to next state and send loaner notification
-                    $transactionService->acceptDebt($transaction);
+                    $this->transactionService->acceptTransaction($transaction);
                 } else {
                     // TODO decline debt => send loaner notification
                 }
@@ -128,7 +144,13 @@ class TransactionController extends AbstractController
         /** @var User $requester */
         $requester = $this->getUser();
 
-        $isDebtor = $this->checkRequestForVariant($requester, $request->get('variant'), $transaction);
+        $isDebtor = $this->transactionService->checkRequestForVariant(
+            $requester,
+            $transaction,
+            $request->get('variant'),
+            Transaction::STATE_ACCEPTED
+        );
+
         if ($isDebtor) {
             $dto = DebtDto::create($transaction);
             $labels = ['label' => ['submit' => 'Überweisen', 'decline' => 'Überweisen']];
@@ -145,7 +167,8 @@ class TransactionController extends AbstractController
 
             if ($isDebtor) {
                 if ($isAccepted) {
-                    return $this->redirect($this->generateUrl('transfer_prepare', ['transaction' => $transaction->getId()]));
+                    return $this->redirect($this->generateUrl('transfer_prepare',
+                        ['transaction' => $transaction->getId()]));
                 } else {
                     // TODO decline debt => send loaner notification
                 }
@@ -173,13 +196,19 @@ class TransactionController extends AbstractController
         /** @var User $requester */
         $requester = $this->getUser();
 
-        $isDebtor = $this->checkRequestForVariant($requester, $request->get('variant'), $transaction);
+        $isDebtor = $this->transactionService->checkRequestForVariant(
+            $requester,
+            $transaction,
+            $request->get('variant'),
+            Transaction::STATE_CLEARED
+        );
+
         if ($isDebtor) {
             $dto = DebtDto::create($transaction);
             $labels = ['label' => ['submit' => 'Bestätigen', 'decline' => 'Bestätigen']];
         } else {
             $dto = LoanDto::create($transaction);
-            $labels = ['label' => ['submit' => 'Bestätigen', 'decline' => 'Bestätigen']];
+            $labels = ['label' => ['submit' => 'Bestätigen', 'decline' => 'Bemängeln']];
         }
 
         $form = $this->createForm(ChoiceType::class, null, $labels);
@@ -224,8 +253,7 @@ class TransactionController extends AbstractController
      * @Route("/create", name="transaction_create")
      */
     public function createTransaction(
-        Request $request,
-        TransactionService $transactionService
+        Request $request
     ): Response {
         $transactionData = (new TransactionCreateData());
         $form = $this->createForm(TransactionCreateType::class, $transactionData);
@@ -291,32 +319,5 @@ class TransactionController extends AbstractController
         return $this->render('transaction/transaction.create.details.html.twig', [
             'form' => $form->createView(),
         ]);
-    }
-
-    /**
-     * checkRequestForVariant
-     *
-     * @param User        $requester
-     * @param string      $variant
-     * @param Transaction $transaction
-     *
-     * @return bool
-     * @throws Exception
-     */
-    private function checkRequestForVariant(User $requester, string $variant, Transaction $transaction): bool
-    {
-        if ($variant === self::DEBTOR_VIEW) {
-            if ($requester !== $transaction->getDebts()[0]->getOwner()) {
-                throw new Exception('User is not the debtor of this transaction');
-            }
-            return true;
-        } elseif ($variant === self::LOANER_VIEW) {
-            if ($requester !== $transaction->getLoans()[0]->getOwner()) {
-                throw new Exception('User is not the loaner of this transaction');
-            }
-            return false;
-        } else {
-            throw new Exception('User is not involved in this transaction');
-        }
     }
 }
