@@ -1,0 +1,32 @@
+{% apply inline_css %}
+    <style>
+        body {
+            color: #ffffff;
+            background-color: #2a4028;
+            text-align: center;
+        }
+
+        h2 {
+            color: #ffffff;
+            font-size: 70px;
+        }
+
+        h2 span {
+            color: #0b8270;
+        }
+
+        p {
+            text-align: left;
+        }
+
+        center {
+
+        }
+    </style>
+
+    {% if type == 1 %}
+    <h2><span>Schulden</span> erfolgreich eingetrieben!</h2>
+    {% endif %}
+    <h3>Hallo <span>{{ userName }}</span></h3>
+    <p>{{ text }}</p>
+{% endapply %}
