@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\BankAccount;
+use App\Entity\PaypalAccount;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Form\ChoiceType;
 use App\Form\PrepareTransferType;
 use App\Service\Debt\DebtDto;
 use App\Service\PaymentOption\BankAccountService;
+use App\Service\PaymentOption\PaypalAccountService;
 use App\Service\Transaction\TransactionService;
 use App\Service\Transaction\TransactionUpdateData;
 use App\Service\Transfer\PrepareTransferData;
@@ -81,6 +83,11 @@ class TransferController extends AbstractController
                     'transaction' => $transaction->getId(),
                 ]);
             }
+            elseif ($data->getPaymentOption() instanceof PaypalAccount) {
+                return $this->redirectToRoute('transfer_send_bank', [
+                    'transaction' => $transaction->getId(),
+                ]);
+            }
         }
 
         $dto = DebtDto::create($transaction);
@@ -93,7 +100,7 @@ class TransferController extends AbstractController
     /**
      * @Route("/send/{transaction}", name="transfer_send_bank")
      */
-    public function sendTransfer(
+    public function sendTransferBank(
         Transaction $transaction,
         Request $request,
         BankAccountService $bankAccountService
@@ -132,6 +139,53 @@ class TransferController extends AbstractController
         }
 
         return $this->render('transfer/send.bank.html.twig', [
+            'dto' => $dto,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/send/{transaction}", name="transfer_send_bank")
+     */
+    public function sendTransferPaypal(
+        Transaction $transaction,
+        Request $request,
+        PaypalAccountService $paypalAccountService
+    ): Response {
+        /** @var User $requester */
+        $requester = $this->getUser();
+
+        $this->transactionService->checkRequestForVariant(
+            $requester,
+            $transaction,
+            TransactionService::DEBTOR_VIEW,
+            Transaction::STATE_ACCEPTED
+        );
+
+        $paypalAccount = $paypalAccountService->getPaypalAccountForUser($transaction->getLoans()[0]->getOwner());
+
+        $dto = (new SendTransferDto)->initFrom($paypalAccount);
+        $dto->setAmount($transaction->getLoans()[0]->getAmount());
+        $dto->setReason($transaction->getReason());
+        $dto->setTransactionId($transaction->getId());
+
+        $labels = ['label' => ['submit' => 'Erledigt', 'decline' => 'Abbrechen']];
+        $form = $this->createForm(ChoiceType::class, null, $labels);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $isAccepted = (bool)$form->get('submit')->isClicked();
+
+            if ($isAccepted) {
+                $transactionUpdateData = (new TransactionUpdateData())->initFrom($transaction);
+                $transactionUpdateData->setState(Transaction::STATE_CLEARED);
+                $this->transactionService->update($transaction, $transactionUpdateData);
+            }
+            return $this->redirectToRoute('account_debts', []);
+        }
+
+        return $this->render('transfer/send.paypal.html.twig', [
             'dto' => $dto,
             'form' => $form->createView(),
         ]);
