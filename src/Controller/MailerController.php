@@ -14,27 +14,46 @@ class MailerController extends AbstractController
     /**
      * @Route("/mailer", name="mailer")
      */
-    public function index(MailerInterface $mailer): Response
+    public function index(MailerInterface $mailer)
     {
         $userName = 'Dieter';
-        $type = 1;
-        $text = 'Test text für die mail';
+        $text = 'Es gibt leider schlechte Nachrichten. Jemand hat eine neue Schuldlast für deinen Debes-Account hinterlegt';
+        $loaner = 'Hans';
+        $amount = 19.48;
+        $reason = 'Essen bei Kuma. Es musste aber in mehrere Teile aufegeutl wertden, weil es gar nciht geschmecjt gat';
+        $subject = 'Du hast neue Schulden gemacht';
+        $problems = 0;
+        $transactions = 0;
+        $debts = 0;
         $email = (new TemplatedEmail())
-            ->sender('wh.company.services@gmail.com')
+            ->from('debes@wh-company.de')
             ->to('wrextuus@gmail.com')
-            ->subject('Test')
-            ->htmlTemplate('mailer/mail.html.twig')
+            ->subject($subject)
+            ->htmlTemplate('mailer/mail.created.html.twig')
             ->context([
                 'userName' => $userName,
-                'type' => $type
+                'text' => $text,
+                'loaner' => $loaner,
+                'reason' => $reason,
+                'amount' => $amount,
+                'problems' => $problems,
+                'transactions' => $transactions,
+                'debts' => $debts,
             ]);
 
+        $mailer->send($email);
 
-//        $mailer->send($email);
-        return $this->render('mailer/mail.html.twig', [
+
+        return $this->render('mailer/index.html.twig', [
             'userName' => $userName,
-            'type' => $type,
-            'text' => $text
+            'text' => $text,
+            'loaner' => $loaner,
+            'reason' => $reason,
+            'amount' => $amount,
+            'problems' => $problems,
+            'transactions' => $transactions,
+            'debts' => $debts,
+
         ]);
     }
 }
