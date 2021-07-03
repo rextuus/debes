@@ -16,23 +16,23 @@
                                             <h2><span>Es ist nicht </span> deine Schuld</h2>
                                             <p>Aber {{ transaction.transactionPartner }} behauptet du hast dir </p>
                                             <h3><span>{{ transaction.amount }} € </span></h3> <p>geliehen</p>
-                                            <a href="{{ path('transaction_accept', {transaction: transaction.transactionId, variant: 'debtor'}) }}" class="site-btn debt">Zur Schuld</a>
+                                            <a href="{{ path('transaction_accept', {transaction: transaction.slug, variant: 'debtor'}) }}" class="site-btn debt">Zur Schuld</a>
                                         {% elseif transaction.state == 2 %}
                                             <h2><span>Es ist nicht </span> deine Schuld</h2>
                                             <p>Aber {{ transaction.transactionPartner }} bekommt noch </p>
                                             <h3><span>{{ transaction.amount }} € </span></h3> <p>von dir</p>
-                                            <a href="{{ path('transaction_process', {transaction: transaction.transactionId, variant: 'debtor'}) }}" class="site-btn debt">Zur Schuld</a>
+                                            <a href="{{ path('transaction_process', {transaction: transaction.slug, variant: 'debtor'}) }}" class="site-btn debt">Zur Schuld</a>
                                         {% elseif transaction.state == 3 %}
                                             <h2><span>Es ist nicht </span> deine Schuld</h2>
                                             <p>{{ transaction.transactionPartner }} hat den Eingang von </p>
                                             <h3><span>{{ transaction.amount }} € </span></h3> <p>wohl noch nicht bemerkt</p>
-                                            <a href="{{ path('transaction_confirm', {transaction: transaction.transactionId, variant: 'debtor'}) }}" class="site-btn debt">Zur Schuld</a>
+                                            <a href="{{ path('transaction_confirm', {transaction: transaction.slug, variant: 'debtor'}) }}" class="site-btn debt">Zur Schuld</a>
                                         {% elseif transaction.state == 4 %}
                                             <h2><span>Es war nicht </span> deine Schuld</h2>
                                             <p>{{ transaction.transactionPartner }} sieht das nun auch so und hat den
                                                 Erhalt von </p>
                                             <h3><span>{{ transaction.amount }} € </span></h3> <p>bestätigt</p>
-                                            <a href="{{ path('transaction_confirm', {transaction: transaction.transactionId, variant: 'debtor'}) }}" class="site-btn debt">Zur Schuld</a>
+                                            <a href="{{ path('transaction_confirm', {transaction: transaction.slug, variant: 'debtor'}) }}" class="site-btn debt">Zur Schuld</a>
                                         {% endif %}
                                     {% else %}
                                         {% if  transaction.state == 1 %}
@@ -40,17 +40,17 @@
                                             <p>hat {{ transaction.transactionPartner }} die Schuldlast von </p>
                                             <h2>{{ transaction.amount }} €</h2> <p> zwar noch
                                             nicht akzeptiert, aber ist informiert</p>
-                                            <a href="{{ path('transaction_accept', {transaction: transaction.transactionId, variant: 'loaner'}) }}" class="site-btn loan">Zum Darlehen</a>
+                                            <a href="{{ path('transaction_accept', {transaction: transaction.slug, variant: 'loaner'}) }}" class="site-btn loan">Zum Darlehen</a>
                                         {% elseif transaction.state == 2 %}
                                             <h2><span>Oben auf der</span> hohen Kante</h2>
                                             <p>liegen noch </p> <h2>{{ transaction.amount }} €</h2> <p> die du
                                             von {{ transaction.transactionPartner }} bekommst</p>
-                                            <a href="{{ path('transaction_process', {transaction: transaction.transactionId, variant: 'loaner'}) }}" class="site-btn loan">Zum Darlehen</a>
+                                            <a href="{{ path('transaction_process', {transaction: transaction.slug, variant: 'loaner'}) }}" class="site-btn loan">Zum Darlehen</a>
                                         {% elseif transaction.state == 3 %}
                                             <h2><span>Oben auf der</span> hohen Kante</h2>
                                             <p>sind</p> <h2>{{ transaction.amount }} €</h2> <p> eingetroffen, die
                                             {{ transaction.transactionPartner }} dir überwiesen hat</p>
-                                            <a href="{{ path('transaction_confirm', {transaction: transaction.transactionId, variant: 'loaner'}) }}" class="site-btn loan">Zum Darlehen</a>
+                                            <a href="{{ path('transaction_confirm', {transaction: transaction.slug, variant: 'loaner'}) }}" class="site-btn loan">Zum Darlehen</a>
                                         {% endif %}
                                     {% endif %}
                                 </div>

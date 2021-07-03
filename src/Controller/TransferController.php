@@ -16,6 +16,7 @@ use App\Service\Transaction\TransactionUpdateData;
 use App\Service\Transfer\PrepareTransferData;
 use App\Service\Transfer\SendTransferDto;
 use App\Service\Transfer\TransferService;
+use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,7 +44,8 @@ class TransferController extends AbstractController
     }
 
     /**
-     * @Route("/prepare/{transaction}", name="transfer_prepare")
+     * @Route("/prepare/{slug}", name="transfer_prepare")
+     * @throws Exception
      */
     public function prepareTransfer(
         Transaction $transaction,
@@ -63,7 +65,7 @@ class TransferController extends AbstractController
         $data = (new PrepareTransferData());
         $default = $transferService->getDefaultPaymentOptionForUser($requester);
         if (!$default) {
-            throw new \Exception('user has no payment option defined or enabled');
+            throw new Exception('user has no payment option defined or enabled');
         }
         $data->setPaymentOption($default);
 
@@ -84,7 +86,7 @@ class TransferController extends AbstractController
                 ]);
             }
             elseif ($data->getPaymentOption() instanceof PaypalAccount) {
-                return $this->redirectToRoute('transfer_send_bank', [
+                return $this->redirectToRoute('transfer_send_paypal', [
                     'transaction' => $transaction->getId(),
                 ]);
             }
@@ -98,7 +100,7 @@ class TransferController extends AbstractController
     }
 
     /**
-     * @Route("/send/{transaction}", name="transfer_send_bank")
+     * @Route("/send/{slug}", name="transfer_send_bank")
      */
     public function sendTransferBank(
         Transaction $transaction,
@@ -145,7 +147,7 @@ class TransferController extends AbstractController
     }
 
     /**
-     * @Route("/send/{transaction}", name="transfer_send_bank")
+     * @Route("/send/{slug}", name="transfer_send_paypal")
      */
     public function sendTransferPaypal(
         Transaction $transaction,

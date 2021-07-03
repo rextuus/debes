@@ -85,7 +85,7 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route("/accept/{transaction}", name="transaction_accept")
+     * @Route("/accept/{slug}", name="transaction_accept")
      */
     public function acceptTransaction(Transaction $transaction, Request $request): Response
     {
@@ -137,7 +137,7 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route("/process/{transaction}", name="transaction_process")
+     * @Route("/process/{slug}", name="transaction_process")
      */
     public function processTransaction(Transaction $transaction, Request $request): Response
     {
@@ -189,7 +189,7 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route("/confirm/{transaction}", name="transaction_confirm")
+     * @Route("/confirm/{slug}", name="transaction_confirm")
      */
     public function confirmTransaction(Transaction $transaction, Request $request): Response
     {

@@ -103,11 +103,11 @@ class TransactionService
      * @param TransactionData $data
      * @param User            $requester
      *
-     * @return void
+     * @return Transaction
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function storeSimpleTransaction(TransactionData $data, User $requester): void
+    public function storeSimpleTransaction(TransactionData $data, User $requester): Transaction
     {
         $data->setState(Transaction::STATE_READY);
         $transaction = $this->storeTransaction($data);
@@ -119,6 +119,8 @@ class TransactionService
         $loanData = (new LoanCreateData())->initFromData($data, $requester);
         $loanData->setTransaction($transaction);
         $this->loanService->storeLoan($loanData);
+
+        return $transaction;
     }
 
     /**

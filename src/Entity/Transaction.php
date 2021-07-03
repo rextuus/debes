@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TransactionRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -63,6 +64,11 @@ class Transaction
      */
     private $edited;
 
+    /**
+     * @ORM\Column(type="string", length=32, unique=true)
+     */
+    private $slug;
+
     public function __construct()
     {
         $this->debts = new ArrayCollection();
@@ -74,12 +80,12 @@ class Transaction
         return $this->id;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
+    public function setCreated(DateTimeInterface $created): self
     {
         $this->created = $created;
 
@@ -182,14 +188,36 @@ class Transaction
         return $this;
     }
 
-    public function getEdited(): ?\DateTimeInterface
+    public function getEdited(): ?DateTimeInterface
     {
         return $this->edited;
     }
 
-    public function setEdited(?\DateTimeInterface $edited): self
+    public function setEdited(?DateTimeInterface $edited): self
     {
         $this->edited = $edited;
+
+        return $this;
+    }
+
+    /**
+     * __toString
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->getReason();
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }
