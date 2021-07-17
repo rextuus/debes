@@ -426,7 +426,7 @@
 
             .counter-text .num {
                 display: block;
-                color: rgb(255, 255, 255);
+                color: #1d1d1d;
                 font-size: 34px;
                 font-weight: 700;
             }
@@ -493,7 +493,7 @@
                 overflow: hidden;
                 position: relative;
                 width: 100%;
-                background: {{ email.image('@images/debt.png') }};
+                background: {{ email.image('@images/transferred.png') }};
             }
 
             .div-background.img {
@@ -561,8 +561,8 @@
                     {# style="background-image: url({{ asset ('@images/debt.png') }}); background-size: cover; height: 400px;" #}
 
                     <td valign="middle" class="hero bg_white">
-                        <img src="{{ email.image('@images/debt.png') }}" alt="Logo"
-                             style="background-size: cover; height: 400px; padding-bottom: 20px">
+                        <img src="{{ email.image('@images/transferred.png') }}" alt="Logo"
+                             style="background-size: cover; height: 400px;">
                         <div class="overlay"></div>
                         <table>
                             <tr>
@@ -611,7 +611,7 @@
                                                                         <div class="text-tour"
                                                                              style="text-align: center;">
                                                                             <h3>Geforderte Summe</h3>
-                                                                            <span class="num">{{ amount }} €</span>
+                                                                            <span class="price">{{ amount }} €</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -624,7 +624,7 @@
                                                                         <div class="text-tour"
                                                                              style="text-align: center;">
                                                                             <h3>Grund</h3>
-                                                                            <span class="num">{{ reason }}</span>
+                                                                            <span class="price">{{ reason }}</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -644,7 +644,7 @@
                                                                         <div class="text-tour"
                                                                              style="text-align: center;">
                                                                             <h3>Kreditgeber</h3>
-                                                                            <span class="num">{{ loaner }}</span>
+                                                                            <span class="price">{{ loaner }}</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -661,8 +661,8 @@
 
                                 </td>
                             </tr><!-- end:tr -->
-                            <tr style="background-color: rgb(45,52,22)">
-                                <td valign="top" class="counter"
+                            <tr>
+                                <td valign="middle" class="counter"
                                     style="background-image: url({{ absolute_url(asset('img/mailTop.png')) }}); background-size: cover; padding: 4em 0;">
                                     <div class="overlay"></div>
                                     <table>
@@ -694,7 +694,7 @@
                                                        width="100%">
                                                     <tr>
                                                         <td class="counter-text">
-                                                            <span class="num">{{ debts }} €</span>
+                                                            <span class="num">{{ debts }}</span>
                                                             <span class="name">Eigene offene Schulden</span>
                                                         </td>
                                                     </tr>
@@ -725,7 +725,7 @@
                                                             <h3>Schulden akzeptieren?</h3>
                                                             <p>Dir bleibt wohl nichts anderes übrig, wenn wir ehrlich
                                                                 sind</p>
-                                                            <p><a href="https://www.wh-company.de/{{ path('transaction_accept', {slug: slug, variant: 'debtor'}) }}" class="btn btn-primary">Akzeptieren</a></p>
+                                                            <p><a href="#" class="btn btn-primary">Akzeptieren</a></p>
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -744,7 +744,7 @@
                                                             <h3>Dem Ganzen widersprechen?</h3>
                                                             <p>Muss wohl um viel Geld gehen. Dann kann man das schon mal
                                                                 in Erwägung ziehen</p>
-                                                            <p><a href="https://www.wh-company.de/{{ path('transaction_accept', {slug: slug, variant: 'debtor'}) }}" class="btn btn-primary">Ablehnen</a></p>
+                                                            <p><a href="#" class="btn btn-primary">Ablehnen</a></p>
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -756,7 +756,11 @@
 
 
                             <!-- 1 Column Text + Button : END -->
-                            {% include 'mailer/footer.html.twig' %}
+                        </table>
+
+                        {% include 'mailer/footer.html.twig' %}
+
+
 
         </div>
     </center>

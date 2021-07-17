@@ -2,9 +2,11 @@
 
 namespace App\Service\Loan;
 
+use App\Entity\Loan;
 use App\Entity\Transaction;
 use App\Entity\User;
 use DateTime;
+use DateTimeInterface;
 
 class LoanData
 {
@@ -15,12 +17,12 @@ class LoanData
     private $amount;
 
     /**
-     * @var DateTime
+     * @var DateTimeInterface
      */
     private $created;
 
     /**
-     * @var DateTime|null
+     * @var DateTimeInterface|null
      */
     private $edited;
 
@@ -61,17 +63,17 @@ class LoanData
     }
 
     /**
-     * @return DateTime
+     * @return DateTimeInterface
      */
-    public function getCreated(): DateTime
+    public function getCreated(): DateTimeInterface
     {
         return $this->created;
     }
 
     /**
-     * @param DateTime $created
+     * @param DateTimeInterface $created
      */
-    public function setCreated(DateTime $created): void
+    public function setCreated(DateTimeInterface $created): void
     {
         $this->created = $created;
     }
@@ -109,9 +111,9 @@ class LoanData
     }
 
     /**
-     * @return DateTime|null
+     * @return DateTimeInterface|null
      */
-    public function getEdited(): ?DateTime
+    public function getEdited(): ?DateTimeInterface
     {
         return $this->edited;
     }
@@ -119,7 +121,7 @@ class LoanData
     /**
      * @param DateTime|null $edited
      */
-    public function setEdited(?DateTime $edited): void
+    public function setEdited(?DateTimeInterface $edited): void
     {
         $this->edited = $edited;
     }
@@ -156,5 +158,22 @@ class LoanData
         $this->paid = $paid;
     }
 
+    /**
+     * initFrom
+     *
+     * @param Loan $loan
+     *
+     * @return LoanData
+     */
+    public function initFrom(Loan $loan): LoanData
+    {
+        $this->setCreated($loan->getCreated());
+        $this->setAmount($loan->getAmount());
+        $this->setCreated($loan->getCreated());
+        $this->setOwner($loan->getOwner());
+        $this->setPaid($loan->getPaid());
+        $this->setTransaction($loan->getTransaction());
 
+        return $this;
+    }
 }

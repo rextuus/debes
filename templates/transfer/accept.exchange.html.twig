@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello TransferController!{% endblock %}
+
+{% block body %}
+    <section class="hero-section">
+        <div class="hero-slider owl-carousel">
+            <div class="hs-item-own">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hs-text">
+                                <h2><span>Deine</span> Verrechnung!</h2>
+
+                                <table class="table table-hover table-dark">
+                                    <tr>
+                                        <th scope="col">Datum</th>
+
+                                        <td>{{ dto.created }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="col">Darlehensgeber</th>
+
+                                        <td>{{ dto.debtor }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="col">Betrag</th>
+                                        <td>{{ dto.amount }} €</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="col">Grund</th>
+                                        <td>{{ dto.reason }}</td>
+                                    </tr>
+                                </table>
+
+                                    <img src="{{ asset ('img/exchange.png') }}" alt="Exchange" style="background-color: transparent; width: 20%; height: 20%; margin-bottom: 10px; text-align: center">
+
+
+                                <table class="table table-hover table-dark">
+                                    <tr>
+                                        <th scope="col">Datum</th>
+
+                                        <td>{{ dto.createdExchange }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="col">Darlehensgeber</th>
+
+                                        <td>{{ dto.loaner }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="col">Betrag</th>
+                                        <td>{{ dto.amountExchange }} €</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="col">Grund</th>
+                                        <td>{{ dto.reasonExchange }}</td>
+                                    </tr>
+                                </table>
+
+                                {% if dto.difference > 0%} <h4 style="color: #5e0016">{{ dto.difference }} €</h4><p>an Schulden bleiben nach der Verrechnung über!</p>
+                                {% else %} <h4 style="color: #404b20">{{ dto.difference }} * -1 €</h4><p>an Darlehn bleiben nach der Verrechnung über!</p>
+                                {% endif %}
+
+
+                                <p>Sollen beide Transaktionen miteinander verrechnet werden?</p>
+                                {{ form_start(form, {'method': 'POST'}) }}
+                                {{ form_row(form._token) }}
+                                {{ form_widget(form.submit, {'attr': {'class': 'site-btn loan'}}) }}
+                                {{ form_widget(form.decline, {'attr': {'class': 'site-btn debt'}}) }}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function updateClipboard(newClip) {
+            navigator.clipboard.writeText(newClip).then(function () {
+                /* clipboard successfully set */
+
+            }, function () {
+                /* clipboard write failed */
+            });
+        }
+
+    </script>
+
+{% endblock %}
+

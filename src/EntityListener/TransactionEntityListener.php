@@ -55,7 +55,7 @@ class TransactionEntityListener
      */
     private function computeSlug(Transaction $transaction): ?string
     {
-        $timeStamp = (new DateTime())->getTimestamp();
+        $timeStamp = (new DateTime())->getTimestamp()+rand();
         if (!$transaction->getSlug() || '-' === $transaction->getSlug()) {
             return $this->slugger->slug(substr((string)$transaction, 0, 16))->lower() . $timeStamp;
         }

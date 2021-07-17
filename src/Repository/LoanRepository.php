@@ -84,7 +84,7 @@ class LoanRepository extends ServiceEntityRepository
      *
      * @return int|mixed|string
      */
-    public function getAllDebtTransactionsForUserAndSate(User $owner, string $state)
+    public function getAllLoanTransactionsForUserAndSate(User $owner, string $state)
     {
         return $this->createQueryBuilder('l')
             ->select('t')

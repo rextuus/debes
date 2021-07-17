@@ -7,12 +7,16 @@ use App\Entity\PaypalAccount;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Form\ChoiceType;
+use App\Form\ExchangeType;
 use App\Form\PrepareTransferType;
 use App\Service\Debt\DebtDto;
+use App\Service\Mailer\MailService;
 use App\Service\PaymentOption\BankAccountService;
 use App\Service\PaymentOption\PaypalAccountService;
 use App\Service\Transaction\TransactionService;
 use App\Service\Transaction\TransactionUpdateData;
+use App\Service\Transfer\ExchangeProcessor;
+use App\Service\Transfer\PrepareExchangeTransferData;
 use App\Service\Transfer\PrepareTransferData;
 use App\Service\Transfer\SendTransferDto;
 use App\Service\Transfer\TransferService;
@@ -36,15 +40,21 @@ class TransferController extends AbstractController
     private $transactionService;
 
     /**
+     * @var MailService
+     */
+    private $mailService;
+
+    /**
      * TransactionController constructor.
      */
-    public function __construct(TransactionService $transactionService)
+    public function __construct(TransactionService $transactionService, MailService $mailService)
     {
         $this->transactionService = $transactionService;
+        $this->mailService = $mailService;
     }
 
     /**
-     * @Route("/prepare/{slug}", name="transfer_prepare")
+     * @Route("/prepare/bank/{slug}", name="transfer_prepare")
      * @throws Exception
      */
     public function prepareTransfer(
@@ -82,12 +92,11 @@ class TransferController extends AbstractController
             $data = $form->getData();
             if ($data->getPaymentOption() instanceof BankAccount) {
                 return $this->redirectToRoute('transfer_send_bank', [
-                    'transaction' => $transaction->getId(),
+                    'slug' => $transaction->getSlug(),
                 ]);
-            }
-            elseif ($data->getPaymentOption() instanceof PaypalAccount) {
+            } elseif ($data->getPaymentOption() instanceof PaypalAccount) {
                 return $this->redirectToRoute('transfer_send_paypal', [
-                    'transaction' => $transaction->getId(),
+                    'slug' => $transaction->getSlug(),
                 ]);
             }
         }
@@ -190,6 +199,77 @@ class TransferController extends AbstractController
         return $this->render('transfer/send.paypal.html.twig', [
             'dto' => $dto,
             'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/prepare/exchange/{slug}", name="exchange_prepare")
+     */
+    public function prepareExchange(
+        Transaction $transaction,
+        Request $request,
+        ExchangeProcessor $exchangeService
+    ): Response {
+        /** @var User $requester */
+        $requester = $this->getUser();
+
+        $this->transactionService->checkRequestForVariant(
+            $requester,
+            $transaction,
+            TransactionService::DEBTOR_VIEW,
+            Transaction::STATE_ACCEPTED
+        );
+
+        $data = new PrepareExchangeTransferData();
+        $form = $this->createForm(
+            ExchangeType::class,
+            $data,
+            ['transaction' => $transaction]
+        );
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            return $this->redirectToRoute('exchange_accept', ['slug1' => $transaction->getSlug(), 'slug2' => $form->getData()->getTransactionSlug()]);
+
+        }
+
+        $dto = DebtDto::create($transaction);
+        return $this->render('transfer/prepare.exchange.html.twig', [
+            'dto' => $dto,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/accept/exchange/{slug1}/{slug2}", name="exchange_accept")
+     */
+    public function acceptExchange(
+        string $slug1,
+        string $slug2,
+        Request $request,
+        ExchangeProcessor $exchangeService
+    ): Response {
+        $dto = $exchangeService->calculateExchange($slug1, $slug2);
+        $labels = ['label' => ['submit' => 'Verrechnen', 'decline' => 'Zurück zur Auswahl']];
+        $form = $this->createForm(ChoiceType::class, null, $labels);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $isAccepted = (bool)$form->get('submit')->isClicked();
+
+            if ($isAccepted){
+                $exchangeService->exchangeTransactions($slug1, $slug2);
+                return $this->redirectToRoute('account_debts', []);
+            }else{
+                return $this->redirectToRoute('exchange_prepare', ['slug' => $slug1]);
+            }
+        }
+
+        return $this->render('transfer/accept.exchange.html.twig', [
+            'form' => $form->createView(),
+            'dto' => $dto
         ]);
     }
 }

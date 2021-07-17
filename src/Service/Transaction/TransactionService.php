@@ -2,16 +2,20 @@
 
 namespace App\Service\Transaction;
 
+use App\Entity\Loan;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Repository\TransactionRepository;
 use App\Service\Debt\DebtCreateData;
 use App\Service\Debt\DebtDto;
 use App\Service\Debt\DebtService;
+use App\Service\Debt\DebtUpdateData;
 use App\Service\Loan\LoanCreateData;
 use App\Service\Loan\LoanDto;
 use App\Service\Loan\LoanService;
+use App\Service\Loan\LoanUpdateData;
 use Doctrine\DBAL\Exception;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
@@ -43,39 +47,50 @@ class TransactionService
     private $loanService;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
      * TransactionService constructor.
      *
-     * @param TransactionFactory    $transactionFactory
-     * @param TransactionRepository $transactionRepository
-     * @param DebtService           $debtService
-     * @param LoanService           $loanService
+     * @param TransactionFactory     $transactionFactory
+     * @param TransactionRepository  $transactionRepository
+     * @param DebtService            $debtService
+     * @param LoanService            $loanService
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
         TransactionFactory $transactionFactory,
         TransactionRepository $transactionRepository,
         DebtService $debtService,
-        LoanService $loanService
+        LoanService $loanService,
+        EntityManagerInterface $entityManager
     ) {
         $this->transactionFactory = $transactionFactory;
         $this->transactionRepository = $transactionRepository;
         $this->debtService = $debtService;
         $this->loanService = $loanService;
+        $this->entityManager = $entityManager;
     }
 
     /**
      * storeTransaction
      *
      * @param TransactionData $transactionData
+     * @param bool            $persist
      *
      * @return Transaction
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function storeTransaction(TransactionData $transactionData): Transaction
+    public function storeTransaction(TransactionData $transactionData, bool $persist = true): Transaction
     {
         $transaction = $this->transactionFactory->createByData($transactionData);
 
-        $this->transactionRepository->persist($transaction);
+        if ($persist) {
+            $this->transactionRepository->persist($transaction);
+        }
 
         return $transaction;
     }
@@ -201,7 +216,7 @@ class TransactionService
     public function getAllLoanTransactionsForUserAndState(User $owner, string $state): array
     {
         $dtos = array();
-        $loanTransactions = $this->loanService->getAllDebtTransactionsForUserAndSate($owner, $state);
+        $loanTransactions = $this->loanService->getAllLoanTransactionsForUserAndSate($owner, $state);
         foreach ($loanTransactions as $transaction) {
             $dtos[] = LoanDto::create($transaction);
         }
@@ -235,9 +250,13 @@ class TransactionService
      * @return bool
      * @throws Exception
      */
-    public function checkRequestForVariant(User $requester, Transaction $transaction, string $variant, string $state): bool
-    {
-        if ($transaction->getState() !== $state){
+    public function checkRequestForVariant(
+        User $requester,
+        Transaction $transaction,
+        string $variant,
+        string $state
+    ): bool {
+        if ($transaction->getState() !== $state) {
             throw new Exception('Transaction is not in correct sate');
         }
 
@@ -254,5 +273,34 @@ class TransactionService
         } else {
             throw new Exception('User is not involved in this transaction');
         }
+    }
+
+    /**
+     * getTransactionBySlug
+     *
+     * @param string $slug
+     *
+     * @return Transaction|null
+     */
+    public function getTransactionBySlug(string $slug): ?Transaction
+    {
+        return $this->transactionRepository->findOneBy(['slug' => $slug]);
+    }
+
+    public function updateInclusive(?Transaction $transaction, TransactionUpdateData $transactionUpdateData)
+    {
+        $this->update($transaction, $transactionUpdateData);
+
+        $loan = $transaction->getLoans()[0];
+        $loanData = (new LoanUpdateData())->initFrom($loan);
+        $loanData->setAmount($transaction->getAmount());
+        $loanData->setReason($transaction->getReason());
+        $this->loanService->update($loan, $loanData);
+
+        $debt = $transaction->getDebts()[0];
+        $debtData = (new DebtUpdateData())->initFrom($debt);
+        $debtData->setAmount($transaction->getAmount());
+        $debtData->setReason($transaction->getReason());
+        $this->debtService->update($debt, $debtData);
     }
 }

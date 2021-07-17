@@ -8,6 +8,7 @@ use App\Service\PaymentOption\BankAccountData;
 use App\Service\PaymentOption\BankAccountService;
 use App\Service\Transaction\TransactionCreateData;
 use App\Service\Transaction\TransactionService;
+use App\Service\Transaction\TransactionUpdateData;
 use App\Service\User\UserData;
 use App\Service\User\UserService;
 use Doctrine\ORM\OptimisticLockException;
@@ -139,5 +140,11 @@ class LegacyImportService
         $transactionData->setOwner($debtor);
 
         $transaction = $this->transactionService->storeSimpleTransaction($transactionData, $loaner);
+
+        if ($state != Transaction::STATE_READY){
+            $data = (new TransactionUpdateData())->initFrom($transaction);
+            $data->setState($state);
+            $this->transactionService->update($transaction, $data);
+        }
     }
 }

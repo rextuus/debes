@@ -69,10 +69,16 @@ class Transaction
      */
     private $slug;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Exchange::class, mappedBy="transaction")
+     */
+    private $exchanges;
+
     public function __construct()
     {
         $this->debts = new ArrayCollection();
         $this->loans = new ArrayCollection();
+        $this->exchanges = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -218,6 +224,56 @@ class Transaction
     public function setSlug(string $slug): self
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * getLoaner
+     *
+     * @return User
+     */
+    public function getLoaner(): User
+    {
+        return $this->loans[0]->getOwner();
+    }
+
+    /**
+     * getDebtor
+     *
+     * @return User
+     */
+    public function getDebtor(): User
+    {
+        return $this->debts[0]->getOwner();
+    }
+
+    /**
+     * @return Collection|Exchange[]
+     */
+    public function getExchanges(): Collection
+    {
+        return $this->exchanges;
+    }
+
+    public function addExchange(Exchange $exchange): self
+    {
+        if (!$this->exchanges->contains($exchange)) {
+            $this->exchanges[] = $exchange;
+            $exchange->setTransaction($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExchange(Exchange $exchange): self
+    {
+        if ($this->exchanges->removeElement($exchange)) {
+            // set the owning side to null (unless already changed)
+            if ($exchange->getTransaction() === $this) {
+                $exchange->setTransaction(null);
+            }
+        }
 
         return $this;
     }

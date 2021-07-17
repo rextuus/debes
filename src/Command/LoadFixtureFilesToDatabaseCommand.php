@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Entity\Transaction;
 use App\Service\Legacy\LegacyImportService;
 use App\Service\User\UserService;
 use Symfony\Component\Console\Command\Command;
@@ -83,11 +84,13 @@ class LoadFixtureFilesToDatabaseCommand extends Command
         }
 
         foreach ($this->getStandardTransactionSet() as $standardTransactionData) {
+            $state = count($standardTransactionData) > 4 ? $standardTransactionData[4] : Transaction::STATE_READY;
             $this->legacyImportService->createTransaction(
                 $standardTransactionData[0],
                 $standardTransactionData[1],
                 $standardTransactionData[2],
-                $standardTransactionData[3]
+                $standardTransactionData[3],
+                $state
             );
         }
         return 0;
@@ -101,10 +104,10 @@ class LoadFixtureFilesToDatabaseCommand extends Command
     private function getStandardUserSet(): array
     {
         return [
-            ['eva@testmail.com', '123Katzen', 'Godman', 'Eva', 'Eva'],
-            ['adam@testmail.com', '123Katzen', 'Godman', 'Adam', 'Adam'],
-            ['kain@testmail.com', '123Katzen', 'Godman', 'Kain', 'Kain'],
-            ['abel@testmail.com', '123Katzen', 'Godman', 'Abel', 'Abel'],
+            ['wrextuus@gmail.com', '123Katzen', 'Eva', 'Godman', 'Eva'],
+            ['wrextuus@gmail.com', '123Katzen', 'Adam', 'Godman', 'Adam'],
+            ['wrextuus@gmail.com', '123Katzen', 'Kain', 'Godman', 'Kain'],
+            ['wrextuus@gmail.com', '123Katzen', 'Abel', 'Godman', 'Abel'],
         ];
     }
 
@@ -200,6 +203,20 @@ class LoadFixtureFilesToDatabaseCommand extends Command
                 199.98,
                 $this->userService->findUserByUserName('Eva'),
                 $this->userService->findUserByUserName('Adam'),
+            ],
+            [
+                'Austausch Seite Eva hat mehr Schulden',
+                30.98,
+                $this->userService->findUserByUserName('Eva'),
+                $this->userService->findUserByUserName('Adam'),
+                Transaction::STATE_ACCEPTED
+            ],
+            [
+                'Austausch Seite Eva hat mehr Schulden',
+                15.98,
+                $this->userService->findUserByUserName('Adam'),
+                $this->userService->findUserByUserName('Eva'),
+                Transaction::STATE_ACCEPTED
             ],
         ];
     }
