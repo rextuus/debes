@@ -88,6 +88,11 @@ class TransferController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $isDeclined = (bool)$form->get('decline')->isClicked();
+            if ($isDeclined){
+                return $this->redirectToRoute('account_debts', []);
+            }
+
             /** @var PrepareTransferData $data */
             $data = $form->getData();
             if ($data->getPaymentOption() instanceof BankAccount) {
@@ -230,8 +235,14 @@ class TransferController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            return $this->redirectToRoute('exchange_accept', ['slug1' => $transaction->getSlug(), 'slug2' => $form->getData()->getTransactionSlug()]);
-
+            $isAccepted = (bool)$form->get('submit')->isClicked();
+            if ($isAccepted){
+                if (!$data->getTransactionSlug()){
+                    return $this->redirectToRoute('account_debts', []);
+                }
+                return $this->redirectToRoute('exchange_accept', ['slug1' => $transaction->getSlug(), 'slug2' => $form->getData()->getTransactionSlug()]);
+            }
+            return $this->redirectToRoute('account_debts', []);
         }
 
         $dto = DebtDto::create($transaction);

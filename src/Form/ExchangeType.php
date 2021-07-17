@@ -44,7 +44,8 @@ class ExchangeType extends AbstractType
                     'data' => $options['transaction'],
                 ]
             )
-            ->add('submit', SubmitType::class, ['label' => 'Mit dieser Transaktion verrechnen']);
+            ->add('submit', SubmitType::class, ['label' => 'Mit dieser Transaktion verrechnen'])
+            ->add('decline', SubmitType::class, ['label' => 'Abbrechen']);
     }
 
     public function configureOptions(OptionsResolver $resolver)

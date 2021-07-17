@@ -51,7 +51,8 @@ class PrepareTransferType extends AbstractType
                     'data' => $options['label']['transaction'],
                 ]
             )
-            ->add('submit', SubmitType::class, ['label' => 'Überweisung vorbereiten']);
+            ->add('submit', SubmitType::class, ['label' => 'Überweisung vorbereiten'])
+            ->add('decline', SubmitType::class, ['label' => 'Abbrechen']);
     }
 
     public function configureOptions(OptionsResolver $resolver)
