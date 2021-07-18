@@ -52,6 +52,104 @@ class MailService
     }
 
     /**
+     * sendCreationMail
+     *
+     * @param Transaction $transaction
+     * @param User        $debtor
+     * @param User        $loaner
+     *
+     * @return void
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     * @throws TransportExceptionInterface
+     */
+    public function sendCreationMail(Transaction $transaction, User $debtor, User $loaner): void
+    {
+        $text = 'Es gibt leider schlechte Nachrichten. Jemand hat eine neue Schuldlast für deinen Debes-Account hinterlegt';
+        $subject = 'Du hast neue Schulden gemacht';
+
+        $context = [
+            'userName' => $debtor->getFirstName(),
+            'text' => $text,
+            'loaner' => $loaner->getFirstName(),
+            'slug' => $transaction->getSlug()
+        ];
+        $this->addStandardInfosToContext($context, $transaction, $debtor);
+
+
+        $this->sendMail(
+            $debtor->getEmail(),
+            $subject,
+            'mailer/mail.created.html.twig',
+            $context
+        );
+    }
+
+    /**
+     * sendAcceptMail
+     *
+     * @param Transaction $transaction
+     * @param User        $debtor
+     * @param User        $loaner
+     *
+     * @return void
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     * @throws TransportExceptionInterface
+     */
+    public function sendAcceptMail(Transaction $transaction, User $debtor, User $loaner): void
+    {
+        $text = 'Es gibt gute Neuigkeiten. Jemand hat hat eine Schuld anerkannt';
+        $subject = 'Dein Darlehen wurde akzeptiert';
+
+        $context = [
+            'userName' => $loaner->getFirstName(),
+            'text' => $text,
+            'debtor' => $debtor->getFirstName()
+        ];
+        $this->addStandardInfosToContext($context, $transaction, $loaner);
+
+        $this->sendMail(
+            $loaner->getEmail(),
+            $subject,
+            'mailer/mail.accepted.html.twig',
+            $context
+        );
+    }
+
+    /**
+     * sendDeclineMail
+     *
+     * @param Transaction $transaction
+     * @param User        $debtor
+     * @param User        $loaner
+     *
+     * @return void
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     * @throws TransportExceptionInterface
+     */
+    public function sendDeclineMail(Transaction $transaction, User $debtor, User $loaner): void
+    {
+        $text = 'Es gibt schlechte Neuigkeiten. Jemand weigert sich eine Schuld anzuerkennen';
+        $subject = 'Dein Darlehen wurde abgelehnt';
+
+        $context = [
+            'userName' => $loaner->getFirstName(),
+            'text' => $text,
+            'debtor' => $debtor->getFirstName()
+        ];
+        $this->addStandardInfosToContext($context, $transaction, $loaner);
+
+        $this->sendMail(
+            $loaner->getEmail(),
+            $subject,
+            'mailer/mail.declined.html.twig',
+            $context
+        );
+    }
+
+    /**
      * sendTransferMail
      *
      * @param Transaction $transaction
@@ -65,140 +163,68 @@ class MailService
      */
     public function sendTransferMail(Transaction $transaction, User $debtor, User $loaner): void
     {
-        $this->sendTransferMailToDebtor(
-            $debtor->getEmail(),
-            $debtor->getFirstName(),
-            $loaner->getFirstName(),
-            $transaction->getAmount(),
-            $transaction->getReason(),
-            $this->transactionStatisticService->getProblemsBetweenUsers($transaction),
-            $this->transactionStatisticService->getTransactionBetweenUsers($transaction),
-            $this->debtService->getTotalDebtsForUser($loaner)
-        );
-
-        //todo: should user get a mail by itself???
-    }
-
-    /**
-     * sendCreationMail
-     *
-     * @param Transaction $transaction
-     *
-     * @return void
-     * @throws NoResultException
-     * @throws NonUniqueResultException
-     * @throws TransportExceptionInterface
-     */
-    public function sendCreationMail(Transaction $transaction, User $debtor, User $loaner): void
-    {
-        $this->sendNewDebtMailToDebtor(
-            $debtor->getEmail(),
-            $debtor->getFirstName(),
-            $loaner->getFirstName(),
-            $transaction->getAmount(),
-            $transaction->getReason(),
-            $this->transactionStatisticService->getProblemsBetweenUsers($transaction),
-            $this->transactionStatisticService->getTransactionBetweenUsers($transaction),
-            $this->debtService->getTotalDebtsForUser($loaner),
-            $transaction->getSlug()
-        );
-    }
-
-    /**
-     * sendNewDebtMailToDebtor
-     *
-     * @param string $debtorMail
-     * @param string $userName
-     * @param string $loaner
-     * @param float  $amount
-     * @param string $reason
-     * @param int    $problems
-     * @param int    $transactions
-     * @param int    $debts
-     * @param string $slug
-     *
-     * @return void
-     * @throws TransportExceptionInterface
-     */
-    private function sendNewDebtMailToDebtor(
-        string $debtorMail,
-        string $userName,
-        string $loaner,
-        float $amount,
-        string $reason,
-        int $problems,
-        int $transactions,
-        int $debts,
-        string $slug
-    ): void {
-        $text = 'Es gibt leider schlechte Nachrichten. Jemand hat eine neue Schuldlast für deinen Debes-Account hinterlegt';
-        $subject = 'Du hast neue Schulden gemacht';
-
-        $email = (new TemplatedEmail())
-            ->from(self::DEBES_MAIL)
-            ->to($debtorMail)
-            ->subject($subject)
-            ->htmlTemplate('mailer/mail.created.html.twig')
-            ->context([
-                          'userName' => $userName,
-                          'text' => $text,
-                          'loaner' => $loaner,
-                          'reason' => $reason,
-                          'amount' => $amount,
-                          'problems' => $problems,
-                          'transactions' => $transactions,
-                          'debts' => $debts,
-                          'slug' => $slug,
-                      ]);
-
-        $this->mailer->send($email);
-    }
-
-
-    /**
-     * sendTransferMailToDebtor
-     *
-     * @param string $debtorMail
-     * @param string $userName
-     * @param string $loaner
-     * @param float  $amount
-     * @param string $reason
-     * @param int    $problems
-     * @param int    $transactions
-     * @param int    $debts
-     *
-     * @return void
-     * @throws TransportExceptionInterface
-     */
-    private function sendTransferMailToDebtor(
-        string $debtorMail,
-        string $userName,
-        string $loaner,
-        float $amount,
-        string $reason,
-        int $problems,
-        int $transactions,
-        int $debts
-    ): void {
         $text = 'Es gibt gute Neuigkeiten. Jemand hat dir Geld überwiesen';
         $subject = 'Du hast eine Überweisung erhalten';
 
+        $context = [
+            'userName' => $debtor->getFirstName(),
+            'text' => $text,
+            'loaner' => $loaner->getFirstName()
+        ];
+        $this->addStandardInfosToContext($context, $transaction, $loaner);
+
+        $this->sendMail(
+            $debtor->getEmail(),
+            $subject,
+            'mailer/mail.transferred.html.twig',
+            $context
+        );
+    }
+
+    /**
+     * addStandardInfosToContext
+     *
+     * @param array       $context
+     * @param Transaction $transaction
+     * @param User        $user
+     *
+     * @return void
+     *
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    private function addStandardInfosToContext(array &$context, Transaction $transaction, User $user): void
+    {
+        $context['reason'] = $transaction->getReason();
+        $context['amount'] = $transaction->getAmount();
+        $context['problems'] = $this->transactionStatisticService->getProblemsBetweenUsers($transaction);
+        $context['transactions'] = $this->transactionStatisticService->getTransactionBetweenUsers($transaction);
+        $context['debts'] = $this->debtService->getTotalDebtsForUser($user);
+    }
+
+    /**
+     * sendMail
+     *
+     * @param string $receiverMail
+     * @param string $subject
+     * @param string $template
+     * @param array  $context
+     *
+     * @return void
+     * @throws TransportExceptionInterface
+     */
+    private function sendMail(
+        string $receiverMail,
+        string $subject,
+        string $template,
+        array $context
+    ) {
         $email = (new TemplatedEmail())
             ->from(self::DEBES_MAIL)
-            ->to($debtorMail)
+            ->to($receiverMail)
             ->subject($subject)
-            ->htmlTemplate('mailer/mail.transferred.html.twig')
-            ->context([
-                          'userName' => $userName,
-                          'text' => $text,
-                          'loaner' => $loaner,
-                          'reason' => $reason,
-                          'amount' => $amount,
-                          'problems' => $problems,
-                          'transactions' => $transactions,
-                          'debts' => $debts,
-                      ]);
-
+            ->htmlTemplate($template)
+            ->context($context);
         $this->mailer->send($email);
     }
 }

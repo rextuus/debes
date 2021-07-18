@@ -240,6 +240,23 @@ class TransactionService
     }
 
     /**
+     * declineTransaction
+     *
+     * @param Transaction $transaction
+     *
+     * @return void
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function declineTransaction(Transaction $transaction): void
+    {
+        $transactionData = (new TransactionUpdateData())->initFrom($transaction);
+        $transactionData->setState(Transaction::STATE_DECLINED);
+        $this->update($transaction, $transactionData);
+    }
+
+    /**
      * checkRequestForVariant
      *
      * @param User        $requester

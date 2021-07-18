@@ -661,49 +661,7 @@
 
                                 </td>
                             </tr><!-- end:tr -->
-                            <tr>
-                                <td valign="middle" class="counter"
-                                    style="background-image: url({{ absolute_url(asset('img/mailTop.png')) }}); background-size: cover; padding: 4em 0;">
-                                    <div class="overlay"></div>
-                                    <table>
-                                        <tr>
-                                            <td valign="middle" width="33.333%">
-                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td class="counter-text">
-                                                            <span class="num">{{ problems }}</span>
-                                                            <span class="name">Probleme mit diesem Nutzer</span>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                            <td valign="middle" width="33.333%">
-                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td class="counter-text">
-                                                            <span class="num">{{ transactions }}</span>
-                                                            <span class="name">Bisherige Transaktionen mit diesem Nutzer</span>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                            <td valign="middle" width="33.333%">
-                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td class="counter-text">
-                                                            <span class="num">{{ debts }}</span>
-                                                            <span class="name">Eigene offene Schulden</span>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr><!-- end tr -->
+                            {% include 'mailer/statistic.html.twig' %}
                             <tr>
                                 <td class="bg_white email-section">
                                     <div class="heading-section" style="text-align: center; padding: 0 30px;">

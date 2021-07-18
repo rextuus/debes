@@ -112,7 +112,7 @@ class ExchangeProcessor
         if ($transaction->getAmount() >= $transactionToExchange->getAmount()) {
             $difference = $transaction->getAmount() - $transactionToExchange->getAmount();
             $transactionUpdateData->setAmount($difference);
-            $exchangeTransactionUpdateData->setState(Transaction::STATE_CLEARED);
+            $exchangeTransactionUpdateData->setState(Transaction::STATE_CONFIRMED);
 
             $exchangeCreationDataForTransaction->setRemainingAmount($difference);
             $exchangeCreationDataForExchangeTransaction->setRemainingAmount(0);

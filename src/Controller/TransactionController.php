@@ -126,10 +126,11 @@ class TransactionController extends AbstractController
 
             if ($isDebtor) {
                 if ($isAccepted) {
-                    // TODO set Transaction to next state and send loaner notification
                     $this->transactionService->acceptTransaction($transaction);
+                    $this->mailService->sendAcceptMail($transaction, $requester, $transaction->getLoaner());
                 } else {
-                    // TODO decline debt => send loaner notification
+                    $this->transactionService->declineTransaction($transaction);
+                    $this->mailService->sendDeclineMail($transaction, $requester, $transaction->getLoaner());
                 }
                 return $this->redirectToRoute('account_debts', []);
             } else {
