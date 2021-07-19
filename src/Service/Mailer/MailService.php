@@ -2,6 +2,7 @@
 
 namespace App\Service\Mailer;
 
+use App\Entity\PaymentAction;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Service\Debt\DebtService;
@@ -11,7 +12,6 @@ use Doctrine\ORM\NoResultException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Message;
 
 /**
  * MailService
@@ -63,7 +63,7 @@ class MailService
      * @throws NonUniqueResultException
      * @throws TransportExceptionInterface
      */
-    public function sendCreationMail(Transaction $transaction, User $debtor, User $loaner): void
+    public function sendCreationMailToDebtor(Transaction $transaction, User $debtor, User $loaner): void
     {
         $text = 'Es gibt leider schlechte Nachrichten. Jemand hat eine neue Schuldlast für deinen Debes-Account hinterlegt';
         $subject = 'Du hast neue Schulden gemacht';
@@ -72,10 +72,9 @@ class MailService
             'userName' => $debtor->getFirstName(),
             'text' => $text,
             'loaner' => $loaner->getFirstName(),
-            'slug' => $transaction->getSlug()
+            'slug' => $transaction->getSlug(),
         ];
         $this->addStandardInfosToContext($context, $transaction, $debtor);
-
 
         $this->sendMail(
             $debtor->getEmail(),
@@ -97,7 +96,7 @@ class MailService
      * @throws NonUniqueResultException
      * @throws TransportExceptionInterface
      */
-    public function sendAcceptMail(Transaction $transaction, User $debtor, User $loaner): void
+    public function sendAcceptMailToLoaner(Transaction $transaction, User $debtor, User $loaner): void
     {
         $text = 'Es gibt gute Neuigkeiten. Jemand hat hat eine Schuld anerkannt';
         $subject = 'Dein Darlehen wurde akzeptiert';
@@ -105,7 +104,7 @@ class MailService
         $context = [
             'userName' => $loaner->getFirstName(),
             'text' => $text,
-            'debtor' => $debtor->getFirstName()
+            'debtor' => $debtor->getFirstName(),
         ];
         $this->addStandardInfosToContext($context, $transaction, $loaner);
 
@@ -129,7 +128,7 @@ class MailService
      * @throws NonUniqueResultException
      * @throws TransportExceptionInterface
      */
-    public function sendDeclineMail(Transaction $transaction, User $debtor, User $loaner): void
+    public function sendDeclineMailToLoaner(Transaction $transaction, User $debtor, User $loaner): void
     {
         $text = 'Es gibt schlechte Neuigkeiten. Jemand weigert sich eine Schuld anzuerkennen';
         $subject = 'Dein Darlehen wurde abgelehnt';
@@ -137,7 +136,7 @@ class MailService
         $context = [
             'userName' => $loaner->getFirstName(),
             'text' => $text,
-            'debtor' => $debtor->getFirstName()
+            'debtor' => $debtor->getFirstName(),
         ];
         $this->addStandardInfosToContext($context, $transaction, $loaner);
 
@@ -161,20 +160,25 @@ class MailService
      * @throws NonUniqueResultException
      * @throws TransportExceptionInterface
      */
-    public function sendTransferMail(Transaction $transaction, User $debtor, User $loaner): void
-    {
+    public function sendTransferMailToLoaner(
+        Transaction $transaction,
+        User $debtor,
+        User $loaner,
+        PaymentAction $paymentAction
+    ): void {
         $text = 'Es gibt gute Neuigkeiten. Jemand hat dir Geld überwiesen';
         $subject = 'Du hast eine Überweisung erhalten';
 
         $context = [
-            'userName' => $debtor->getFirstName(),
+            'userName' => $loaner->getFirstName(),
             'text' => $text,
-            'loaner' => $loaner->getFirstName()
+            'loaner' => $loaner->getFirstName(),
+            'paymentAction' => $paymentAction,
         ];
         $this->addStandardInfosToContext($context, $transaction, $loaner);
 
         $this->sendMail(
-            $debtor->getEmail(),
+            $loaner->getEmail(),
             $subject,
             'mailer/mail.transferred.html.twig',
             $context
@@ -184,12 +188,11 @@ class MailService
     /**
      * addStandardInfosToContext
      *
-     * @param array       $context
+     * @param array $context
      * @param Transaction $transaction
-     * @param User        $user
+     * @param User $user
      *
      * @return void
-     *
      * @throws NoResultException
      * @throws NonUniqueResultException
      */

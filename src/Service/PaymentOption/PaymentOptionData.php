@@ -13,12 +13,12 @@ abstract class PaymentOptionData
     private $owner;
 
     /**
-     * @boolean
+     * @var boolean
      */
     private $enabled;
 
     /**
-     * @boolean
+     * @var boolean
      */
     private $preferred;
 
@@ -44,47 +44,33 @@ abstract class PaymentOptionData
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getEnabled()
+    public function isEnabled(): bool
     {
         return $this->enabled;
     }
 
     /**
-     * @param mixed $enabled
+     * @param bool $enabled
      */
-    public function setEnabled($enabled): void
+    public function setEnabled(bool $enabled): void
     {
         $this->enabled = $enabled;
     }
 
     /**
-     * initFromUser
-     *
-     * @param User $owner
-     *
-     * @return $this
+     * @return bool
      */
-    public function initFromUser(User $owner): self
-    {
-        $this->setOwner($owner);
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPreferred()
+    public function isPreferred(): bool
     {
         return $this->preferred;
     }
 
     /**
-     * @param mixed $preferred
+     * @param bool $preferred
      */
-    public function setPreferred($preferred): void
+    public function setPreferred(bool $preferred): void
     {
         $this->preferred = $preferred;
     }
@@ -103,5 +89,19 @@ abstract class PaymentOptionData
     public function setDescription(string $description): void
     {
         $this->description = $description;
+    }
+
+    /**
+     * initFromUser
+     *
+     * @param User $owner
+     *
+     * @return $this
+     */
+    public function initFromUser(User $owner): self
+    {
+        $this->setOwner($owner);
+
+        return $this;
     }
 }

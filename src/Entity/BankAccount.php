@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\BankAccountRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -29,6 +31,16 @@ class BankAccount extends PaymentOption
      * @ORM\Column(type="string", length=255)
      */
     private $bankName;
+
+    /**
+     * @ORM\OneToMany(targetEntity=PaymentAction::class, mappedBy="bankAccountSender")
+     */
+    private $paymentActions;
+
+    public function __construct()
+    {
+        $this->paymentActions = new ArrayCollection();
+    }
 
     public function getIban(): ?string
     {
@@ -74,6 +86,36 @@ class BankAccount extends PaymentOption
     public function setBankName(string $bankName): self
     {
         $this->bankName = $bankName;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PaymentAction[]
+     */
+    public function getPaymentActions(): Collection
+    {
+        return $this->paymentActions;
+    }
+
+    public function addPaymentAction(PaymentAction $paymentAction): self
+    {
+        if (!$this->paymentActions->contains($paymentAction)) {
+            $this->paymentActions[] = $paymentAction;
+            $paymentAction->setBankAccountSender($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaymentAction(PaymentAction $paymentAction): self
+    {
+        if ($this->paymentActions->removeElement($paymentAction)) {
+            // set the owning side to null (unless already changed)
+            if ($paymentAction->getBankAccountSender() === $this) {
+                $paymentAction->setBankAccountSender(null);
+            }
+        }
 
         return $this;
     }

@@ -68,7 +68,7 @@ class TransactionController extends AbstractController
 
             $transaction = $this->transactionService->storeSimpleTransaction($data, $requester);
 
-            $this->mailService->sendCreationMail($transaction, $requester, $data->getOwner());
+            $this->mailService->sendCreationMailToDebtor($transaction, $requester, $data->getOwner());
 
             return $this->redirect($this->generateUrl('account_overview', []));
         }
@@ -127,10 +127,10 @@ class TransactionController extends AbstractController
             if ($isDebtor) {
                 if ($isAccepted) {
                     $this->transactionService->acceptTransaction($transaction);
-                    $this->mailService->sendAcceptMail($transaction, $requester, $transaction->getLoaner());
+                    $this->mailService->sendAcceptMailToLoaner($transaction, $requester, $transaction->getLoaner());
                 } else {
                     $this->transactionService->declineTransaction($transaction);
-                    $this->mailService->sendDeclineMail($transaction, $requester, $transaction->getLoaner());
+                    $this->mailService->sendDeclineMailToLoaner($transaction, $requester, $transaction->getLoaner());
                 }
                 return $this->redirectToRoute('account_debts', []);
             } else {

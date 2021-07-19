@@ -582,6 +582,35 @@
                         <div class="heading-section">
                             <h2>Hallo {{ userName }}</h2>
                             <p>{{ text }}</p>
+                            {% if paymentAction.variant == "bank"%}
+                                <p>{{ loaner }} hat das Geld per Banküberweisung auf folgendes deiner Konten überwiesen:</p>
+                                <table>
+                                    <tr>
+                                        <th>Inhaber: </th>
+                                        <td>{{ paymentAction.bankAccountSender.accountName }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>IBAN: </th>
+                                        <td>{{ paymentAction.bankAccountSender.iban }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>BIC: </th>
+                                        <td>{{ paymentAction.bankAccountSender.bic }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Bankname: </th>
+                                        <td>{{ paymentAction.bankAccountSender.bankName }}</td>
+                                    </tr>
+                                </table>
+                            {% elseif paymentAction.variant == "paypal"%}
+                                <p>{{ loaner }} hat das Geld per Paypal auf folgendes deiner Konten überwiesen:</p>
+                                <table>
+                                    <tr>
+                                        <th>Email: </th>
+                                        <td>{{ paymentAction.paypalAccountSender.email }}</td>
+                                    </tr>
+                                </table>
+                            {% endif %}
                         </div>
                     </td>
                 </tr><!-- end: tr -->

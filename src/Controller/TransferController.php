@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\BankAccount;
+use App\Entity\PaymentAction;
 use App\Entity\PaypalAccount;
 use App\Entity\Transaction;
 use App\Entity\User;
@@ -11,6 +12,8 @@ use App\Form\ExchangeType;
 use App\Form\PrepareTransferType;
 use App\Service\Debt\DebtDto;
 use App\Service\Mailer\MailService;
+use App\Service\PaymentAction\PaymentActionData;
+use App\Service\PaymentAction\PaymentActionService;
 use App\Service\PaymentOption\BankAccountService;
 use App\Service\PaymentOption\PaypalAccountService;
 use App\Service\Transaction\TransactionService;
@@ -45,12 +48,18 @@ class TransferController extends AbstractController
     private $mailService;
 
     /**
+     * @var PaymentActionService
+     */
+    private $paymentActionService;
+
+    /**
      * TransactionController constructor.
      */
-    public function __construct(TransactionService $transactionService, MailService $mailService)
+    public function __construct(TransactionService $transactionService, MailService $mailService, PaymentActionService $paymentActionService)
     {
         $this->transactionService = $transactionService;
         $this->mailService = $mailService;
+        $this->paymentActionService = $paymentActionService;
     }
 
     /**
@@ -98,10 +107,12 @@ class TransferController extends AbstractController
             if ($data->getPaymentOption() instanceof BankAccount) {
                 return $this->redirectToRoute('transfer_send_bank', [
                     'slug' => $transaction->getSlug(),
+                    'senderBankAccount' => $data->getPaymentOption()->getId(),
                 ]);
             } elseif ($data->getPaymentOption() instanceof PaypalAccount) {
                 return $this->redirectToRoute('transfer_send_paypal', [
                     'slug' => $transaction->getSlug(),
+                    'senderPaypalAccount' => $data->getPaymentOption()->getId(),
                 ]);
             }
         }
@@ -114,10 +125,11 @@ class TransferController extends AbstractController
     }
 
     /**
-     * @Route("/send/{slug}", name="transfer_send_bank")
+     * @Route("/send/{slug}/{senderBankAccount}", name="transfer_send_bank")
      */
     public function sendTransferBank(
         Transaction $transaction,
+        BankAccount $senderBankAccount,
         Request $request,
         BankAccountService $bankAccountService
     ): Response {
@@ -131,9 +143,9 @@ class TransferController extends AbstractController
             Transaction::STATE_ACCEPTED
         );
 
-        $bankAccount = $bankAccountService->getActiveBankAccountForUser($transaction->getLoans()[0]->getOwner());
+        $receiverBankAccount = $bankAccountService->getActiveBankAccountForUser($transaction->getLoans()[0]->getOwner());
 
-        $dto = (new SendTransferDto)->initFrom($bankAccount);
+        $dto = (new SendTransferDto)->initFrom($receiverBankAccount);
         $dto->setAmount($transaction->getLoans()[0]->getAmount());
         $dto->setReason($transaction->getReason());
         $dto->setTransactionId($transaction->getId());
@@ -150,6 +162,15 @@ class TransferController extends AbstractController
                 $transactionUpdateData = (new TransactionUpdateData())->initFrom($transaction);
                 $transactionUpdateData->setState(Transaction::STATE_CLEARED);
                 $this->transactionService->update($transaction, $transactionUpdateData);
+
+                $paymentActionData = new PaymentActionData();
+                $paymentActionData->setTransaction($transaction);
+                $paymentActionData->setVariant(PaymentAction::VARIANT_BANK);
+                $paymentActionData->setBankAccountSender($senderBankAccount);
+                $paymentActionData->setBankAccountReceiver($receiverBankAccount);
+                $paymentAction = $this->paymentActionService->storePaymentAction($paymentActionData);
+
+                $this->mailService->sendTransferMailToLoaner($transaction, $requester, $transaction->getLoaner(), $paymentAction);
             }
             return $this->redirectToRoute('account_debts', []);
         }
@@ -161,10 +182,11 @@ class TransferController extends AbstractController
     }
 
     /**
-     * @Route("/send/{slug}", name="transfer_send_paypal")
+     * @Route("/send/{slug}/{senderPaypalAccount}", name="transfer_send_paypal")
      */
     public function sendTransferPaypal(
         Transaction $transaction,
+        PaypalAccount $senderPaypalAccount,
         Request $request,
         PaypalAccountService $paypalAccountService
     ): Response {
@@ -178,9 +200,9 @@ class TransferController extends AbstractController
             Transaction::STATE_ACCEPTED
         );
 
-        $paypalAccount = $paypalAccountService->getPaypalAccountForUser($transaction->getLoans()[0]->getOwner());
+        $receiverPaypalAccount = $paypalAccountService->getPaypalAccountForUser($transaction->getLoans()[0]->getOwner());
 
-        $dto = (new SendTransferDto)->initFrom($paypalAccount);
+        $dto = (new SendTransferDto)->initFrom($receiverPaypalAccount);
         $dto->setAmount($transaction->getLoans()[0]->getAmount());
         $dto->setReason($transaction->getReason());
         $dto->setTransactionId($transaction->getId());
@@ -197,6 +219,15 @@ class TransferController extends AbstractController
                 $transactionUpdateData = (new TransactionUpdateData())->initFrom($transaction);
                 $transactionUpdateData->setState(Transaction::STATE_CLEARED);
                 $this->transactionService->update($transaction, $transactionUpdateData);
+
+                $paymentActionData = new PaymentActionData();
+                $paymentActionData->setTransaction($transaction);
+                $paymentActionData->setVariant(PaymentAction::VARIANT_PAYPAL);
+                $paymentActionData->setPaypalAccountSender($senderPaypalAccount);
+                $paymentActionData->setPaypalAccountReceiver($receiverPaypalAccount);
+                $paymentAction = $this->paymentActionService->storePaymentAction($paymentActionData);
+
+                $this->mailService->sendTransferMailToLoaner($transaction, $requester, $transaction->getLoaner(), $paymentAction);
             }
             return $this->redirectToRoute('account_debts', []);
         }
