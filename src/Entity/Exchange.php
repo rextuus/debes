@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ExchangeRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -32,17 +33,22 @@ class Exchange
      */
     private $transaction;
 
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $amount;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
+    public function setCreated(DateTimeInterface $created): self
     {
         $this->created = $created;
 
@@ -69,6 +75,18 @@ class Exchange
     public function setTransaction(?Transaction $transaction): self
     {
         $this->transaction = $transaction;
+
+        return $this;
+    }
+
+    public function getAmount(): ?float
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(float $amount): self
+    {
+        $this->amount = $amount;
 
         return $this;
     }

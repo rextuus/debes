@@ -3,7 +3,6 @@
 namespace App\Service\Exchange;
 
 use App\Entity\Transaction;
-use DateTimeInterface;
 
 /**
  * ExchangeData
@@ -22,6 +21,11 @@ class ExchangeData
      * @var Transaction
      */
     private $transaction;
+
+    /**
+     * @var float
+     */
+    private $amount;
 
     /**
      * @return float
@@ -53,5 +57,21 @@ class ExchangeData
     public function setTransaction(Transaction $transaction): void
     {
         $this->transaction = $transaction;
+    }
+
+    /**
+     * @return float
+     */
+    public function getAmount(): float
+    {
+        return $this->amount;
+    }
+
+    /**
+     * @param float $amount
+     */
+    public function setAmount(float $amount): void
+    {
+        $this->amount = $amount;
     }
 }

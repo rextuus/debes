@@ -3,10 +3,7 @@
 namespace App\Service\Exchange;
 
 use App\Entity\Exchange;
-use App\Entity\Transaction;
 use DateTime;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 
 /**
  * ExchangeFactory
@@ -29,6 +26,7 @@ class ExchangeFactory
         $exchange->setCreated(new DateTime());
         $exchange->setRemainingAmount($exchangeData->getRemainingAmount());
         $exchange->setTransaction($exchangeData->getTransaction());
+        $exchange->setAmount($exchangeData->getAmount());
     }
 
     /**

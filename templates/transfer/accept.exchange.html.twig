@@ -11,7 +11,7 @@
                         <div class="col-lg-6">
                             <div class="hs-text">
                                 <h2><span>Deine</span> Verrechnung!</h2>
-
+                                <p>Du schuldest noch:</p>
                                 <table class="table table-hover table-dark">
                                     <tr>
                                         <th scope="col">Datum</th>
@@ -37,7 +37,7 @@
 
                                     <img src="{{ asset ('img/exchange.png') }}" alt="Exchange" style="background-color: transparent; width: 20%; height: 20%; margin-bottom: 10px; text-align: center">
 
-
+                                <p>Du bekommst noch:</p>
                                 <table class="table table-hover table-dark">
                                     <tr>
                                         <th scope="col">Datum</th>
@@ -62,7 +62,7 @@
                                 </table>
 
                                 {% if dto.difference > 0%} <h4 style="color: #5e0016">{{ dto.difference }} €</h4><p>an Schulden bleiben nach der Verrechnung über!</p>
-                                {% else %} <h4 style="color: #404b20">{{ dto.difference }} * -1 €</h4><p>an Darlehn bleiben nach der Verrechnung über!</p>
+                                {% else %} <h4 style="color: #404b20">{{ dto.difference * -1 }} €</h4><p>an Darlehn bleiben nach der Verrechnung über!</p>
                                 {% endif %}
 
 

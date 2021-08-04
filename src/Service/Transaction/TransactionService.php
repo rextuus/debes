@@ -2,12 +2,10 @@
 
 namespace App\Service\Transaction;
 
-use App\Entity\Loan;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Repository\TransactionRepository;
 use App\Service\Debt\DebtCreateData;
-use App\Service\Debt\DebtDto;
 use App\Service\Debt\DebtService;
 use App\Service\Debt\DebtUpdateData;
 use App\Service\Loan\LoanCreateData;
@@ -52,6 +50,11 @@ class TransactionService
     private $entityManager;
 
     /**
+     * @var DtoProvider
+     */
+    private $dtoProvider;
+
+    /**
      * TransactionService constructor.
      *
      * @param TransactionFactory     $transactionFactory
@@ -59,19 +62,22 @@ class TransactionService
      * @param DebtService            $debtService
      * @param LoanService            $loanService
      * @param EntityManagerInterface $entityManager
+     * @param DtoProvider            $dtoProvider
      */
     public function __construct(
         TransactionFactory $transactionFactory,
         TransactionRepository $transactionRepository,
         DebtService $debtService,
         LoanService $loanService,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        DtoProvider $dtoProvider
     ) {
         $this->transactionFactory = $transactionFactory;
         $this->transactionRepository = $transactionRepository;
         $this->debtService = $debtService;
         $this->loanService = $loanService;
         $this->entityManager = $entityManager;
+        $this->dtoProvider = $dtoProvider;
     }
 
     /**
@@ -198,11 +204,30 @@ class TransactionService
     public function getAllDebtTransactionsForUserAndState(User $owner, string $state): array
     {
         $dtos = array();
-        $debtTransactions = $this->debtService->getAllDebtTransactionsForUserAndSate($owner, $state);
+        $debtTransactions = $this->debtService->getAllDebtTransactionsForUserAndState($owner, $state);
         foreach ($debtTransactions as $transaction) {
-            $dtos[] = DebtDto::create($transaction);
+            $dtos[] = $this->dtoProvider->createDebtDto($transaction);
         }
         return $dtos;
+    }
+
+    /**
+     * createDtoFromTransaction
+     *
+     * @param Transaction $transaction
+     * @param bool        $isDebt
+     *
+     * @return LoanAndDebtDto
+     */
+    public function createDtoFromTransaction(Transaction $transaction, bool $isDebt): LoanAndDebtDto
+    {
+        if ($isDebt) {
+            return $this->dtoProvider->createDebtDto($transaction);
+        }
+        else{
+            return $this->dtoProvider->createLoanDto($transaction);
+
+        }
     }
 
     /**
@@ -245,7 +270,6 @@ class TransactionService
      * @param Transaction $transaction
      *
      * @return void
-     *
      * @throws ORMException
      * @throws OptimisticLockException
      */

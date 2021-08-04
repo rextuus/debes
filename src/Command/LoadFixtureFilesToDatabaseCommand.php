@@ -221,3 +221,4 @@ class LoadFixtureFilesToDatabaseCommand extends Command
         ];
     }
 }
+//TODO Es wäre schön wenn wir die exchanges auf den seiten farblich markiert darstellen könnten rot für eine Verrechnung von uns und grün für eine von jemand anderem

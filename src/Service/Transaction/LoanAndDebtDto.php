@@ -54,6 +54,11 @@ abstract class LoanAndDebtDto
     private $slug;
 
     /**
+     * @var array
+     */
+    private $exchangeDtos;
+
+    /**
      * create
      *
      * @param Transaction    $transaction
@@ -69,6 +74,7 @@ abstract class LoanAndDebtDto
         $dto->setReason($transaction->getReason());
         $dto->setTransactionId($transaction->getId());
         $dto->setSlug($transaction->getSlug());
+        $dto->setExchangeDtos([]);
     }
 
     /**
@@ -208,5 +214,21 @@ abstract class LoanAndDebtDto
     public function setSlug(string $slug): void
     {
         $this->slug = $slug;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExchangeDtos(): array
+    {
+        return $this->exchangeDtos;
+    }
+
+    /**
+     * @param array $exchangeDtos
+     */
+    public function setExchangeDtos(array $exchangeDtos): void
+    {
+        $this->exchangeDtos = $exchangeDtos;
     }
 }

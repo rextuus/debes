@@ -3,6 +3,7 @@
 namespace App\Service\Exchange;
 
 use App\Entity\Exchange;
+use App\Entity\Transaction;
 use App\Repository\ExchangeRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -75,6 +76,19 @@ class ExchangeService
         $this->exchangeFactory->mapData($transaction, $data);
 
         $this->exchangeRepository->persist($transaction);
+    }
+
+    /**
+     * getAllExchangesBelongingToTransaction
+     *
+     * @param Transaction $transaction
+     *
+     * @return Exchange[]
+     *
+     */
+    public function getAllExchangesBelongingToTransaction(Transaction $transaction): array
+    {
+        return $this->exchangeRepository->findBy(['transaction' => $transaction]);
     }
 
 }

@@ -5,7 +5,6 @@ namespace App\Service\Transfer;
 use App\Entity\Transaction;
 use App\Service\Exchange\ExchangeCreateData;
 use App\Service\Exchange\ExchangeService;
-use App\Service\Loan\LoanUpdateData;
 use App\Service\Transaction\TransactionService;
 use App\Service\Transaction\TransactionUpdateData;
 use Doctrine\ORM\OptimisticLockException;
@@ -112,7 +111,7 @@ class ExchangeProcessor
         if ($transaction->getAmount() >= $transactionToExchange->getAmount()) {
             $difference = $transaction->getAmount() - $transactionToExchange->getAmount();
             $transactionUpdateData->setAmount($difference);
-            $exchangeTransactionUpdateData->setState(Transaction::STATE_CONFIRMED);
+            $exchangeTransactionUpdateData->setState(Transaction::STATE_ACCEPTED);
 
             $exchangeCreationDataForTransaction->setRemainingAmount($difference);
             $exchangeCreationDataForExchangeTransaction->setRemainingAmount(0);
@@ -135,7 +134,9 @@ class ExchangeProcessor
 
         // create an single exchange for each transaction
         $exchangeCreationDataForTransaction->setTransaction($transaction);
+        $exchangeCreationDataForTransaction->setAmount($transactionToExchange->getAmount());
         $exchangeCreationDataForExchangeTransaction->setTransaction($transactionToExchange);
+        $exchangeCreationDataForExchangeTransaction->setAmount($transactionToExchange->getAmount());
 
         $this->exchangeService->storeExchange($exchangeCreationDataForTransaction);
         $this->exchangeService->storeExchange($exchangeCreationDataForExchangeTransaction);

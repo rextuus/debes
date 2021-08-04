@@ -8,7 +8,6 @@ use App\Form\ChoiceType;
 use App\Form\TransactionCreateDebtorType;
 use App\Form\TransactionCreateSimpleType;
 use App\Form\TransactionCreateType;
-use App\Repository\TransactionRepository;
 use App\Service\Debt\DebtDto;
 use App\Service\Loan\LoanDto;
 use App\Service\Mailer\MailService;
@@ -16,7 +15,6 @@ use App\Service\Transaction\TransactionCreateData;
 use App\Service\Transaction\TransactionCreateDebtorData;
 use App\Service\Transaction\TransactionData;
 use App\Service\Transaction\TransactionService;
-use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -164,10 +162,10 @@ class TransactionController extends AbstractController
         );
 
         if ($isDebtor) {
-            $dto = DebtDto::create($transaction);
+            $dto = $this->transactionService->createDtoFromTransaction($transaction, true);
             $labels = ['label' => ['submit' => 'Überweisen', 'decline' => 'Verrechnen']];
         } else {
-            $dto = LoanDto::create($transaction);
+            $dto = $this->transactionService->createDtoFromTransaction($transaction, false);
             $labels = ['label' => ['submit' => 'Mahn-Mail senden', 'decline' => 'Mahn-Mail senden']];
         }
 
