@@ -12,49 +12,41 @@
                             <div class="hs-text">
                                 <h2><span>Das Wichtigste</span> zuerst</h2>
 
-                                {{ form_start(form, {'method': 'POST'}) }}
-                                <div class="my-custom-class-for-errors">
+
+                                    {{ form_start(form) }}
                                     {{ form_errors(form) }}
-                                </div>
 
-                                <div class="row">
-                                    <div class="col">
-                                        <div>
-                                            {{ form_label(form.reason, 'Beschreibung', {'label_attr': {'class': 'h2'}}) }}
+{#                                    {{ form_row(form.professions) }}#}
+
+{#                                    {% if form.subProfessions is defined %}#}
+{#                                        {{ form_row(form.subProfessions) }}#}
+{#                                    {% endif %}#}
+
+{#                                    {% if form.disciplines is defined %}#}
+{#                                        {{ form_row(form.disciplines) }}#}
+{#                                    {% endif %}#}
+{#                                    {% if form.positions is defined %}#}
+{#                                        {{ form_row(form.positions) }}#}
+{#                                    {% endif %}#}
+{#                                    {% if form.activities is defined %}#}
+{#                                        {{ form_row(form.activities) }}#}
+{#                                    {% endif %}#}
+{#                                    {% if form.specialties is defined %}#}
+{#                                        {{ form_row(form.specialties) }}#}
+{#                                    {% endif %}#}
+{#                                    {% if form.additionals is defined %}#}
+{#                                        {{ form_row(form.additionals) }}#}
+{#                                    {% endif %}#}
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-2"></div>
+                                        <div class="col-sm-10">
+                                            {{ form_widget(form.submit) }}
                                         </div>
-                                        {{ form_widget(form.reason, {'attr': {'class': 'earch-form input'}}) }}
-
-                                    <br>
-
-                                        <div>
-                                            {{ form_label(form.amount, 'Betrag', {'label_attr': {'class': 'h2'}}) }}
-                                        </div>
-                                        {{ form_widget(form.amount, {'attr': {'class': 'earch-form input'}}) }}
-
-                                    <br>
-
-                                        <div>
-                                            {{ form_label(form.debtors, 'Schuldner', {'label_attr': {'class': 'h2'}}) }}
-                                        </div>
-                                        {{ form_widget(form.debtors, {'attr': {'class': 'earch-form input'}}) }}
-
-
-                                        <div>
-                                            {{ form_label(form.loaners, 'Gläubiger', {'label_attr': {'class': 'h2'}}) }}
-                                        </div>
-                                        {{ form_widget(form.loaners, {'attr': {'class': 'earch-form input'}}) }}
                                     </div>
-                                    <br>
+                                    {{ form_end(form) }}
 
 
-                                    {{ form_row(form._token) }}
-
-                                    <div>
-                                        <br>
-                                        {{ form_widget(form.submit, {'attr': {'class': 'site-btn'}}) }}
-                                    </div>
-
-                                </div>
                             </div>
                         </div>
                     </div>
