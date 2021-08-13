@@ -227,3 +227,4 @@ class LoadFixtureFilesToDatabaseCommand extends Command
 //TODO reminder per email
 //TODO einstellungen, wegen mail benachrichtigungen oder automatischen Verrechnen von neuen Transaktionen
 //TODO History
+//TODO Umschulden: Es ist möglich seine vergebenen Kredite so zu bearbeiten, dass man sie einer neue Person zuweisen kann falls es sich um ein multi transaction handelt

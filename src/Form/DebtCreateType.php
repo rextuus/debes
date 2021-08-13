@@ -29,14 +29,19 @@ class DebtCreateType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $choices = $this->prepareOptions($options['requester']);
         $builder
-            ->add('amount', MoneyType::class)
+            ->add(
+                'amount', MoneyType::class,
+                ['attr' => ['amountField' => true]]
+            )
             ->add(
                 'owner',
                 ChoiceType::class,
                 [
-                    'choices' => $this->prepareOptions($options['requester']),
+                    'choices' => $choices,
                     'data' => $options['requester'],
+                    'attr' => [ 'debtorBox' => true]
                 ]
             );
     }

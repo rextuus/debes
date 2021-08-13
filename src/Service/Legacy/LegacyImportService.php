@@ -139,7 +139,7 @@ class LegacyImportService
         $transactionData->setAmount($amount);
         $transactionData->setOwner($debtor);
 
-        $transaction = $this->transactionService->storeSimpleTransaction($transactionData, $loaner);
+        $transaction = $this->transactionService->storeSingleTransaction($transactionData, $loaner);
 
         if ($state != Transaction::STATE_READY){
             $data = (new TransactionUpdateData())->initFrom($transaction);

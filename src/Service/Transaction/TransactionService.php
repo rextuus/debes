@@ -12,6 +12,7 @@ use App\Service\Loan\LoanCreateData;
 use App\Service\Loan\LoanDto;
 use App\Service\Loan\LoanService;
 use App\Service\Loan\LoanUpdateData;
+use DateTime;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
@@ -128,7 +129,7 @@ class TransactionService
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function storeSimpleTransaction(TransactionData $data, User $requester): Transaction
+    public function storeSingleTransaction(TransactionData $data, User $requester): Transaction
     {
         $data->setState(Transaction::STATE_READY);
         $transaction = $this->storeTransaction($data);
@@ -138,6 +139,40 @@ class TransactionService
         $this->debtService->storeDebt($debtData);
 
         $loanData = (new LoanCreateData())->initFromData($data, $requester);
+        $loanData->setTransaction($transaction);
+        $this->loanService->storeLoan($loanData);
+
+        return $transaction;
+    }
+
+    /**
+     * storeSimpleTransaction
+     *
+     * @param TransactionCreateMultipleData $data
+     * @param User            $requester
+     *
+     * @return Transaction
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function storeMultipleTransaction(TransactionCreateMultipleData $data, User $requester): Transaction
+    {
+        $transactionData = new TransactionCreateData();
+        $transactionData->setReason($data->getReason());
+        $transactionData->setAmount($data->getCompleteAmount());
+        $transactionData->setState(Transaction::STATE_READY);
+
+        $transaction = $this->storeTransaction($transactionData);
+
+        foreach ($data->getDebtorsData() as $debtData){
+            $debtData->setTransaction($transaction);
+            $debtData->setPaid(false);
+            $debtData->setCreated(new DateTime());
+            $debtData->setReason($data->getReason());
+            $this->debtService->storeDebt($debtData);
+        }
+
+        $loanData = (new LoanCreateData())->initFromData($transactionData, $requester);
         $loanData->setTransaction($transaction);
         $this->loanService->storeLoan($loanData);
 

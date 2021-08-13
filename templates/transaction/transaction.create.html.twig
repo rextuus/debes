@@ -1,57 +1,259 @@
 {% extends 'base.html.twig' %}
 
+
+{% block javascripts %}
+    <script>
+        jQuery(document).ready(function () {
+            var $wrapper = $('.js-genus-scientist-wrapper');
+
+            $wrapper.on('click', '.js-genus-scientist-add', function (e) {
+                alert("de");
+                e.preventDefault();
+                // Get the data-prototype explained earlier
+                var prototype = $wrapper.data('prototype');
+                // get the new index
+                var index = $wrapper.data('index');
+                // Replace '__name__' in the prototype's HTML to
+                // instead be a number based on how many items we have
+                var newForm = prototype.replace(/__name__/g, index);
+                // increase the index with one for the next item
+                $wrapper.data('index', index + 1);
+                // Display the form in the page before the "new" link
+                $(this).before(newForm);
+            });
+
+            $wrapper.on('click', '.js-remove-scientist', function (e) {
+                e.preventDefault();
+                $(this).closest('.js-genus-scientist-item')
+                    .fadeOut()
+                    .remove();
+            });
+        });
+    </script>
+
+{% endblock %}
+
 {% block title %}Hello PaymentController!{% endblock %}
 
 {% block body %}
+
     <section class="hero-section">
         <div class="hero-slider owl-carousel">
-            <div class="hs-item">
+            <div class="hs-item-own">
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="hs-text">
                                 <h2><span>Das Wichtigste</span> zuerst</h2>
 
+                                {{ form_start(form) }}
 
-                                    {{ form_start(form) }}
-                                    {{ form_errors(form) }}
-
-{#                                    {{ form_row(form.professions) }}#}
-
-{#                                    {% if form.subProfessions is defined %}#}
-{#                                        {{ form_row(form.subProfessions) }}#}
-{#                                    {% endif %}#}
-
-{#                                    {% if form.disciplines is defined %}#}
-{#                                        {{ form_row(form.disciplines) }}#}
-{#                                    {% endif %}#}
-{#                                    {% if form.positions is defined %}#}
-{#                                        {{ form_row(form.positions) }}#}
-{#                                    {% endif %}#}
-{#                                    {% if form.activities is defined %}#}
-{#                                        {{ form_row(form.activities) }}#}
-{#                                    {% endif %}#}
-{#                                    {% if form.specialties is defined %}#}
-{#                                        {{ form_row(form.specialties) }}#}
-{#                                    {% endif %}#}
-{#                                    {% if form.additionals is defined %}#}
-{#                                        {{ form_row(form.additionals) }}#}
-{#                                    {% endif %}#}
-
-                                    <div class="form-group row">
-                                        <div class="col-sm-2"></div>
-                                        <div class="col-sm-10">
-                                            {{ form_widget(form.submit) }}
-                                        </div>
+                                <div class="row js-genus-scientist-wrapper"
+                                     data-prototype="{{ form_widget(form.debtorsData.vars.prototype)|e('html_attr') }}"
+                                     data-index="{{ form.debtorsData|length }}"
+                                     data-clicked="0"
+                                     data-debtors=1
+                                >
+                                    <div>
+                                        {{ form_label(form.debtors, 'Anzahl Schuldner ', {'label_attr': {'class': 'h2'}}) }}
+                                        {{ form_widget(form.debtors, {'id': 'debtorNr', 'attr': {'class': 'earch-form input js-remove-scientist'}}) }}
                                     </div>
-                                    {{ form_end(form) }}
+                                    <div>
+                                        {{ form_label(form.completeAmount, 'Gesamtsumme ', {'label_attr': {'class': 'h2'}}) }}
+                                        {{ form_widget(form.completeAmount, {'id': 'completeAmount', 'attr': {'class': 'earch-form input js-calculate-distribution'}}) }}
+                                    </div>
+                                    <div>
+                                        {{ form_label(form.reason, 'Grund ', {'label_attr': {'class': 'h2'}}) }}
+                                        {{ form_widget(form.reason) }}
+                                    </div>
 
+{#                                    <div>#}
+{#                                        {{ form_widget(form.professions, {'id': 'completeAmount', 'attr': {'class': 'earch-form input js-calculate-distribution'}}) }}#}
+{#                                    </div>#}
+
+                                    {% for debtorData in form.debtorsData %}
+                                        <div class="col-xs-4 js-genus-scientist-item">
+
+                                            {{ form_errors(debtorData) }}
+                                            {{ form_row(debtorData.amount) }}
+                                            {{ form_row(debtorData.owner) }}
+                                        </div>
+                                    {% endfor %}
+
+                                </div>
 
                             </div>
+                            {{ form_row(form._token) }}
+                            {{ form_widget(form.submit, {'attr': {'class': 'site-btn'}}) }}
+
+                            {{ form_end(form) }}
+
+                            {# remove Elements  see https://symfonycasts.com/screencast/collections/collection-delete-orphan-removal#play #}
+
+
+                            <script>
+
+
+                                jQuery(document).ready(function () {
+                                    var $wrapper = $('.js-genus-scientist-wrapper');
+
+
+                                    $wrapper.on('change', '.js-calculate-distribution', function (e) {
+                                        e.preventDefault();
+                                        if ($wrapper.data('clicked') == 0) {
+                                            distributeAmount();
+                                            checkAmounts();
+                                            $wrapper.data('clicked', data('clicked'));
+
+                                        }
+                                    });
+
+                                    function distributeAmount(){
+                                        var totalAmount = 0;
+                                        $(".js-calculate-distribution").each(function (index) {
+                                            var valueOfField = $(this).val();
+                                            if (valueOfField) {
+                                                totalAmount = valueOfField;
+                                            }
+                                        });
+                                        var debtorNr = $wrapper.data('debtors');
+
+                                        var splitted = 0;
+                                        if (isNaN(totalAmount)){
+                                            alert('Please enter a number');
+
+                                        }else{
+                                            splitted = totalAmount/debtorNr;
+                                        }
+
+                                        $("[amountField]").val(splitted);
+
+                                    }
+
+                                    $(document).ready(function() {
+                                        $(".js-genus-scientist-item").remove();
+                                        $(":submit").attr("disabled", true);
+                                    });
+
+                                    function distributeDebtors(){
+                                        $("[debtorBox]").each(function (index) {
+                                            var numberOfCandidates = $(this).children("option").length;
+                                            $(this).val(index)
+                                        });
+                                    }
+
+                                    function checkDebtors(){
+
+                                        var doubleUsed = false;
+                                        let used = [];
+                                        $("[debtorBox]").each(function (index) {
+                                            var selectedCandidate = $(this).children("option:selected").val();
+                                            if (used[selectedCandidate]){
+                                                doubleUsed = true;
+                                            }
+                                            used[selectedCandidate] = true;
+                                        });
+
+                                        if(!doubleUsed){
+                                            $(":submit").removeAttr("disabled");
+                                            $("[debtorBox]").each(function (index) {
+                                                $(this).css("background-color","#ffffff");
+                                            });
+                                        }else{
+                                            $("[debtorBox]").each(function (index) {
+                                                $(this).css("background-color","#fa2d2d");
+                                                $(":submit").attr("disabled", true);
+
+                                            });
+                                        }
+                                    }
+
+                                    function checkAmounts(){
+                                        var totalAmount = 0;
+                                        $(".js-calculate-distribution").each(function (index) {
+                                            var valueOfField = $(this).val();
+                                            if (valueOfField) {
+                                                totalAmount = parseFloat(valueOfField);
+                                            }
+                                        });
+
+                                        var summedAmount = 0;
+                                        $("[amountField]").each(function (index) {
+                                            var amount = $(this).val();
+                                            summedAmount = summedAmount + parseFloat(amount);
+                                        });
+
+                                        var delta = 0.01;
+                                        if (summedAmount === totalAmount || summedAmount === totalAmount + delta || summedAmount === totalAmount - delta){
+                                            $(":submit").removeAttr("disabled");
+                                            $("[amountField]").each(function (index) {
+                                                $(this).css("background-color","#ffffff");
+                                            });
+                                        }else{
+                                            $("[amountField]").each(function (index) {
+                                                $(this).css("background-color","#fa2d2d");
+                                                $(":submit").attr("disabled", true);
+
+                                            });
+                                        }
+
+                                    }
+
+                                    $wrapper.on('change', '.js-remove-scientist', function (e) {
+                                        e.preventDefault();
+                                        if ($wrapper.data('clicked') == 0) {
+
+                                            $(".js-genus-scientist-item").remove();
+
+                                            var debtorNr = $(this).children("option:selected").val();
+
+                                            $wrapper.data('debtors', debtorNr);
+                                            for (let i = 0; i < debtorNr; i++) {
+                                                var prototype = $wrapper.data('prototype');
+                                                // get the new index
+                                                var index = $wrapper.data('index');
+                                                // Replace '__name__' in the prototype's HTML to
+                                                // instead be a number based on how many items we have
+                                                var newForm = prototype.replace(/__name__/g, index);
+                                                // increase the index with one for the next item
+                                                $wrapper.data('index', index + 1);
+                                                // Display the form in the page before the "new" link
+                                                $(this).after(newForm);
+                                            }
+                                            distributeAmount();
+                                            distributeDebtors();
+                                            checkDebtors();
+                                        }
+                                        $wrapper.data('clicked', data('clicked'));
+                                    });
+
+                                    $wrapper.on('change', '[debtorBox]', function (e) {
+                                        e.preventDefault();
+                                        if ($wrapper.data('clicked') == 0) {
+                                            checkDebtors($(this).children("option").length);
+                                        }
+                                        $wrapper.data('clicked', data('clicked'));
+
+                                    });
+
+                                    $wrapper.on('change', '[amountField]', function (e) {
+                                        e.preventDefault();
+                                        if ($wrapper.data('clicked') == 0) {
+                                            checkAmounts($wrapper.data('debtors'));
+                                        }
+                                        $wrapper.data('clicked', data('clicked'));
+                                    });
+                                });
+                            </script>
+
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </section>
+
+
 {% endblock %}

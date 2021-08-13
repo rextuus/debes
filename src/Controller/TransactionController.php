@@ -6,13 +6,16 @@ use App\Entity\Transaction;
 use App\Entity\User;
 use App\Form\ChoiceType;
 use App\Form\TransactionCreateDebtorType;
+use App\Form\TransactionCreateMultipleType;
 use App\Form\TransactionCreateSimpleType;
 use App\Form\TransactionCreateType;
+use App\Service\Debt\DebtCreateData;
 use App\Service\Debt\DebtDto;
 use App\Service\Loan\LoanDto;
 use App\Service\Mailer\MailService;
 use App\Service\Transaction\TransactionCreateData;
 use App\Service\Transaction\TransactionCreateDebtorData;
+use App\Service\Transaction\TransactionCreateMultipleData;
 use App\Service\Transaction\TransactionData;
 use App\Service\Transaction\TransactionService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -64,7 +67,7 @@ class TransactionController extends AbstractController
             /** @var TransactionData $data */
             $data = $form->getData();
 
-            $transaction = $this->transactionService->storeSimpleTransaction($data, $requester);
+            $transaction = $this->transactionService->storeSingleTransaction($data, $requester);
 
             $this->mailService->sendCreationMailToDebtor($transaction, $requester, $data->getOwner());
 
@@ -270,8 +273,14 @@ class TransactionController extends AbstractController
     public function createTransaction(
         Request $request
     ): Response {
-        $transactionData = (new TransactionCreateData());
-        $form = $this->createForm(TransactionCreateType::class, $transactionData);
+        /** @var User $requester */
+        $requester = $this->getUser();
+
+        $transactionData = (new TransactionCreateMultipleData());
+        $dat = new DebtCreateData();
+        $dat->setOwner($requester);
+        $transactionData->setDebtorsData([$dat]);
+        $form = $this->createForm(TransactionCreateMultipleType::class, $transactionData, ['requester' => $requester]);
 
         $form->handleRequest($request);
 
@@ -279,59 +288,13 @@ class TransactionController extends AbstractController
             /** @var User $requester */
             $requester = $this->getUser();
 
-            /** @var TransactionCreateData $data */
+            /** @var TransactionCreateMultipleData $data */
             $data = $form->getData();
-            $data->setRequester($requester);
 
-            $transactionData = (new TransactionCreateDebtorData())->initFromData($data);
-            $form = $this->createForm(
-                TransactionCreateDebtorType::class,
-                $transactionData,
-                [
-                    'debtors' => $data->getDebtors(),
-                    'requester' => $requester,
-                ]
-            );
-
-            return $this->render(
-                'transaction/transaction.create.details.html.twig',
-                [
-                    'form' => $form->createView(),
-                    'numberOfDebtors' => $data->getDebtors(),
-                    'debtors' => $transactionData->getDebtorData(),
-                ]
-            );
-
-            return $this->redirect($this->generateUrl('transaction_overview'));
+            $this->transactionService->storeMultipleTransaction($data, $requester);
         }
 
         return $this->render('transaction/transaction.create.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
-    /**
-     * @Route("/create/debtors", name="transaction_create_debtors")
-     */
-    public function createTransactionDebtors(
-        Request $request,
-        TransactionService $transactionService
-    ): Response {
-        $transactionData = (new TransactionCreateDebtorType());
-        $form = $this->createForm(TransactionCreateDebtorType::class, $transactionData);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var TransactionCreateData $data */
-            $data = $form->getData();
-
-            $transactionService->storeTransaction($data);
-
-            return $this->redirect($this->generateUrl('transaction_overview'));
-        }
-
-        return $this->render('transaction/transaction.create.details.html.twig', [
             'form' => $form->createView(),
         ]);
     }

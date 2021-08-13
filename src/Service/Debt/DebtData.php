@@ -29,7 +29,7 @@ class DebtData
     private $transaction;
 
     /**
-     * @var User
+     * @var User|null
      */
     private $owner;
 
@@ -92,17 +92,17 @@ class DebtData
     }
 
     /**
-     * @return User
+     * @return User|null
      */
-    public function getOwner(): User
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
 
     /**
-     * @param User $owner
+     * @param User|null $owner
      */
-    public function setOwner(User $owner): void
+    public function setOwner(?User $owner): void
     {
         $this->owner = $owner;
     }
