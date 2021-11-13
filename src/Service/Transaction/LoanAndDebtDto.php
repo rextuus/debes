@@ -3,7 +3,6 @@
 namespace App\Service\Transaction;
 
 use App\Entity\Transaction;
-use App\Service\Loan\LoanDto;
 use DateTimeInterface;
 
 /**
@@ -50,6 +49,16 @@ abstract class LoanAndDebtDto
     private $transactionId;
 
     /**
+     * @var string
+     */
+    private $slug;
+
+    /**
+     * @var array
+     */
+    private $exchangeDtos;
+
+    /**
      * create
      *
      * @param Transaction    $transaction
@@ -64,6 +73,8 @@ abstract class LoanAndDebtDto
         $dto->setState($transaction->getState());
         $dto->setReason($transaction->getReason());
         $dto->setTransactionId($transaction->getId());
+        $dto->setSlug($transaction->getSlug());
+        $dto->setExchangeDtos([]);
     }
 
     /**
@@ -187,5 +198,37 @@ abstract class LoanAndDebtDto
     public function setTransactionId(int $transactionId): void
     {
         $this->transactionId = $transactionId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @param string $slug
+     */
+    public function setSlug(string $slug): void
+    {
+        $this->slug = $slug;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExchangeDtos(): array
+    {
+        return $this->exchangeDtos;
+    }
+
+    /**
+     * @param array $exchangeDtos
+     */
+    public function setExchangeDtos(array $exchangeDtos): void
+    {
+        $this->exchangeDtos = $exchangeDtos;
     }
 }

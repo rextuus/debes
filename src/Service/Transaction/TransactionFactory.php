@@ -33,7 +33,13 @@ class TransactionFactory
      */
     public function mapData(Transaction $transaction, TransactionData $data): void
     {
-        $transaction->setCreated(new DateTime());
+        if ($data instanceof TransactionCreateData){
+            $transaction->setCreated(new DateTime());
+            $transaction->setEdited($transaction->getCreated());
+        }else{
+            $transaction->setEdited(new DateTime());
+        }
+
         $transaction->setAmount($data->getAmount());
         $transaction->setReason($data->getReason());
         $transaction->setState($data->getState());

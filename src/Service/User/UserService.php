@@ -58,4 +58,17 @@ class UserService
     {
         return $this->userRepository->findAllUserExcept($requester->getId());
     }
+
+    /**
+     * findUserByUserName
+     *
+     * @param string $userName
+     *
+     * @return User|null
+     *
+     */
+    public function findUserByUserName(string $userName): ?User
+    {
+        return $this->userRepository->findOneBy(['username' => $userName]);
+    }
 }

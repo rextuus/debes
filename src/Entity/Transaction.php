@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TransactionRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -63,10 +64,21 @@ class Transaction
      */
     private $edited;
 
+    /**
+     * @ORM\Column(type="string", length=32, unique=true)
+     */
+    private $slug;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Exchange::class, mappedBy="transaction")
+     */
+    private $exchanges;
+
     public function __construct()
     {
         $this->debts = new ArrayCollection();
         $this->loans = new ArrayCollection();
+        $this->exchanges = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -74,12 +86,12 @@ class Transaction
         return $this->id;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
+    public function setCreated(DateTimeInterface $created): self
     {
         $this->created = $created;
 
@@ -182,14 +194,86 @@ class Transaction
         return $this;
     }
 
-    public function getEdited(): ?\DateTimeInterface
+    public function getEdited(): ?DateTimeInterface
     {
         return $this->edited;
     }
 
-    public function setEdited(?\DateTimeInterface $edited): self
+    public function setEdited(?DateTimeInterface $edited): self
     {
         $this->edited = $edited;
+
+        return $this;
+    }
+
+    /**
+     * __toString
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->getReason();
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * getLoaner
+     *
+     * @return User
+     */
+    public function getLoaner(): User
+    {
+        return $this->loans[0]->getOwner();
+    }
+
+    /**
+     * getDebtor
+     *
+     * @return User
+     */
+    public function getDebtor(): User
+    {
+        return $this->debts[0]->getOwner();
+    }
+
+    /**
+     * @return Collection|Exchange[]
+     */
+    public function getExchanges(): Collection
+    {
+        return $this->exchanges;
+    }
+
+    public function addExchange(Exchange $exchange): self
+    {
+        if (!$this->exchanges->contains($exchange)) {
+            $this->exchanges[] = $exchange;
+            $exchange->setTransaction($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExchange(Exchange $exchange): self
+    {
+        if ($this->exchanges->removeElement($exchange)) {
+            // set the owning side to null (unless already changed)
+            if ($exchange->getTransaction() === $this) {
+                $exchange->setTransaction(null);
+            }
+        }
 
         return $this;
     }

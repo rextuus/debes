@@ -37,9 +37,9 @@
                                 <tr>
                                     <td>
                                         {% if debtVariant %}
-                                            <a href="{{ path('transaction_accept', {transaction: entry.transactionId, variant: 'debtor'}) }}">{{ loop.index }}</a>
+                                            <a href="{{ path('transaction_accept', {slug: entry.slug, variant: 'debtor'}) }}">{{ loop.index }}</a>
                                         {% else %}
-                                            <a href="{{ path('transaction_accept', {transaction: entry.transactionId, variant: 'loaner'}) }}">{{ loop.index }}</a>
+                                            <a href="{{ path('transaction_accept', {slug: entry.slug, variant: 'loaner'}) }}">{{ loop.index }}</a>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -75,9 +75,9 @@
                                 <tr>
                                     <td>
                                         {% if debtVariant %}
-                                            <a href="{{ path('transaction_process', {transaction: entry.transactionId, variant: 'debtor'}) }}">{{ loop.index }}</a>
+                                            <a href="{{ path('transaction_process', {slug: entry.slug, variant: 'debtor'}) }}">{{ loop.index }}</a>
                                         {% else %}
-                                            <a href="{{ path('transaction_process', {transaction: entry.transactionId, variant: 'loaner'}) }}">{{ loop.index }}</a>
+                                            <a href="{{ path('transaction_process', {slug: entry.slug, variant: 'loaner'}) }}">{{ loop.index }}</a>
                                         {% endif %}
                                     </td>
                                     <td>
@@ -114,9 +114,9 @@
                                 <tr>
                                     <td>
                                         {% if debtVariant %}
-                                            <a href="{{ path('transaction_confirm', {transaction: entry.transactionId, variant: 'debtor'}) }}">{{ loop.index }}</a>
+                                            <a href="{{ path('transaction_confirm', {slug: entry.slug, variant: 'debtor'}) }}">{{ loop.index }}</a>
                                         {% else %}
-                                            <a href="{{ path('transaction_confirm', {transaction: entry.transactionId, variant: 'loaner'}) }}">{{ loop.index }}</a>
+                                            <a href="{{ path('transaction_confirm', {slug: entry.slug, variant: 'loaner'}) }}">{{ loop.index }}</a>
                                         {% endif %}
                                     </td>
                                     <td>

@@ -49,8 +49,8 @@ class PaymentOptionFactory
         }
 
         $paymentOption->setOwner($data->getOwner());
-        $paymentOption->setEnabled($data->getEnabled());
-        $paymentOption->setIsPrioritised($data->getPreferred());
+        $paymentOption->setEnabled($data->isEnabled());
+        $paymentOption->setIsPrioritised($data->isPreferred());
         $paymentOption->setDescription($data->getDescription());
     }
 

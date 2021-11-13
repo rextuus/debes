@@ -6,85 +6,85 @@ class BankAccountData extends PaymentOptionData
 {
 
     /**
-     * @string
+     * @var string
      */
     private $iban;
 
     /**
-     * @string
+     * @var string
      */
     private $bic;
 
     /**
-     * @string
+     * @var string
      */
     private $accountName;
 
     /**
-     * @string
+     * @var string
      */
     private $bankName;
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getIban()
+    public function getIban(): string
     {
         return $this->iban;
     }
 
     /**
-     * @param mixed $iban
+     * @param string $iban
      */
-    public function setIban($iban): void
+    public function setIban(string $iban): void
     {
         $this->iban = $iban;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getBic()
+    public function getBic(): string
     {
         return $this->bic;
     }
 
     /**
-     * @param mixed $bic
+     * @param string $bic
      */
-    public function setBic($bic): void
+    public function setBic(string $bic): void
     {
         $this->bic = $bic;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getAccountName()
+    public function getAccountName(): string
     {
         return $this->accountName;
     }
 
     /**
-     * @param mixed $accountName
+     * @param string $accountName
      */
-    public function setAccountName($accountName): void
+    public function setAccountName(string $accountName): void
     {
         $this->accountName = $accountName;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getBankName()
+    public function getBankName(): string
     {
         return $this->bankName;
     }
 
     /**
-     * @param mixed $bankName
+     * @param string $bankName
      */
-    public function setBankName($bankName): void
+    public function setBankName(string $bankName): void
     {
         $this->bankName = $bankName;
     }

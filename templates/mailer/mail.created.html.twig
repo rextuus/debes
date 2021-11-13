@@ -426,7 +426,7 @@
 
             .counter-text .num {
                 display: block;
-                color: #1d1d1d;
+                color: rgb(255, 255, 255);
                 font-size: 34px;
                 font-weight: 700;
             }
@@ -510,24 +510,6 @@
         </style>
     </head>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <body width="100%"
           style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: #222222;">
     <center style="width: 100%; background-color: #f1f1f1;">
@@ -543,7 +525,7 @@
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                             <tr>
                                 <td width="40%" class="logo" style="text-align: left;">
-                                    <h1><a href="{{ path ('landing') }}">DEBES</a></h1>
+                                    <h1><a href="https://www.wh-company.de">DEBES</a></h1>
                                 </td>
                                 <td width="60%" class="logo" style="text-align: right;">
                                     <ul class="navigation">
@@ -562,7 +544,7 @@
 
                     <td valign="middle" class="hero bg_white">
                         <img src="{{ email.image('@images/debt.png') }}" alt="Logo"
-                             style="background-size: cover; height: 400px;">
+                             style="background-size: cover; height: 400px; padding-bottom: 20px">
                         <div class="overlay"></div>
                         <table>
                             <tr>
@@ -611,7 +593,7 @@
                                                                         <div class="text-tour"
                                                                              style="text-align: center;">
                                                                             <h3>Geforderte Summe</h3>
-                                                                            <span class="price">{{ amount }} €</span>
+                                                                            <span class="num">{{ amount }} €</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -624,7 +606,7 @@
                                                                         <div class="text-tour"
                                                                              style="text-align: center;">
                                                                             <h3>Grund</h3>
-                                                                            <span class="price">{{ reason }}</span>
+                                                                            <span class="num">{{ reason }}</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -644,12 +626,10 @@
                                                                         <div class="text-tour"
                                                                              style="text-align: center;">
                                                                             <h3>Kreditgeber</h3>
-                                                                            <span class="price">{{ loaner }}</span>
+                                                                            <span class="num">{{ loaner }}</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-
-
                                                             </table>
                                                         </td>
                                                     </tr>
@@ -661,49 +641,7 @@
 
                                 </td>
                             </tr><!-- end:tr -->
-                            <tr>
-                                <td valign="middle" class="counter"
-                                    style="background-image: url({{ absolute_url(asset('img/mailTop.png')) }}); background-size: cover; padding: 4em 0;">
-                                    <div class="overlay"></div>
-                                    <table>
-                                        <tr>
-                                            <td valign="middle" width="33.333%">
-                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td class="counter-text">
-                                                            <span class="num">{{ problems }}</span>
-                                                            <span class="name">Probleme mit diesem Nutzer</span>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                            <td valign="middle" width="33.333%">
-                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td class="counter-text">
-                                                            <span class="num">{{ transactions }}</span>
-                                                            <span class="name">Bisherige Transaktionen mit diesem Nutzer</span>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                            <td valign="middle" width="33.333%">
-                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td class="counter-text">
-                                                            <span class="num">{{ debts }}</span>
-                                                            <span class="name">Eigene offene Schulden</span>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr><!-- end tr -->
+                            {% include 'mailer/statistic.html.twig' %}
                             <tr>
                                 <td class="bg_white email-section">
                                     <div class="heading-section" style="text-align: center; padding: 0 30px;">
@@ -725,7 +663,7 @@
                                                             <h3>Schulden akzeptieren?</h3>
                                                             <p>Dir bleibt wohl nichts anderes übrig, wenn wir ehrlich
                                                                 sind</p>
-                                                            <p><a href="#" class="btn btn-primary">Akzeptieren</a></p>
+                                                            <p><a href="https://www.wh-company.de/{{ path('transaction_accept', {slug: slug, variant: 'debtor'}) }}" class="btn btn-primary">Akzeptieren</a></p>
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -744,7 +682,7 @@
                                                             <h3>Dem Ganzen widersprechen?</h3>
                                                             <p>Muss wohl um viel Geld gehen. Dann kann man das schon mal
                                                                 in Erwägung ziehen</p>
-                                                            <p><a href="#" class="btn btn-primary">Ablehnen</a></p>
+                                                            <p><a href="https://www.wh-company.de/{{ path('transaction_accept', {slug: slug, variant: 'debtor'}) }}" class="btn btn-primary">Ablehnen</a></p>
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -756,83 +694,7 @@
 
 
                             <!-- 1 Column Text + Button : END -->
-                        </table>
-                        <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0"
-                               width="100%" style="margin: auto;">
-                            <tr>
-                                <td valign="middle" class="bg_black footer email-section">
-                                    <table>
-                                        <tr>
-                                            <td valign="top" width="60%" style="padding-top: 20px;">
-                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td style="text-align: left; padding-right: 10px;">
-                                                            <h3 class="heading">About</h3>
-                                                            <p>DEBES ist ein kostenloser Service der WH-Company</p>
-                                                            <ul class="social">
-                                                                <li><img src="images/002-play-button.png" alt=""
-                                                                         style="width: 30px; max-width: 600px; height: auto; display: block;">
-                                                                </li>
-                                                                <li><img src="images/002-play-button.png" alt=""
-                                                                         style="width: 30px; max-width: 600px; height: auto; display: block;">
-                                                                </li>
-                                                                <li><img src="images/002-play-button.png" alt=""
-                                                                         style="width: 30px; max-width: 600px; height: auto; display: block;">
-                                                                </li>
-                                                            </ul>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                            <td valign="top" width="40%" style="padding-top: 20px;">
-                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td style="text-align: left; padding-left: 5px; padding-right: 5px;">
-                                                            <h3 class="heading">Kontakt</h3>
-                                                            <ul>
-                                                                <li><span class="text">Köln</span></li>
-                                                                <li><span class="text">+2 392 3929 210</span></a></li>
-                                                            </ul>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr><!-- end: tr -->
-                            <tr>
-                                <td valign="middle" class="bg_black footer email-section">
-                                    <table>
-                                        <tr>
-                                            <td valign="top" width="33.333%">
-                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td style="text-align: left; padding-right: 10px;">
-                                                            <p>&copy; 2021 DEBES. All Rights Reserved</p>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                            <td valign="top" width="33.333%">
-                                                <table role="presentation" cellspacing="0" cellpadding="0" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td style="text-align: right; padding-left: 5px; padding-right: 5px;">
-                                                            <p><a href="#" style="color: rgb(64,75,32);">Unsubcribe</a>
-                                                            </p>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
+                            {% include 'mailer/footer.html.twig' %}
 
         </div>
     </center>

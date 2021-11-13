@@ -10,11 +10,11 @@ use App\Form\TransactionCreateSimpleType;
 use App\Form\TransactionCreateType;
 use App\Service\Debt\DebtDto;
 use App\Service\Loan\LoanDto;
+use App\Service\Mailer\MailService;
 use App\Service\Transaction\TransactionCreateData;
 use App\Service\Transaction\TransactionCreateDebtorData;
 use App\Service\Transaction\TransactionData;
 use App\Service\Transaction\TransactionService;
-use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,11 +34,17 @@ class TransactionController extends AbstractController
     private $transactionService;
 
     /**
+     * @var MailService
+     */
+    private $mailService;
+
+    /**
      * TransactionController constructor.
      */
-    public function __construct(TransactionService $transactionService)
+    public function __construct(TransactionService $transactionService, MailService $mailService)
     {
         $this->transactionService = $transactionService;
+        $this->mailService = $mailService;
     }
 
     /**
@@ -49,7 +55,7 @@ class TransactionController extends AbstractController
         /** @var User $requester */
         $requester = $this->getUser();
 
-        $transactionData = (new TransactionData());
+        $transactionData = (new TransactionCreateData());
         $form = $this->createForm(TransactionCreateSimpleType::class, $transactionData, ['requester' => $requester]);
 
         $form->handleRequest($request);
@@ -58,8 +64,11 @@ class TransactionController extends AbstractController
             /** @var TransactionData $data */
             $data = $form->getData();
 
-            $this->transactionService->storeSimpleTransaction($data, $requester);
-            return $this->redirect($this->generateUrl('transaction_overview'));
+            $transaction = $this->transactionService->storeSimpleTransaction($data, $requester);
+
+            $this->mailService->sendCreationMailToDebtor($transaction, $requester, $data->getOwner());
+
+            return $this->redirect($this->generateUrl('account_overview', []));
         }
 
         return $this->render('transaction/transaction.create.simple.html.twig', [
@@ -85,7 +94,7 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route("/accept/{transaction}", name="transaction_accept")
+     * @Route("/accept/{slug}", name="transaction_accept")
      */
     public function acceptTransaction(Transaction $transaction, Request $request): Response
     {
@@ -115,10 +124,11 @@ class TransactionController extends AbstractController
 
             if ($isDebtor) {
                 if ($isAccepted) {
-                    // TODO set Transaction to next state and send loaner notification
                     $this->transactionService->acceptTransaction($transaction);
+                    $this->mailService->sendAcceptMailToLoaner($transaction, $requester, $transaction->getLoaner());
                 } else {
-                    // TODO decline debt => send loaner notification
+                    $this->transactionService->declineTransaction($transaction);
+                    $this->mailService->sendDeclineMailToLoaner($transaction, $requester, $transaction->getLoaner());
                 }
                 return $this->redirectToRoute('account_debts', []);
             } else {
@@ -137,7 +147,7 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route("/process/{transaction}", name="transaction_process")
+     * @Route("/process/{slug}", name="transaction_process")
      */
     public function processTransaction(Transaction $transaction, Request $request): Response
     {
@@ -152,10 +162,10 @@ class TransactionController extends AbstractController
         );
 
         if ($isDebtor) {
-            $dto = DebtDto::create($transaction);
-            $labels = ['label' => ['submit' => 'Überweisen', 'decline' => 'Überweisen']];
+            $dto = $this->transactionService->createDtoFromTransaction($transaction, true);
+            $labels = ['label' => ['submit' => 'Überweisen', 'decline' => 'Verrechnen']];
         } else {
-            $dto = LoanDto::create($transaction);
+            $dto = $this->transactionService->createDtoFromTransaction($transaction, false);
             $labels = ['label' => ['submit' => 'Mahn-Mail senden', 'decline' => 'Mahn-Mail senden']];
         }
 
@@ -163,18 +173,21 @@ class TransactionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $isAccepted = (bool)$form->get('submit')->isClicked();
+            $useTransaction = (bool)$form->get('submit')->isClicked();
+            $useChange = (bool)$form->get('decline')->isClicked();
 
             if ($isDebtor) {
-                if ($isAccepted) {
+                if ($useTransaction) {
                     return $this->redirect($this->generateUrl('transfer_prepare',
-                        ['transaction' => $transaction->getId()]));
-                } else {
-                    // TODO decline debt => send loaner notification
+                                                              ['slug' => $transaction->getSlug()]));
+                }
+                if ($useChange){
+                    return $this->redirect($this->generateUrl('exchange_prepare',
+                                                              ['slug' => $transaction->getSlug()]));
                 }
                 return $this->redirectToRoute('account_debts', []);
             } else {
-                if ($isAccepted) {
+                if ($useTransaction) {
                     // TODO remove Transaction and send loaner notification
                 }
                 return $this->redirectToRoute('account_loans', []);
@@ -189,7 +202,7 @@ class TransactionController extends AbstractController
     }
 
     /**
-     * @Route("/confirm/{transaction}", name="transaction_confirm")
+     * @Route("/confirm/{slug}", name="transaction_confirm")
      */
     public function confirmTransaction(Transaction $transaction, Request $request): Response
     {
@@ -238,6 +251,8 @@ class TransactionController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    // TODO edit is only needed for admin area. Transaction with multiple users will be a new feature in future
 
     /**
      * @Route("/edit", name="transaction_edit")

@@ -155,5 +155,22 @@ class DebtData
         $this->reason = $reason;
     }
 
+    /**
+     * initFrom
+     *
+     * @param $loan
+     *
+     * @return $this
+     */
+    public function initFrom($loan): DebtData
+    {
+        $this->setCreated($loan->getCreated());
+        $this->setAmount($loan->getAmount());
+        $this->setCreated($loan->getCreated());
+        $this->setOwner($loan->getOwner());
+        $this->setPaid($loan->getPaid());
+        $this->setTransaction($loan->getTransaction());
 
+        return $this;
+    }
 }

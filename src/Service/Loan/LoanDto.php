@@ -18,9 +18,9 @@ class LoanDto extends LoanAndDebtDto
      *
      * @param Transaction $transaction
      *
-     * @return LoanAndDebtDto
+     * @return LoanDto
      */
-    public static function create(Transaction $transaction): LoanAndDebtDto
+    public static function create(Transaction $transaction): LoanDto
     {
         $dto = new self();
 

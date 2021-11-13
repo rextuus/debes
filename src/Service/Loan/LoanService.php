@@ -90,9 +90,9 @@ class LoanService
      * @return array
      *
      */
-    public function getAllDebtTransactionsForUserAndSate(User $owner, string $state): array
+    public function getAllLoanTransactionsForUserAndSate(User $owner, string $state): array
     {
-        return $this->loanRepository->getAllDebtTransactionsForUserAndSate($owner, $state);
+        return $this->loanRepository->getAllLoanTransactionsForUserAndSate($owner, $state);
     }
 
     /**
