@@ -39,6 +39,7 @@ class MailerController extends AbstractController
                 'problems' => $problems,
                 'transactions' => $transactions,
                 'debts' => $debts,
+                'imagePath' => 'debt.png',
             ]);
 
         $mailer->send($email);

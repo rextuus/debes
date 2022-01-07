@@ -6,7 +6,7 @@ services:
             MYSQL_ROOT_PASSWORD: password
             MYSQL_DATABASE: main
         volumes:
-            - my-datavolume:/home/wolfgang/Dokumente/DB
+            - my-datavolume:/home/master/Dokumente/DB
         ports:
             # To allow the host machine to access the ports below, modify the lines below.
             # For example, to allow the host to connect to port 3306 on the container, you would change
