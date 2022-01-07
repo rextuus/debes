@@ -3,6 +3,9 @@
 namespace App\Service\Loan;
 
 use App\Entity\Loan;
+use App\Entity\Transaction;
+use App\Service\Debt\DebtCreateData;
+use DateTime;
 
 class LoanFactory
 {
@@ -31,7 +34,16 @@ class LoanFactory
      */
     public function mapData(Loan $loan, LoanData $data): void
     {
-        $loan->setCreated($data->getCreated());
+        if ($data instanceof  LoanCreateData) {
+            $loan->setCreated($data->getCreated());
+            $loan->setEdited($data->getCreated());
+            $loan->setState(Transaction::STATE_READY);
+            $loan->setInitialAmount($data->getAmount());
+        }else{
+            $loan->setEdited(new DateTime());
+            $loan->setState($data->getState());
+            $loan->setAmount($data->getAmount());
+        }
         $loan->setAmount($data->getAmount());
         $loan->setOwner($data->getOwner());
         $loan->setTransaction($data->getTransaction());

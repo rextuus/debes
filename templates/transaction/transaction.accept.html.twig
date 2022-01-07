@@ -24,7 +24,7 @@
                                         {% else %}
                                             <th scope="col">Gläubiger</th>
                                         {% endif %}
-                                        <td>{{ dto.transactionPartner }}</td>
+                                        <td>{{ dto.transactionPartners }}</td>
                                     </tr>
 
                                     <tr>
@@ -43,7 +43,7 @@
                                 {% if debtVariant %}
                                     <p>Akzeptierst du die Schuld?</p>
                                 {% else %}
-                                    <p>{{ dto.transactionPartner }} hat das Darlehen noch nicht akzeptiert. Möchtest du es zurückziehen?</p>
+                                    <p>{{ dto.transactionPartners }} hat das Darlehen noch nicht akzeptiert. Möchtest du es zurückziehen?</p>
                                 {% endif %}
 
 

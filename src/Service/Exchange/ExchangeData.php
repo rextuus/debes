@@ -2,6 +2,8 @@
 
 namespace App\Service\Exchange;
 
+use App\Entity\Debt;
+use App\Entity\Loan;
 use App\Entity\Transaction;
 
 /**
@@ -26,6 +28,16 @@ class ExchangeData
      * @var float
      */
     private $amount;
+
+    /**
+     * @var Loan
+     */
+    private $loan;
+
+    /**
+     * @var Debt
+     */
+    private $debt;
 
     /**
      * @return float
@@ -73,5 +85,37 @@ class ExchangeData
     public function setAmount(float $amount): void
     {
         $this->amount = $amount;
+    }
+
+    /**
+     * @return Loan
+     */
+    public function getLoan(): Loan
+    {
+        return $this->loan;
+    }
+
+    /**
+     * @param Loan $loan
+     */
+    public function setLoan(Loan $loan): void
+    {
+        $this->loan = $loan;
+    }
+
+    /**
+     * @return Debt
+     */
+    public function getDebt(): Debt
+    {
+        return $this->debt;
+    }
+
+    /**
+     * @param Debt $debt
+     */
+    public function setDebt(Debt $debt): void
+    {
+        $this->debt = $debt;
     }
 }

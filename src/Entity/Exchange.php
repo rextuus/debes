@@ -38,6 +38,18 @@ class Exchange
      */
     private $amount;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Debt::class, inversedBy="exchanges")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $debt;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Loan::class, inversedBy="exchanges")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $loan;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -87,6 +99,30 @@ class Exchange
     public function setAmount(float $amount): self
     {
         $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getDebt(): ?Debt
+    {
+        return $this->debt;
+    }
+
+    public function setDebt(?Debt $debt): self
+    {
+        $this->debt = $debt;
+
+        return $this;
+    }
+
+    public function getLoan(): ?Loan
+    {
+        return $this->loan;
+    }
+
+    public function setLoan(?Loan $loan): self
+    {
+        $this->loan = $loan;
 
         return $this;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Debt;
 use App\Entity\Loan;
 use App\Entity\Transaction;
 use App\Entity\User;
@@ -79,20 +80,57 @@ class LoanRepository extends ServiceEntityRepository
 
     /**
      * getAllDebtTransactionsForUserAndSate
+     *
      * @param User   $owner
      * @param string $state
+     * @param float  $amount
      *
      * @return int|mixed|string
      */
-    public function getAllLoanTransactionsForUserAndSate(User $owner, string $state)
+    public function getAllLoanTransactionsForUserAndSate(User $owner, string $state, float $amount)
     {
         return $this->createQueryBuilder('l')
-            ->select('t')
+            ->select('l')
             ->leftJoin(Transaction::class, 't', 'WITH', 'l.transaction = t.id')
             ->where('l.owner = :owner')
-            ->andWhere('t.state = :state')
+            ->andWhere('l.state = :state')
+            ->andWhere('l.amount >= :amount')
             ->setParameter('owner', $owner)
             ->setParameter('state', $state)
+            ->setParameter('amount', $amount)
+            ->orderBy('t.created', 'ASC')
+            ->getQuery()->getResult();
+    }
+
+    /**
+     * getAllExchangeLoansForDebt
+     *
+     * @param User   $debtor
+     * @param string $state
+     * @param float  $amount
+     * @param array  $loaner
+     *
+     * @return int|mixed|string
+     */
+    public function getAllExchangeLoansForDebt(
+        User $debtor,
+        string $state,
+        float $amount,
+        array $loaner
+    ) {dump($loaner);
+        return $this->createQueryBuilder('l')
+            ->select('l')
+            ->innerJoin(Transaction::class, 't', 'WITH', 'l.transaction = t.id')
+            ->innerJoin(Debt::class, 'd', 'WITH', 'd.transaction = t.id')
+            ->innerJoin(User::class, 'u', 'WITH', 'd.owner = u.id')
+            ->where('l.owner = :debtor')
+            ->andWhere('t.state = :state')
+            ->andWhere('l.amount >= :amount')
+            ->andWhere('u.id IN (:loaner)')
+            ->setParameter('debtor', $debtor)
+            ->setParameter('state', $state)
+            ->setParameter('amount', $amount)
+            ->setParameter('loaner', $loaner)
             ->orderBy('t.created', 'ASC')
             ->getQuery()->getResult();
     }

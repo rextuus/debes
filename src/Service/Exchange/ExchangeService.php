@@ -4,6 +4,7 @@ namespace App\Service\Exchange;
 
 use App\Entity\Exchange;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
 use App\Repository\ExchangeRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -91,4 +92,24 @@ class ExchangeService
         return $this->exchangeRepository->findBy(['transaction' => $transaction]);
     }
 
+    /**
+     * getAllExchangesBelongingToTransactionAndPartType
+     *
+     * @param Transaction              $transaction
+     * @param TransactionPartInterface $transactionPart
+     * @param bool                     $isDebt
+     *
+     * @return Exchange[]
+     */
+    public function getAllExchangesBelongingToTransactionAndPartType(
+        Transaction $transaction,
+        TransactionPartInterface $transactionPart,
+        bool $isDebt = true
+    ): array {
+        if ($isDebt){
+            return $this->exchangeRepository->findBy(['transaction' => $transaction, 'debt' => $transactionPart]);
+        }else{
+            return $this->exchangeRepository->findBy(['transaction' => $transaction, 'loan' => $transactionPart]);
+        }
+    }
 }

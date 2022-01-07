@@ -2,10 +2,14 @@
 
 namespace App\Service\Transaction;
 
+use App\Entity\Debt;
+use App\Entity\Loan;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
 use App\Entity\User;
 use App\Repository\TransactionRepository;
 use App\Service\Debt\DebtCreateData;
+use App\Service\Debt\DebtData;
 use App\Service\Debt\DebtService;
 use App\Service\Debt\DebtUpdateData;
 use App\Service\Loan\LoanCreateData;
@@ -54,6 +58,11 @@ class TransactionService
      * @var DtoProvider
      */
     private $dtoProvider;
+
+    /**
+     * @var TransactionProcessor
+     */
+    private $transactionProcessor;
 
     /**
      * TransactionService constructor.
@@ -149,13 +158,12 @@ class TransactionService
      * storeSimpleTransaction
      *
      * @param TransactionCreateMultipleData $data
-     * @param User            $requester
      *
      * @return Transaction
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function storeMultipleTransaction(TransactionCreateMultipleData $data, User $requester): Transaction
+    public function storeMultipleTransaction(TransactionCreateMultipleData $data): Transaction
     {
         $transactionData = new TransactionCreateData();
         $transactionData->setReason($data->getReason());
@@ -164,17 +172,23 @@ class TransactionService
 
         $transaction = $this->storeTransaction($transactionData);
 
-        foreach ($data->getDebtorsData() as $debtData){
+        foreach ($data->getDebtorsData() as $debtData) {
             $debtData->setTransaction($transaction);
             $debtData->setPaid(false);
             $debtData->setCreated(new DateTime());
             $debtData->setReason($data->getReason());
+            $debtData->setState(Transaction::STATE_READY);
             $this->debtService->storeDebt($debtData);
         }
 
-        $loanData = (new LoanCreateData())->initFromData($transactionData, $requester);
-        $loanData->setTransaction($transaction);
-        $this->loanService->storeLoan($loanData);
+        foreach ($data->getLoanersData() as $loanData) {
+            $loanData->setTransaction($transaction);
+            $loanData->setPaid(false);
+            $loanData->setCreated(new DateTime());
+            $loanData->setReason($data->getReason());
+            $loanData->setState(Transaction::STATE_READY);
+            $this->loanService->storeLoan($loanData);
+        }
 
         return $transaction;
     }
@@ -239,9 +253,9 @@ class TransactionService
     public function getAllDebtTransactionsForUserAndState(User $owner, string $state): array
     {
         $dtos = array();
-        $debtTransactions = $this->debtService->getAllDebtTransactionsForUserAndState($owner, $state);
-        foreach ($debtTransactions as $transaction) {
-            $dtos[] = $this->dtoProvider->createDebtDto($transaction);
+        $debts = $this->debtService->getAllDebtTransactionsForUserAndState($owner, $state);
+        foreach ($debts as $debt) {
+            $dtos[] = $this->dtoProvider->createDebtDto($debt);
         }
         return $dtos;
     }
@@ -250,19 +264,15 @@ class TransactionService
      * createDtoFromTransaction
      *
      * @param Transaction $transaction
-     * @param bool        $isDebt
+     * @param bool        $isDebtVariant
      *
-     * @return LoanAndDebtDto
+     * @return TransactionDtos\TransactionDto
      */
-    public function createDtoFromTransaction(Transaction $transaction, bool $isDebt): LoanAndDebtDto
-    {
-        if ($isDebt) {
-            return $this->dtoProvider->createDebtDto($transaction);
-        }
-        else{
-            return $this->dtoProvider->createLoanDto($transaction);
-
-        }
+    public function createDtoFromTransaction(
+        Transaction $transaction,
+        bool $isDebtVariant
+    ): TransactionDtos\TransactionDto {
+        return $this->dtoProvider->createTransactionDto($transaction, $isDebtVariant);
     }
 
     /**
@@ -273,46 +283,31 @@ class TransactionService
      *
      * @return array
      */
-    public function getAllLoanTransactionsForUserAndState(User $owner, string $state): array
+    public function getAllLoanTransactionPartsForUserAndState(User $owner, string $state): array
     {
         $dtos = array();
-        $loanTransactions = $this->loanService->getAllLoanTransactionsForUserAndSate($owner, $state);
-        foreach ($loanTransactions as $transaction) {
-            $dtos[] = LoanDto::create($transaction);
+        $loans = $this->loanService->getAllLoanTransactionsForUserAndSate($owner, $state, 0.0);
+        foreach ($loans as $loan) {
+            $dtos[] = $this->dtoProvider->createLoanDto($loan);
         }
         return $dtos;
     }
 
-    /**
-     * acceptDebt
-     *
-     * @param Transaction $transaction
-     *
-     * @return void
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    public function acceptTransaction(Transaction $transaction): void
-    {
-        $transactionData = (new TransactionUpdateData())->initFrom($transaction);
-        $transactionData->setState(Transaction::STATE_ACCEPTED);
-        $this->update($transaction, $transactionData);
-    }
 
     /**
      * declineTransaction
      *
-     * @param Transaction $transaction
+     * @param Debt $debt
      *
      * @return void
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function declineTransaction(Transaction $transaction): void
+    public function declineDebt(Debt $debt): void
     {
-        $transactionData = (new TransactionUpdateData())->initFrom($transaction);
-        $transactionData->setState(Transaction::STATE_DECLINED);
-        $this->update($transaction, $transactionData);
+        $debtData = (new DebtUpdateData())->initFrom($debt);
+        $debtData->setState(Transaction::STATE_DECLINED);
+        $this->debtService->update($debt, $debtData);
     }
 
     /**
@@ -332,18 +327,24 @@ class TransactionService
         string $variant,
         string $state
     ): bool {
-        if ($transaction->getState() !== $state) {
-            throw new Exception('Transaction is not in correct sate');
-        }
-
         if ($variant === self::DEBTOR_VIEW) {
-            if ($requester !== $transaction->getDebts()[0]->getOwner()) {
-                throw new Exception('User is not the debtor of this transaction');
+            $debt = $this->getDebtPartOfUserForTransaction($transaction, $requester);
+            if (is_null($debt)) {
+                throw new Exception('User is not a loaner of this transaction');
+            }
+            if ($debt->getState() !== $state) {
+                throw new Exception('TransactionPart is not in correct sate');
             }
             return true;
         } elseif ($variant === self::LOANER_VIEW) {
-            if ($requester !== $transaction->getLoans()[0]->getOwner()) {
-                throw new Exception('User is not the loaner of this transaction');
+            $loan = $this->getLoanPartOfUserForTransaction($transaction, $requester);
+            if (is_null($loan)) {
+                throw new Exception('User is not a loaner of this transaction');
+            }
+            if ($loan->getState() !== $state) {
+                dump($state);
+                dump($loan->getState());
+                throw new Exception('TransactionPart is not in correct sate');
             }
             return false;
         } else {
@@ -379,4 +380,42 @@ class TransactionService
         $debtData->setReason($transaction->getReason());
         $this->debtService->update($debt, $debtData);
     }
+
+    /**
+     * getDebtPartOfUserForTransaction
+     *
+     * @param Transaction $transaction
+     * @param User        $user
+     *
+     * @return Debt|null
+     */
+    public function getDebtPartOfUserForTransaction(Transaction $transaction, User $user): ?Debt
+    {
+        foreach ($transaction->getDebts() as $debt) {
+            if ($debt->getOwner() === $user) {
+                return $debt;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * getLoanPartOfUserForTransaction
+     *
+     * @param Transaction $transaction
+     * @param User        $user
+     *
+     * @return Loan|null
+     */
+    public function getLoanPartOfUserForTransaction(Transaction $transaction, User $user): ?Loan
+    {
+        foreach ($transaction->getLoans() as $loan) {
+            if ($loan->getOwner() === $user) {
+                return $loan;
+            }
+        }
+        return null;
+    }
+
+
 }

@@ -4,9 +4,12 @@ namespace App\Service\Legacy;
 
 use App\Entity\Transaction;
 use App\Entity\User;
+use App\Service\Debt\DebtCreateData;
+use App\Service\Loan\LoanCreateData;
 use App\Service\PaymentOption\BankAccountData;
 use App\Service\PaymentOption\BankAccountService;
 use App\Service\Transaction\TransactionCreateData;
+use App\Service\Transaction\TransactionCreateMultipleData;
 use App\Service\Transaction\TransactionService;
 use App\Service\Transaction\TransactionUpdateData;
 use App\Service\User\UserData;
@@ -140,6 +143,55 @@ class LegacyImportService
         $transactionData->setOwner($debtor);
 
         $transaction = $this->transactionService->storeSingleTransaction($transactionData, $loaner);
+
+        if ($state != Transaction::STATE_READY){
+            $data = (new TransactionUpdateData())->initFrom($transaction);
+            $data->setState($state);
+            $this->transactionService->update($transaction, $data);
+        }
+    }
+
+    public function createMultiTransaction(
+        string $reason,
+        float $amount,
+        array $debtors,
+        array $debtorAmounts,
+        array $loaners,
+        array $loanerAmounts,
+        ?string $state = Transaction::STATE_READY
+    ): void {
+        $transactionData = new TransactionCreateMultipleData();
+        $transactionData->setReason($reason);
+        $transactionData->setCompleteAmount($amount);
+
+        $debtData = array();
+        foreach ($debtors as $index => $debtor){
+            $data = new DebtCreateData();
+            $data->setAmount($debtorAmounts[$index]);
+            $data->setInitialAmount($debtorAmounts[$index]);
+            $data->setReason($reason);
+            $data->setPaid(false);
+            $data->setState(Transaction::STATE_READY);
+            $data->setOwner($debtor);
+            $debtData[] = $data;
+        }
+        $transactionData->setDebtorsData($debtData);
+
+        $loanData = array();
+        foreach ($loaners as $index => $loaner){
+            $data = new LoanCreateData();
+            $data->setAmount($loanerAmounts[$index]);
+            $data->setInitialAmount($loanerAmounts[$index]);
+            $data->setReason($reason);
+            $data->setPaid(false);
+            $data->setState(Transaction::STATE_READY);
+            $data->setOwner($loaner);
+            $loanData[] = $data;
+        }
+        $transactionData->setLoanersData($loanData);
+
+
+        $transaction = $this->transactionService->storeMultipleTransaction($transactionData);
 
         if ($state != Transaction::STATE_READY){
             $data = (new TransactionUpdateData())->initFrom($transaction);

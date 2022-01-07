@@ -3,6 +3,7 @@
 namespace App\Service\Transaction;
 
 use App\Service\Debt\DebtCreateData;
+use App\Service\Loan\LoanCreateData;
 
 /**
  * TransactionCreateMultipleData
@@ -16,6 +17,11 @@ class TransactionCreateMultipleData
      * @var DebtCreateData[]
      */
     private $debtorsData = [];
+
+    /**
+     * @var LoanCreateData[]
+     */
+    private $loanersData = [];
 
     /**
      * @var int
@@ -105,4 +111,21 @@ class TransactionCreateMultipleData
     {
         $this->reason = $reason;
     }
+
+    /**
+     * @return LoanCreateData[]
+     */
+    public function getLoanersData(): array
+    {
+        return $this->loanersData;
+    }
+
+    /**
+     * @param LoanCreateData[] $loanersData
+     */
+    public function setLoanersData(array $loanersData): void
+    {
+        $this->loanersData = $loanersData;
+    }
+
 }

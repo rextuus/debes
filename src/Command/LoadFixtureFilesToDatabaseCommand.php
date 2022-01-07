@@ -93,6 +93,19 @@ class LoadFixtureFilesToDatabaseCommand extends Command
                 $state
             );
         }
+
+        foreach ($this->getMultiTransactionSet() as $multiTransactionData) {
+            $state = count($multiTransactionData) > 6 ? $multiTransactionData[6] : Transaction::STATE_READY;
+            $this->legacyImportService->createMultiTransaction(
+                $multiTransactionData[0],
+                $multiTransactionData[1],
+                $multiTransactionData[2],
+                $multiTransactionData[3],
+                $multiTransactionData[4],
+                $multiTransactionData[5],
+                $state
+            );
+        }
         return 0;
     }
 
@@ -218,6 +231,25 @@ class LoadFixtureFilesToDatabaseCommand extends Command
                 $this->userService->findUserByUserName('Eva'),
                 Transaction::STATE_ACCEPTED
             ],
+        ];
+    }
+
+    /**
+     * getStandardTransactionSet
+     *
+     * @return array
+     */
+    private function getMultiTransactionSet(): array
+    {
+        return [
+            [
+                'Apfel',
+                100.00,
+                [$this->userService->findUserByUserName('Eva'), $this->userService->findUserByUserName('Adam')],
+                [75.00, 25.00],
+                [$this->userService->findUserByUserName('Kain'), $this->userService->findUserByUserName('Abel')],
+                [23.00, 77.00]
+            ]
         ];
     }
 }

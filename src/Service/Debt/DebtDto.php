@@ -2,6 +2,7 @@
 
 namespace App\Service\Debt;
 
+use App\Entity\Debt;
 use App\Entity\Transaction;
 use App\Service\Transaction\LoanAndDebtDto;
 
@@ -15,20 +16,24 @@ class DebtDto extends LoanAndDebtDto
 {
     /**
      * create
-     * @param Transaction $transaction
+     *
+     * @param Debt $debt
      *
      * @return DebtDto
      */
-    public static function create(Transaction $transaction): DebtDto
+    public static function create(Debt $debt): DebtDto
     {
         $dto = new self();
 
-        $debt = $transaction->getDebts()[0];
-        $loan = $transaction->getLoans()[0];
-        $dto->setAmount($debt->getAmount());
-        $dto->setTransactionPartner($loan->getOwner()->getFullName());
+       if ($debt->getTransaction()->hasMultipleDebtors()){
+           $dto->setTransactionPartners('Mehrere Gläubiger');
+       }else{
+           $dto->setTransactionPartners($debt->getTransaction()->getLoaner()->getFullName());
+       }
 
-        parent::init($transaction, $dto);
+        $dto->setAmount($debt->getAmount());
+
+        parent::init($debt, $dto);
 
         return $dto;
     }

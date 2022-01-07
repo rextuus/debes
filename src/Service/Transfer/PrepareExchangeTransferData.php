@@ -2,6 +2,7 @@
 
 namespace App\Service\Transfer;
 
+use App\Entity\Loan;
 use App\Entity\PaymentOption;
 use App\Entity\Transaction;
 
@@ -14,23 +15,23 @@ use App\Entity\Transaction;
 class PrepareExchangeTransferData
 {
     /**
-     * @var string|null
+     * @var Loan|null
      */
-    private $transactionSlug;
+    private $loan;
 
     /**
-     * @return string|null
+     * @return Loan|null
      */
-    public function getTransactionSlug(): ?string
+    public function getLoan(): ?Loan
     {
-        return $this->transactionSlug;
+        return $this->loan;
     }
 
     /**
-     * @param string|null $transactionSlug
+     * @param Loan|null $loan
      */
-    public function setTransactionSlug(?string $transactionSlug): void
+    public function setLoan(?Loan $loan): void
     {
-        $this->transactionSlug = $transactionSlug;
+        $this->loan = $loan;
     }
 }

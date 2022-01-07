@@ -12,28 +12,9 @@
                             <div class="hs-text">
                                 <h2><span>Zahl es</span> zurück!</h2>
 
-
-                                <h2><span>Schuld vom</span></h2>
-                                <h2> {{ dto.created }}</h2>
+                                {% include 'base.info.html.twig' %}
 
 
-                                <table class="table table-hover table-dark">
-                                    <tr>
-                                        <th scope="col">Darlehensgeber</th>
-
-                                        <td>{{ dto.transactionPartner }}</td>
-                                    </tr>
-
-                                    <tr>
-                                        <th scope="col">Betrag</th>
-                                        <td>{{ dto.amount }} €</td>
-                                    </tr>
-
-                                    <tr>
-                                        <th scope="col">Grund</th>
-                                        <td>{{ dto.reason }}</td>
-                                    </tr>
-                                </table>
                                 <p>Über welche Zahlungsmethode möchtest du das Geld überweisen?</p>
 
                                 {{ form_start(form, {'method': 'POST'}) }}

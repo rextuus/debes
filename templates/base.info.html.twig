@@ -16,7 +16,7 @@
 
     <tr>
         <th scope="col">Betrag</th>
-        <td>{{ dto.amount }} €</td>
+        <td>{{ dto.totalAmount }} €</td>
     </tr>
 
     <tr>
@@ -28,7 +28,7 @@
 </table>
 <h5>Verrechnete Transaktionen:</h5>
 <table class="table table-hover table-dark">
-    {% for exchangeDto in dto.exchangeDtos %}
+    {% for exchangeDto in dto.singleTransactionPartner.exchangeDtos %}
         <tr>
             <th>
                 {{ loop.index }}.
@@ -43,7 +43,7 @@
             {% else %}
                 <th scope="col">Gläubiger</th>
             {% endif %}
-            <td>{{ exchangeDto.exchangePartner }}</td>
+            <td>{{ exchangeDto.exchangePartners }}</td>
         </tr>
         <tr>
             <th scope="col">Betrag</th>
@@ -55,6 +55,35 @@
             <td>{{ exchangeDto.exchangeReason }}</td>
         </tr>
     {% endfor %}
+{#<h5>Verrechnete Transaktionen:</h5>#}
+{#<table class="table table-hover table-dark">#}
+{#    {% for exchangeDto in dto.exchangeDtos %}#}
+{#        <tr>#}
+{#            <th>#}
+{#                {{ loop.index }}.#}
+{#            </th>#}
+{#            <td>#}
+{#                vom {{ exchangeDto.creationDate }}#}
+{#            </td>#}
+{#        </tr>#}
+{#        <tr>#}
+{#            {% if debtVariant %}#}
+{#                <th scope="col">Darlehensgeber</th>#}
+{#            {% else %}#}
+{#                <th scope="col">Gläubiger</th>#}
+{#            {% endif %}#}
+{#            <td>{{ exchangeDto.exchangePartner }}</td>#}
+{#        </tr>#}
+{#        <tr>#}
+{#            <th scope="col">Betrag</th>#}
+{#            <td>{{ exchangeDto.amount }} €</td>#}
+{#        </tr>#}
+
+{#        <tr>#}
+{#            <th scope="col">Grund</th>#}
+{#            <td>{{ exchangeDto.exchangeReason }}</td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
 
 
 </table>

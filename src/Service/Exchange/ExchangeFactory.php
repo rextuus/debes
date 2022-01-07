@@ -27,6 +27,8 @@ class ExchangeFactory
         $exchange->setRemainingAmount($exchangeData->getRemainingAmount());
         $exchange->setTransaction($exchangeData->getTransaction());
         $exchange->setAmount($exchangeData->getAmount());
+        $exchange->setDebt($exchangeData->getDebt());
+        $exchange->setLoan($exchangeData->getLoan());
     }
 
     /**

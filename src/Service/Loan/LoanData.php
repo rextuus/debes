@@ -47,6 +47,16 @@ class LoanData
     private $paid;
 
     /**
+     * @var string
+     */
+    private $state;
+
+    /**
+     * @var float
+     */
+    private $initialAmount;
+
+    /**
      * @return float
      */
     public function getAmount(): float
@@ -159,6 +169,38 @@ class LoanData
     }
 
     /**
+     * @return string
+     */
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param string $state
+     */
+    public function setState(string $state): void
+    {
+        $this->state = $state;
+    }
+
+    /**
+     * @return float
+     */
+    public function getInitialAmount(): float
+    {
+        return $this->initialAmount;
+    }
+
+    /**
+     * @param float $initialAmount
+     */
+    public function setInitialAmount(float $initialAmount): void
+    {
+        $this->initialAmount = $initialAmount;
+    }
+
+    /**
      * initFrom
      *
      * @param Loan $loan
@@ -168,11 +210,13 @@ class LoanData
     public function initFrom(Loan $loan): LoanData
     {
         $this->setCreated($loan->getCreated());
+        $this->setEdited($loan->getCreated());
         $this->setAmount($loan->getAmount());
         $this->setCreated($loan->getCreated());
         $this->setOwner($loan->getOwner());
         $this->setPaid($loan->getPaid());
         $this->setTransaction($loan->getTransaction());
+        $this->setState(Transaction::STATE_READY);
 
         return $this;
     }

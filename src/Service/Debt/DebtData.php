@@ -2,9 +2,12 @@
 
 namespace App\Service\Debt;
 
+use App\Entity\Debt;
+use App\Entity\Loan;
 use App\Entity\Transaction;
 use App\Entity\User;
 use DateTime;
+use DateTimeInterface;
 
 class DebtData
 {
@@ -14,12 +17,12 @@ class DebtData
     private $amount;
 
     /**
-     * @var DateTime
+     * @var DateTimeInterface
      */
     private $created;
 
     /**
-     * @var DateTime|null
+     * @var DateTimeInterface|null
      */
     private $edited;
 
@@ -44,6 +47,16 @@ class DebtData
     private $reason;
 
     /**
+     * @var string
+     */
+    private $state;
+
+    /**
+     * @var float
+     */
+    private $initialAmount;
+
+    /**
      * @return float
      */
     public function getAmount(): float
@@ -60,17 +73,17 @@ class DebtData
     }
 
     /**
-     * @return DateTime
+     * @return DateTimeInterface
      */
-    public function getCreated(): DateTime
+    public function getCreated(): DateTimeInterface
     {
         return $this->created;
     }
 
     /**
-     * @param DateTime $created
+     * @param DateTimeInterface $created
      */
-    public function setCreated(DateTime $created): void
+    public function setCreated(DateTimeInterface $created): void
     {
         $this->created = $created;
     }
@@ -124,17 +137,17 @@ class DebtData
     }
 
     /**
-     * @return DateTime|null
+     * @return DateTimeInterface|null
      */
-    public function getEdited(): ?DateTime
+    public function getEdited(): ?DateTimeInterface
     {
         return $this->edited;
     }
 
     /**
-     * @param DateTime|null $edited
+     * @param DateTimeInterface|null $edited
      */
-    public function setEdited(?DateTime $edited): void
+    public function setEdited(?DateTimeInterface $edited): void
     {
         $this->edited = $edited;
     }
@@ -156,20 +169,54 @@ class DebtData
     }
 
     /**
+     * @return string|null
+     */
+    public function getState(): ?string
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param string $state
+     */
+    public function setState(string $state): void
+    {
+        $this->state = $state;
+    }
+
+    /**
+     * @return float
+     */
+    public function getInitialAmount(): float
+    {
+        return $this->initialAmount;
+    }
+
+    /**
+     * @param float $initialAmount
+     */
+    public function setInitialAmount(float $initialAmount): void
+    {
+        $this->initialAmount = $initialAmount;
+    }
+
+    /**
      * initFrom
      *
-     * @param $loan
+     * @param Debt $debt
      *
      * @return $this
      */
-    public function initFrom($loan): DebtData
+    public function initFrom(Debt $debt): DebtData
     {
-        $this->setCreated($loan->getCreated());
-        $this->setAmount($loan->getAmount());
-        $this->setCreated($loan->getCreated());
-        $this->setOwner($loan->getOwner());
-        $this->setPaid($loan->getPaid());
-        $this->setTransaction($loan->getTransaction());
+        $this->setCreated($debt->getCreated());
+        $this->setAmount($debt->getAmount());
+        $this->setInitialAmount($debt->getInitialAmount());
+        $this->setOwner($debt->getOwner());
+        $this->setPaid($debt->getPaid());
+        $this->setTransaction($debt->getTransaction());
+        $this->setEdited($debt->getEdited());
+        $this->setState(Transaction::STATE_READY);
 
         return $this;
     }

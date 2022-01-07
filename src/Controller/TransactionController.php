@@ -17,6 +17,7 @@ use App\Service\Transaction\TransactionCreateData;
 use App\Service\Transaction\TransactionCreateDebtorData;
 use App\Service\Transaction\TransactionCreateMultipleData;
 use App\Service\Transaction\TransactionData;
+use App\Service\Transaction\TransactionProcessor;
 use App\Service\Transaction\TransactionService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,12 +43,18 @@ class TransactionController extends AbstractController
     private $mailService;
 
     /**
+     * @var TransactionProcessor
+     */
+    private $transactionProcessor;
+
+    /**
      * TransactionController constructor.
      */
-    public function __construct(TransactionService $transactionService, MailService $mailService)
+    public function __construct(TransactionService $transactionService, MailService $mailService, TransactionProcessor $transactionProcessor)
     {
         $this->transactionService = $transactionService;
         $this->mailService = $mailService;
+        $this->transactionProcessor = $transactionProcessor;
     }
 
     /**
@@ -79,22 +86,22 @@ class TransactionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/", name="transaction_list")
-     */
-    public function listTransactionsForUser(): Response
-    {
-        /** @var User $requester */
-        $requester = $this->getUser();
-
-        $transactions = $this->transactionService->getAllTransactionBelongingUser($requester);
-
-        return $this->render('transaction/transaction.list.html.twig', [
-            'debtAmount' => 345.77,
-            'loanAmount' => 666.77,
-            'transactions' => $transactions,
-        ]);
-    }
+//    /**
+//     * @Route("/", name="transaction_list")
+//     */
+//    public function listTransactionsForUser(): Response
+//    {
+//        /** @var User $requester */
+//        $requester = $this->getUser();
+//
+//        $transactions = $this->transactionService->getAllTransactionBelongingUser($requester);
+//
+//        return $this->render('transaction/transaction.list.html.twig', [
+//            'debtAmount' => 345.77,
+//            'loanAmount' => 666.77,
+//            'transactions' => $transactions,
+//        ]);
+//    }
 
     /**
      * @Route("/accept/{slug}", name="transaction_accept")
@@ -112,10 +119,12 @@ class TransactionController extends AbstractController
         );
 
         if ($isDebtor) {
-            $dto = DebtDto::create($transaction);
+            $debt = $this->transactionService->getDebtPartOfUserForTransaction($transaction, $requester);
+            $dto = DebtDto::create($debt);
             $labels = ['label' => ['submit' => 'akzeptieren', 'decline' => 'ablehnen']];
         } else {
-            $dto = LoanDto::create($transaction);
+            $loan = $this->transactionService->getLoanPartOfUserForTransaction($transaction, $requester);
+            $dto = LoanDto::create($loan);
             $labels = ['label' => ['submit' => 'Zurückziehen', 'decline' => 'Zurückziehen']];
         }
 
@@ -127,10 +136,10 @@ class TransactionController extends AbstractController
 
             if ($isDebtor) {
                 if ($isAccepted) {
-                    $this->transactionService->acceptTransaction($transaction);
+                    $this->transactionProcessor->accept($debt);
                     $this->mailService->sendAcceptMailToLoaner($transaction, $requester, $transaction->getLoaner());
                 } else {
-                    $this->transactionService->declineTransaction($transaction);
+                    $this->transactionService->declineDebt($debt);
                     $this->mailService->sendDeclineMailToLoaner($transaction, $requester, $transaction->getLoaner());
                 }
                 return $this->redirectToRoute('account_debts', []);
@@ -165,12 +174,11 @@ class TransactionController extends AbstractController
         );
 
         if ($isDebtor) {
-            $dto = $this->transactionService->createDtoFromTransaction($transaction, true);
             $labels = ['label' => ['submit' => 'Überweisen', 'decline' => 'Verrechnen']];
         } else {
-            $dto = $this->transactionService->createDtoFromTransaction($transaction, false);
             $labels = ['label' => ['submit' => 'Mahn-Mail senden', 'decline' => 'Mahn-Mail senden']];
         }
+        $dto = $this->transactionService->createDtoFromTransaction($transaction, $isDebtor);
 
         $form = $this->createForm(ChoiceType::class, null, $labels);
         $form->handleRequest($request);

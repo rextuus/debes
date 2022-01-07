@@ -2,11 +2,18 @@
 
 namespace App\Service\Transfer;
 
+use App\Entity\Debt;
+use App\Entity\Loan;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
+use App\Service\Debt\DebtUpdateData;
 use App\Service\Exchange\ExchangeCreateData;
 use App\Service\Exchange\ExchangeService;
+use App\Service\Loan\LoanService;
+use App\Service\Loan\LoanUpdateData;
 use App\Service\Transaction\TransactionService;
 use App\Service\Transaction\TransactionUpdateData;
+use DateTime;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 
@@ -29,40 +36,48 @@ class ExchangeProcessor
     private $exchangeService;
 
     /**
+     * @var LoanService
+     */
+    private $loanService;
+
+    /**
      * ExchangeProcessor constructor.
      */
-    public function __construct(TransactionService $transactionService, ExchangeService $exchangeService)
-    {
+    public function __construct(
+        TransactionService $transactionService,
+        ExchangeService $exchangeService,
+        LoanService $loanService
+    ) {
         $this->transactionService = $transactionService;
         $this->exchangeService = $exchangeService;
+        $this->loanService = $loanService;
     }
 
     /**
      * findExchangeCandidatesForTransaction
      *
-     * @param Transaction $transaction
+     * @param Debt $debt
      *
      * @return ExchangeCandidateSet
      */
-    public function findExchangeCandidatesForTransaction(Transaction $transaction): ExchangeCandidateSet
+    public function findExchangeCandidatesForTransaction(Debt $debt): ExchangeCandidateSet
     {
-        $candidates = $this->transactionService->getAllLoanTransactionsForUserAndState(
-            $transaction->getDebtor(),
-            Transaction::STATE_ACCEPTED
-        );
-        $fittingCandidates = array();
+        // get all loans from given user
+        $candidates = $this->loanService->getAllExchangeLoansForDebt($debt);
+        dump($candidates);
+//        $fittingCandidates = array();
         $nonFittingCandidates = array();
-        foreach ($candidates as $candidate) {
-            /** @var Transaction $candidate */
-            if ($candidate->getAmount() >= $transaction->getAmount()) {
-                $fittingCandidates[] = $candidate;
-            } else {
-                $nonFittingCandidates[] = $candidate;
-            }
-        }
+//        foreach ($candidates as $candidate) {
+//            /** @var Transaction $candidate */
+//            if ($candidate->getAmount() >= $debt->getAmount()) {
+//                $fittingCandidates[] = $candidate;
+//            } else {
+//                $nonFittingCandidates[] = $candidate;
+//            }
+//        }
 
         $exchangeCandidateSet = new ExchangeCandidateSet();;
-        $exchangeCandidateSet->setFittingCandidates($fittingCandidates);
+        $exchangeCandidateSet->setFittingCandidates($candidates);
         $exchangeCandidateSet->setNonFittingCandidates($nonFittingCandidates);
 
         return $exchangeCandidateSet;
@@ -85,6 +100,50 @@ class ExchangeProcessor
         $exchangeDto->setDifference($difference);
 
         return $exchangeDto;
+    }
+
+    /**
+     * exchangeDebtAndLoan
+     *
+     * @param Debt $debt
+     * @param Loan $loan
+     *
+     * @return void
+     */
+    public function exchangeDebtAndLoan(Debt $debt, Loan $loan): void
+    {
+        // update debt and transaction
+
+        // debt is greater than loan => set loan to 0 and debt to difference
+        if ($debt->getAmount() > $loan->getAmount()){
+            $difference = $debt->getAmount() - $loan->getAmount();
+            $transactionDifference = $difference;
+            $debtUpdateData = new DebtUpdateData();
+            $debtUpdateData->setAmount($difference);
+            $debtUpdateData->setState(Transaction::STATE_PARTIAL_CLEARED);
+
+            $loanUpdateData = new LoanUpdateData();
+            $loanUpdateData->setAmount(0.0);
+            $loanUpdateData->setPaid(true);
+            $loanUpdateData->setState(Transaction::STATE_CLEARED);
+
+        }else{
+            $difference = $loan->getAmount() - $debt->getAmount();
+            $transactionDifference = $difference;
+            $debtUpdateData = new DebtUpdateData();
+            $debtUpdateData->setAmount(0.0);
+            $debtUpdateData->setState(Transaction::STATE_CLEARED);
+            $debtUpdateData->setPaid(true);
+
+            $loanUpdateData = new LoanUpdateData();
+            $loanUpdateData->setAmount($difference);
+            $loanUpdateData->setState(Transaction::STATE_PARTIAL_CLEARED);
+        }
+        $debtUpdateData->setEdited(new DateTime());
+        $loanUpdateData->setEdited(new DateTime());
+
+
+        // create exchange
     }
 
     /**
@@ -129,8 +188,6 @@ class ExchangeProcessor
             $this->transactionService->update($transaction, $transactionUpdateData);
             $this->transactionService->updateInclusive($transactionToExchange, $exchangeTransactionUpdateData);
         }
-
-
 
         // create an single exchange for each transaction
         $exchangeCreationDataForTransaction->setTransaction($transaction);

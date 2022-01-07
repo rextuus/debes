@@ -3,6 +3,7 @@
 namespace App\Service\Debt;
 
 use App\Entity\Debt;
+use App\Entity\Transaction;
 
 class DebtFactory
 {
@@ -31,7 +32,17 @@ class DebtFactory
      */
     public function mapData(Debt $debt, DebtData $data): void
     {
-        $debt->setCreated($data->getCreated());
+        if ($data instanceof  DebtCreateData){
+            $debt->setCreated($data->getCreated());
+            $debt->setEdited($data->getCreated());
+            $debt->setState(Transaction::STATE_READY);
+            $debt->setInitialAmount($data->getAmount());
+        }else{
+            $debt->setEdited($data->getEdited());
+            $debt->setState($data->getState());
+            $debt->setAmount($data->getAmount());
+        }
+
         $debt->setAmount($data->getAmount());
         $debt->setOwner($data->getOwner());
         $debt->setTransaction($data->getTransaction());

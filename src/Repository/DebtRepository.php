@@ -83,16 +83,15 @@ class DebtRepository extends ServiceEntityRepository
      *
      * @return int|mixed|string
      */
-    public function findTransactionsForUserAndState(User $owner, string $state)
+    public function findAllDebtsForUserAndState(User $owner, string $state)
     {
         return $this->createQueryBuilder('d')
-            ->select('t')
-            ->leftJoin(Transaction::class, 't', 'WITH', 'd.transaction = t.id')
+            ->select('d')
             ->where('d.owner = :owner')
-            ->andWhere('t.state = :state')
+            ->andWhere('d.state = :state')
             ->setParameter('owner', $owner)
             ->setParameter('state', $state)
-            ->orderBy('t.created', 'ASC')
+            ->orderBy('d.created', 'ASC')
             ->getQuery()->getResult();
     }
 }

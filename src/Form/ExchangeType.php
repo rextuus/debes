@@ -2,8 +2,11 @@
 
 namespace App\Form;
 
+use App\Entity\Debt;
+use App\Entity\Loan;
 use App\Entity\Transaction;
 use App\Service\Loan\LoanDto;
+use App\Service\Loan\LoanService;
 use App\Service\Transfer\ExchangeProcessor;
 use App\Service\Transfer\PrepareExchangeTransferData;
 use Symfony\Component\Form\AbstractType;
@@ -21,27 +24,27 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ExchangeType extends AbstractType
 {
     /**
-     * @var ExchangeProcessor
+     * @var LoanService
      */
-    private $exchangeService;
+    private $loanService;
 
     /**
      * TransactionCreateSimpleType constructor.
      */
-    public function __construct(ExchangeProcessor $exchangeService)
+    public function __construct(LoanService $loanService)
     {
-        $this->exchangeService = $exchangeService;
+        $this->loanService = $loanService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add(
-                'transactionSlug',
+                'loan',
                 ChoiceType::class,
                 [
-                    'choices' => $this->prepareOptions($options['transaction']),
-                    'data' => $options['transaction'],
+                    'choices' => $this->prepareOptions($options['debt']),
+                    'data' => $options['debt'],
                 ]
             )
             ->add('submit', SubmitType::class, ['label' => 'Mit dieser Transaktion verrechnen'])
@@ -52,44 +55,24 @@ class ExchangeType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => PrepareExchangeTransferData::class,
-            'transaction' => Transaction::class,
+            'debt' => Debt::class,
         ]);
     }
 
     /**
      * prepareOptions
      *
-     * @param Transaction $transaction
+     * @param Debt $debt
      *
      * @return array
      */
-    private function prepareOptions(Transaction $transaction): array
+    private function prepareOptions(Debt $debt): array
     {
-        $candidates = $this->exchangeService->findExchangeCandidatesForTransaction($transaction)->getFittingCandidates();
-        $candidates = array_merge($candidates, $this->exchangeService->findExchangeCandidatesForTransaction($transaction)->getNonFittingCandidates());
+        $candidates = $this->loanService->getAllExchangeLoansForDebt($debt);
         $choices = array();
         foreach ($candidates as $candidate) {
-            /** @var LoanDto $candidate */
-            $choices[$candidate->getReason()] = $candidate->getSlug();
-        }
-        return $choices;
-    }
-
-    /**
-     * prepareNonFittingOptions
-     *
-     * @param Transaction $transaction
-     *
-     * @return array
-     */
-    private function prepareNonFittingOptions(Transaction $transaction): array
-    {
-        $candidates = $this->exchangeService->findExchangeCandidatesForTransaction($transaction)->getNonFittingCandidates();
-        $candidates = array_merge($candidates, $this->exchangeService->findExchangeCandidatesForTransaction($transaction)->getNonFittingCandidates());
-        $choices = array();
-        foreach ($candidates as $candidate) {
-            /** @var LoanDto $candidate */
-            $choices[$candidate->getReason()] = $candidate->getSlug();
+            /** @var Loan $candidate */
+            $choices[(string) $candidate] = $candidate;
         }
         return $choices;
     }

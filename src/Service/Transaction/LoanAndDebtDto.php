@@ -2,7 +2,10 @@
 
 namespace App\Service\Transaction;
 
+use App\Entity\Debt;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
+use App\Service\Transaction\TransactionDtos\TransactionPartDtoInterface;
 use DateTimeInterface;
 
 /**
@@ -36,7 +39,7 @@ abstract class LoanAndDebtDto
     /**
      * @var string
      */
-    private $transactionPartner;
+    private $transactionPartners;
 
     /**
      * @var string
@@ -61,19 +64,19 @@ abstract class LoanAndDebtDto
     /**
      * create
      *
-     * @param Transaction    $transaction
-     * @param LoanAndDebtDto $dto
+     * @param TransactionPartInterface $transactionPartInterface
+     * @param LoanAndDebtDto           $dto
      *
      * @return void
      */
-    protected static function init(Transaction $transaction, LoanAndDebtDto $dto): void
+    protected static function init(TransactionPartInterface $transactionPartInterface, LoanAndDebtDto $dto): void
     {
-        $dto->setCreated($transaction->getCreated());
-        $dto->setEdited($transaction->getEdited());
-        $dto->setState($transaction->getState());
-        $dto->setReason($transaction->getReason());
-        $dto->setTransactionId($transaction->getId());
-        $dto->setSlug($transaction->getSlug());
+        $dto->setCreated($transactionPartInterface->getCreated());
+        $dto->setEdited($transactionPartInterface->getEdited());
+        $dto->setState($transactionPartInterface->getState());
+        $dto->setReason($transactionPartInterface->getTransaction()->getReason());
+        $dto->setTransactionId($transactionPartInterface->getId());
+        $dto->setSlug($transactionPartInterface->getTransaction()->getSlug());
         $dto->setExchangeDtos([]);
     }
 
@@ -128,17 +131,17 @@ abstract class LoanAndDebtDto
     /**
      * @return string
      */
-    public function getTransactionPartner(): string
+    public function getTransactionPartners(): string
     {
-        return $this->transactionPartner;
+        return $this->transactionPartners;
     }
 
     /**
-     * @param string $transactionPartner
+     * @param string $transactionPartners
      */
-    public function setTransactionPartner(string $transactionPartner): void
+    public function setTransactionPartners(string $transactionPartners): void
     {
-        $this->transactionPartner = $transactionPartner;
+        $this->transactionPartners = $transactionPartners;
     }
 
     /**

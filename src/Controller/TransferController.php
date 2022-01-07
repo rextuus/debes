@@ -16,6 +16,8 @@ use App\Service\PaymentAction\PaymentActionData;
 use App\Service\PaymentAction\PaymentActionService;
 use App\Service\PaymentOption\BankAccountService;
 use App\Service\PaymentOption\PaypalAccountService;
+use App\Service\Transaction\DtoProvider;
+use App\Service\Transaction\TransactionProcessor;
 use App\Service\Transaction\TransactionService;
 use App\Service\Transaction\TransactionUpdateData;
 use App\Service\Transfer\ExchangeProcessor;
@@ -53,13 +55,30 @@ class TransferController extends AbstractController
     private $paymentActionService;
 
     /**
+     * @var TransactionProcessor
+     */
+    private $transactionProcessor;
+
+    /**
+     * @var DtoProvider
+     */
+    private $dtoProvider;
+
+    /**
      * TransactionController constructor.
      */
-    public function __construct(TransactionService $transactionService, MailService $mailService, PaymentActionService $paymentActionService)
-    {
+    public function __construct(
+        TransactionService $transactionService,
+        MailService $mailService,
+        PaymentActionService $paymentActionService,
+        TransactionProcessor $transactionProcessor,
+        DtoProvider $dtoProvider
+    ) {
         $this->transactionService = $transactionService;
         $this->mailService = $mailService;
         $this->paymentActionService = $paymentActionService;
+        $this->transactionProcessor = $transactionProcessor;
+        $this->dtoProvider = $dtoProvider;
     }
 
     /**
@@ -74,7 +93,7 @@ class TransferController extends AbstractController
         /** @var User $requester */
         $requester = $this->getUser();
 
-        $this->transactionService->checkRequestForVariant(
+        $isDebtor = $this->transactionService->checkRequestForVariant(
             $requester,
             $transaction,
             TransactionService::DEBTOR_VIEW,
@@ -98,7 +117,7 @@ class TransferController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $isDeclined = (bool)$form->get('decline')->isClicked();
-            if ($isDeclined){
+            if ($isDeclined) {
                 return $this->redirectToRoute('account_debts', []);
             }
 
@@ -106,21 +125,23 @@ class TransferController extends AbstractController
             $data = $form->getData();
             if ($data->getPaymentOption() instanceof BankAccount) {
                 return $this->redirectToRoute('transfer_send_bank', [
-                    'slug' => $transaction->getSlug(),
+                    'slug'              => $transaction->getSlug(),
                     'senderBankAccount' => $data->getPaymentOption()->getId(),
                 ]);
             } elseif ($data->getPaymentOption() instanceof PaypalAccount) {
                 return $this->redirectToRoute('transfer_send_paypal', [
-                    'slug' => $transaction->getSlug(),
+                    'slug'                => $transaction->getSlug(),
                     'senderPaypalAccount' => $data->getPaymentOption()->getId(),
                 ]);
             }
         }
 
-        $dto = DebtDto::create($transaction);
+        $dto = $this->transactionService->createDtoFromTransaction($transaction, $isDebtor);
+
         return $this->render('transfer/prepare.html.twig', [
             'form' => $form->createView(),
-            'dto' => $dto,
+            'dto'  => $dto,
+            'debtVariant' => $isDebtor,
         ]);
     }
 
@@ -143,6 +164,10 @@ class TransferController extends AbstractController
             Transaction::STATE_ACCEPTED
         );
 
+        // todo check if Transaction has correct state if multiple
+        $debt = $this->transactionService->getDebtPartOfUserForTransaction($transaction, $requester);
+
+
         $receiverBankAccount = $bankAccountService->getActiveBankAccountForUser($transaction->getLoans()[0]->getOwner());
 
         $dto = (new SendTransferDto)->initFrom($receiverBankAccount);
@@ -162,7 +187,9 @@ class TransferController extends AbstractController
                 $transactionUpdateData = (new TransactionUpdateData())->initFrom($transaction);
                 $transactionUpdateData->setState(Transaction::STATE_CLEARED);
                 $this->transactionService->update($transaction, $transactionUpdateData);
+                $this->transactionProcessor->process($debt);
 
+                // store payment for history
                 $paymentActionData = new PaymentActionData();
                 $paymentActionData->setTransaction($transaction);
                 $paymentActionData->setVariant(PaymentAction::VARIANT_BANK);
@@ -170,13 +197,14 @@ class TransferController extends AbstractController
                 $paymentActionData->setBankAccountReceiver($receiverBankAccount);
                 $paymentAction = $this->paymentActionService->storePaymentAction($paymentActionData);
 
-                $this->mailService->sendTransferMailToLoaner($transaction, $requester, $transaction->getLoaner(), $paymentAction);
+                $this->mailService->sendTransferMailToLoaner($transaction, $requester, $transaction->getLoaner(),
+                                                             $paymentAction);
             }
             return $this->redirectToRoute('account_debts', []);
         }
 
         return $this->render('transfer/send.bank.html.twig', [
-            'dto' => $dto,
+            'dto'  => $dto,
             'form' => $form->createView(),
         ]);
     }
@@ -227,13 +255,14 @@ class TransferController extends AbstractController
                 $paymentActionData->setPaypalAccountReceiver($receiverPaypalAccount);
                 $paymentAction = $this->paymentActionService->storePaymentAction($paymentActionData);
 
-                $this->mailService->sendTransferMailToLoaner($transaction, $requester, $transaction->getLoaner(), $paymentAction);
+                $this->mailService->sendTransferMailToLoaner($transaction, $requester, $transaction->getLoaner(),
+                                                             $paymentAction);
             }
             return $this->redirectToRoute('account_debts', []);
         }
 
         return $this->render('transfer/send.paypal.html.twig', [
-            'dto' => $dto,
+            'dto'  => $dto,
             'form' => $form->createView(),
         ]);
     }
@@ -260,35 +289,50 @@ class TransferController extends AbstractController
         $form = $this->createForm(
             ExchangeType::class,
             $data,
-            ['transaction' => $transaction]
+            ['debt' => $this->transactionService->getDebtPartOfUserForTransaction($transaction, $requester)]
         );
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $isAccepted = (bool)$form->get('submit')->isClicked();
-            if ($isAccepted){
-                if (!$data->getTransactionSlug()){
+            if ($isAccepted) {
+                if (!$data->getLoan()) {
                     return $this->redirectToRoute('account_debts', []);
                 }
-                return $this->redirectToRoute('exchange_accept', ['slug1' => $transaction->getSlug(), 'slug2' => $form->getData()->getTransactionSlug()]);
+
+                /** @var PrepareExchangeTransferData $data */
+                $data = $form->getData();
+                $loanToExchange = $data->getLoan();
+                return $this->redirectToRoute(
+                    'exchange_accept',
+                    [
+                        'slug1' => $transaction->getSlug(),
+                        'slug2' => $loanToExchange->getTransaction()->getSlug(),
+                        'part1' => $this->transactionService->getDebtPartOfUserForTransaction($transaction,
+                                                                                              $requester)->getId(),
+                        'part2' => $loanToExchange->getId(),
+                    ]
+                );
             }
             return $this->redirectToRoute('account_debts', []);
         }
 
         $dto = DebtDto::create($transaction);
         return $this->render('transfer/prepare.exchange.html.twig', [
-            'dto' => $dto,
+            'dto'  => $dto,
             'form' => $form->createView(),
         ]);
     }
 
     /**
-     * @Route("/accept/exchange/{slug1}/{slug2}", name="exchange_accept")
+     * @Route("/accept/exchange/{slug1}/{part1}/{slug2}/{part2}", name="exchange_accept")
      */
     public function acceptExchange(
         string $slug1,
         string $slug2,
+        int $part1,
+        int $part2,
         Request $request,
         ExchangeProcessor $exchangeService
     ): Response {
@@ -301,17 +345,17 @@ class TransferController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $isAccepted = (bool)$form->get('submit')->isClicked();
 
-            if ($isAccepted){
+            if ($isAccepted) {
                 $exchangeService->exchangeTransactions($slug1, $slug2);
                 return $this->redirectToRoute('account_debts', []);
-            }else{
+            } else {
                 return $this->redirectToRoute('exchange_prepare', ['slug' => $slug1]);
             }
         }
 
         return $this->render('transfer/accept.exchange.html.twig', [
             'form' => $form->createView(),
-            'dto' => $dto
+            'dto'  => $dto,
         ]);
     }
 }

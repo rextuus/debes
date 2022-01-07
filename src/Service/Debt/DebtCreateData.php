@@ -2,6 +2,7 @@
 
 namespace App\Service\Debt;
 
+use App\Entity\Transaction;
 use App\Entity\User;
 use App\Service\Transaction\TransactionData;
 use DateTime;
@@ -35,6 +36,8 @@ class DebtCreateData extends DebtData
         $this->setAmount($data->getAmount());
         $this->setReason($data->getReason());
         $this->setCreated(new DateTime());
+        $this->setEdited(new DateTime());
+        $this->setState(Transaction::STATE_READY);
         $this->setPaid(false);
         return $this;
     }

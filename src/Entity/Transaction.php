@@ -17,6 +17,7 @@ class Transaction
     const STATE_CREATED = 'created';
     const STATE_READY = 'ready';
     const STATE_ACCEPTED = 'accepted';
+    const STATE_PARTIAL_ACCEPTED = 'partial_accepted';
     const STATE_DECLINED = 'declined';
     const STATE_PARTIAL_CLEARED = 'partial_cleared';
     const STATE_CLEARED = 'cleared';
@@ -73,6 +74,11 @@ class Transaction
      * @ORM\OneToMany(targetEntity=Exchange::class, mappedBy="transaction")
      */
     private $exchanges;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $initialAmount;
 
     public function __construct()
     {
@@ -276,5 +282,139 @@ class Transaction
         }
 
         return $this;
+    }
+
+    /**
+     * getDebtors
+     *
+     * @return array
+     */
+    public function getDebtorIds(): array
+    {
+        $debtors = array();
+        foreach ($this->getDebts() as $debt) {
+            $debtors[] = $debt->getOwner()->getId();
+        }
+        return $debtors;
+    }
+
+    /**
+     * getLoaners
+     *
+     * @return array
+     */
+    public function getLoanerIds(): array
+    {
+        $loaners = array();
+        foreach ($this->getLoans() as $loans) {
+            $loaners[] = $loans->getOwner()->getId();
+        }
+        return $loaners;
+    }
+
+    public function getInitialAmount(): ?float
+    {
+        return $this->initialAmount;
+    }
+
+    public function setInitialAmount(float $initialAmount): self
+    {
+        $this->initialAmount = $initialAmount;
+
+        return $this;
+    }
+
+    /**
+     * getDebtors
+     *
+     * @return array
+     */
+    public function getDebtors(): array
+    {
+        $debtors = array();
+        foreach ($this->getDebts() as $debt) {
+            $debtors[] = $debt->getOwner();
+        }
+        return $debtors;
+    }
+
+    /**
+     * getLoaners
+     *
+     * @return array
+     */
+    public function getLoaners(): array
+    {
+        $loaners = array();
+        foreach ($this->getLoans() as $loans) {
+            $loaners[] = $loans->getOwner();
+        }
+        return $loaners;
+    }
+
+    public function isDebtTheLastNonAcceptedOne(Debt $debtToCheck): bool
+    {
+        $allowedStates = [self::STATE_ACCEPTED, self::STATE_CLEARED, self::STATE_CONFIRMED];
+        $debtsWithIncorrectState = 0;
+        foreach ($this->getDebts() as $debt) {
+            if (in_array($debt->getState(), $allowedStates)) {
+                $debtsWithIncorrectState++;
+            }
+        }
+        // all greater 1 (our last debt) means we cant update to accept
+        return $debtsWithIncorrectState < 2 && $debtToCheck->getState() === self::STATE_READY;
+    }
+
+    public function isDebtTheLastNonClearedOne(Debt $debtToCheck): bool
+    {
+        $allowedStates = [self::STATE_CLEARED, self::STATE_CONFIRMED];
+        $debtsWithIncorrectState = 0;
+        foreach ($this->getDebts() as $debt) {
+            if (in_array($debt->getState(), $allowedStates)) {
+                $debtsWithIncorrectState++;
+            }
+        }
+        // all greater 1 (our last debt) means we cant update to accept
+        return $debtsWithIncorrectState < 2 && $debtToCheck->getState() === self::STATE_ACCEPTED;
+    }
+
+    /**
+     * hasMultipleLoaners
+     *
+     * @return bool
+     */
+    public function hasMultipleLoaners(): bool
+    {
+        return count($this->loans) > 1;
+    }
+
+    /**
+     * hasMultipleDebtors
+     *
+     * @return bool
+     */
+    public function hasMultipleDebtors(): bool
+    {
+        return count($this->debts) > 1;
+    }
+
+    /**
+     * isMultipleTransaction
+     *
+     * @return bool
+     */
+    public function isMultipleTransaction(): bool
+    {
+        return $this->hasMultipleLoaners() && $this->hasMultipleDebtors();
+    }
+
+    /**
+     * isSingleTransaction
+     *
+     * @return bool
+     */
+    public function isSingleTransaction(): bool
+    {
+        return !$this->hasMultipleLoaners() && !$this->hasMultipleDebtors();
     }
 }

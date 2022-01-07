@@ -90,7 +90,7 @@ class DebtService
      */
     public function getAllDebtTransactionsForUserAndState(User $user, string $state): array
     {
-        return $this->debtRepository->findTransactionsForUserAndState($user, $state);
+        return $this->debtRepository->findAllDebtsForUserAndState($user, $state);
     }
 
     /**

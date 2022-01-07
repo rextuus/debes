@@ -2,7 +2,9 @@
 
 namespace App\Service\Loan;
 
+use App\Entity\Debt;
 use App\Entity\Loan;
+use App\Entity\Transaction;
 use App\Entity\User;
 use App\Repository\LoanRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -86,13 +88,30 @@ class LoanService
      *
      * @param User   $owner
      * @param string $state
+     * @param float  $amount
      *
      * @return array
-     *
      */
-    public function getAllLoanTransactionsForUserAndSate(User $owner, string $state): array
+    public function getAllLoanTransactionsForUserAndSate(User $owner, string $state, float $amount): array
     {
-        return $this->loanRepository->getAllLoanTransactionsForUserAndSate($owner, $state);
+        return $this->loanRepository->getAllLoanTransactionsForUserAndSate($owner, $state, $amount);
+    }
+
+    /**
+     * getAllDebtTransactionsForUserAndSate
+     *
+     * @param Debt $debt
+     *
+     * @return array
+     */
+    public function getAllExchangeLoansForDebt(Debt $debt): array
+    {
+        return $this->loanRepository->getAllExchangeLoansForDebt(
+            $debt->getOwner(),
+            Transaction::STATE_ACCEPTED,
+            $debt->getAmount(),
+            $debt->getTransaction()->getLoanerIds()
+        );
     }
 
     /**

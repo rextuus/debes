@@ -41,6 +41,7 @@ class TransactionFactory
         }
 
         $transaction->setAmount($data->getAmount());
+        $transaction->setInitialAmount($data->getAmount());
         $transaction->setReason($data->getReason());
         $transaction->setState($data->getState());
     }
