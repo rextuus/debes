@@ -4,7 +4,7 @@ DROP TABLE paypal_account;
 DROP TABLE loan;
 DROP TABLE debt;
 DROP TABLE exchange;
-DROP TABLE transaction;
+DROP TABLE transactions;
 DROP TABLE user;
 
 CREATE USER 'debes_user'@'localhost' IDENTIFIED BY 'password';

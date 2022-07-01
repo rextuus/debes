@@ -4,11 +4,13 @@ namespace App\Service\Loan;
 
 use App\Entity\Loan;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
 use App\Entity\User;
+use App\Service\Transaction\TransactionPartDataInterface;
 use DateTime;
 use DateTimeInterface;
 
-class LoanData
+class LoanData implements TransactionPartDataInterface
 {
 
     /**
@@ -203,11 +205,11 @@ class LoanData
     /**
      * initFrom
      *
-     * @param Loan $loan
+     * @param TransactionPartInterface $loan
      *
      * @return LoanData
      */
-    public function initFrom(Loan $loan): LoanData
+    public function initFrom(TransactionPartInterface $loan): LoanData
     {
         $this->setCreated($loan->getCreated());
         $this->setEdited($loan->getCreated());
@@ -216,7 +218,7 @@ class LoanData
         $this->setOwner($loan->getOwner());
         $this->setPaid($loan->getPaid());
         $this->setTransaction($loan->getTransaction());
-        $this->setState(Transaction::STATE_READY);
+        $this->setState($loan->getState());
 
         return $this;
     }

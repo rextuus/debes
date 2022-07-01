@@ -3,8 +3,10 @@
 namespace App\Service\Debt;
 
 use App\Entity\Debt;
+use App\Entity\TransactionPartInterface;
 use App\Entity\User;
 use App\Repository\DebtRepository;
+use App\Service\Transaction\TransactionPartDataInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
@@ -41,27 +43,29 @@ class DebtService
      *
      * @param DebtCreateData $debtData
      *
-     * @return void
+     * @return Debt
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function storeDebt(DebtCreateData $debtData): void
+    public function storeDebt(DebtCreateData $debtData): Debt
     {
         $debt = $this->debtFactory->createByData($debtData);
 
         $this->debtRepository->persist($debt);
+
+        return $debt;
     }
 
     /**
      * update
      *
-     * @param Debt           $debt
-     * @param DebtUpdateData $data
+     * @param TransactionPartInterface           $debt
+     * @param TransactionPartDataInterface $data
      *
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function update(Debt $debt, DebtUpdateData $data): void
+    public function update(TransactionPartInterface $debt, TransactionPartDataInterface $data): void
     {
         $this->debtFactory->mapData($debt, $data);
 

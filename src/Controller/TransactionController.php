@@ -19,11 +19,16 @@ use App\Service\Transaction\TransactionCreateMultipleData;
 use App\Service\Transaction\TransactionData;
 use App\Service\Transaction\TransactionProcessor;
 use App\Service\Transaction\TransactionService;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use App\Service\Transaction\TransactionUpdateData;
+use Doctrine\DBAL\Exception;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+
 
 /**
  * Class PaymentController
@@ -49,6 +54,9 @@ class TransactionController extends AbstractController
 
     /**
      * TransactionController constructor.
+     *
+     * @param TransactionService $transactionService
+     * @param MailService $mailService
      */
     public function __construct(TransactionService $transactionService, MailService $mailService, TransactionProcessor $transactionProcessor)
     {
@@ -59,6 +67,10 @@ class TransactionController extends AbstractController
 
     /**
      * @Route("/create/simple", name="transaction_create_simple")
+     * @param Request $request
+     * @return Response
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function createSimpleTransaction(Request $request): Response
     {
@@ -76,7 +88,7 @@ class TransactionController extends AbstractController
 
             $transaction = $this->transactionService->storeSingleTransaction($data, $requester);
 
-            $this->mailService->sendCreationMailToDebtor($transaction, $requester, $data->getOwner());
+            $this->mailService->sendNotificationMail($transaction, MailService::MAIL_DEBT_CREATED);
 
             return $this->redirect($this->generateUrl('account_overview', []));
         }
@@ -86,25 +98,33 @@ class TransactionController extends AbstractController
         ]);
     }
 
-//    /**
-//     * @Route("/", name="transaction_list")
-//     */
-//    public function listTransactionsForUser(): Response
-//    {
-//        /** @var User $requester */
-//        $requester = $this->getUser();
-//
-//        $transactions = $this->transactionService->getAllTransactionBelongingUser($requester);
-//
-//        return $this->render('transaction/transaction.list.html.twig', [
-//            'debtAmount' => 345.77,
-//            'loanAmount' => 666.77,
-//            'transactions' => $transactions,
-//        ]);
-//    }
+    // TODO CHECK IF USED
+    /**
+     * @Route("/", name="transaction_list")
+     */
+    public function listTransactionsForUser(): Response
+    {
+        /** @var User $requester */
+        $requester = $this->getUser();
+
+        $transactions = $this->transactionService->getAllTransactionBelongingUser($requester);
+
+        return $this->render('transaction/transaction.list.html.twig', [
+            'debtAmount' => 345.77,
+            'loanAmount' => 666.77,
+            'transactions' => $transactions,
+        ]);
+    }
 
     /**
      * @Route("/accept/{slug}", name="transaction_accept")
+     *
+     * @param Transaction $transaction
+     * @param Request $request
+     * @return Response
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws Exception
      */
     public function acceptTransaction(Transaction $transaction, Request $request): Response
     {
@@ -137,15 +157,15 @@ class TransactionController extends AbstractController
             if ($isDebtor) {
                 if ($isAccepted) {
                     $this->transactionProcessor->accept($debt);
-                    $this->mailService->sendAcceptMailToLoaner($transaction, $requester, $transaction->getLoaner());
+                    $this->mailService->sendNotificationMail($transaction, MailService::MAIL_DEBT_ACCEPTED);
                 } else {
                     $this->transactionService->declineDebt($debt);
-                    $this->mailService->sendDeclineMailToLoaner($transaction, $requester, $transaction->getLoaner());
+                    $this->mailService->sendNotificationMail($transaction, MailService::MAIL_DEBT_DECLINED);
                 }
                 return $this->redirectToRoute('account_debts', []);
             } else {
                 if ($isAccepted) {
-                    // TODO remove Transaction and send loaner notification
+                    $this->mailService->sendNotificationMail($transaction, MailService::MAIL_DEBT_CANCELED);
                 }
                 return $this->redirectToRoute('account_loans', []);
             }
@@ -174,8 +194,10 @@ class TransactionController extends AbstractController
         );
 
         if ($isDebtor) {
+            $dto = $this->transactionService->createDtoFromTransaction($transaction, true);
             $labels = ['label' => ['submit' => 'Überweisen', 'decline' => 'Verrechnen']];
         } else {
+            $dto = $this->transactionService->createDtoFromTransaction($transaction, false);
             $labels = ['label' => ['submit' => 'Mahn-Mail senden', 'decline' => 'Mahn-Mail senden']];
         }
         $dto = $this->transactionService->createDtoFromTransaction($transaction, $isDebtor);
@@ -228,7 +250,7 @@ class TransactionController extends AbstractController
         );
 
         if ($isDebtor) {
-            $dto = DebtDto::create($transaction);
+            $dto = DebtDto::create($this->transactionService->getDebtPartOfUserForTransaction($transaction, $requester));
             $labels = ['label' => ['submit' => 'Bestätigen', 'decline' => 'Bestätigen']];
         } else {
             $dto = LoanDto::create($transaction);
@@ -250,7 +272,8 @@ class TransactionController extends AbstractController
                 return $this->redirectToRoute('account_debts', []);
             } else {
                 if ($isAccepted) {
-                    // TODO set transaction to history state and inform debtor that all is fine
+                    $this->transactionService->confirmTransaction($transaction);
+                    $this->mailService->sendNotificationMail($transaction, MailService::MAIL_DEBT_CONFIRMED, null);
                 }
                 return $this->redirectToRoute('account_loans', []);
             }

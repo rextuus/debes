@@ -1,0 +1,117 @@
+App\Entity\Debt:
+  debt1:
+    amount: 20.00
+    initialAmount: 20.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt2:
+    amount: 30.00
+    initialAmount: 30.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt3:
+    amount: 10.00
+    initialAmount: 10.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt4:
+    amount: 15.00
+    initialAmount: 15.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+
+App\Entity\Loan:
+  loan1:
+    amount: 20.00
+    initialAmount: 20.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan2:
+    amount: 30.00
+    initialAmount: 30.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan3:
+    amount: 10.00
+    initialAmount: 10.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan4:
+    amount: 15.00
+    initialAmount: 15.00
+    paid: false
+    owner: '@exchangeUser3'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+
+App\Entity\Transaction:
+  transactionExchange1:
+    state: 'accepted'
+    amount: 20.00
+    initialAmount: 20.00
+    reason: 'User1'
+    slug: 'ExchangeTest1'
+    debts:
+      - '@debt1'
+    loans:
+      - '@loan1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  transactionExchange2:
+    state: 'accepted'
+    amount: 30.00
+    initialAmount: 30.00
+    reason: 'Test for exchange mechanism'
+    slug: 'ExchangeTest2'
+    debts:
+      - '@debt2'
+    loans:
+      - '@loan2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  transactionExchange3:
+    state: 'accepted'
+    amount: 10.00
+    initialAmount: 10.00
+    reason: 'Test for exchange mechanism'
+    slug: 'ExchangeTest3'
+    debts:
+      - '@debt3'
+    loans:
+      - '@loan3'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  transactionExchange4:
+    state: 'accepted'
+    amount: 15.00
+    initialAmount: 15.00
+    reason: 'Test for exchange mechanism'
+    slug: 'ExchangeTest4'
+    debts:
+      - '@debt4'
+    loans:
+      - '@loan4'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'

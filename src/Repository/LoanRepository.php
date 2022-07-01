@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Debt;
 use App\Entity\Loan;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -30,12 +31,12 @@ class LoanRepository extends ServiceEntityRepository
     /**
      * persist
      *
-     * @param Loan $loan
+     * @param TransactionPartInterface $loan
      *
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function persist(Loan $loan): void
+    public function persist(TransactionPartInterface $loan): void
     {
         $this->_em->persist($loan);
         $this->_em->flush();

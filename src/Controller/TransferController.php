@@ -197,7 +197,7 @@ class TransferController extends AbstractController
                 $paymentActionData->setBankAccountReceiver($receiverBankAccount);
                 $paymentAction = $this->paymentActionService->storePaymentAction($paymentActionData);
 
-                $this->mailService->sendTransferMailToLoaner($transaction, $requester, $transaction->getLoaner(),
+                $this->mailService->sendNotificationMail($transaction, MailService::MAIL_DEBT_PAYED_ACCOUNT,
                                                              $paymentAction);
             }
             return $this->redirectToRoute('account_debts', []);
@@ -255,7 +255,7 @@ class TransferController extends AbstractController
                 $paymentActionData->setPaypalAccountReceiver($receiverPaypalAccount);
                 $paymentAction = $this->paymentActionService->storePaymentAction($paymentActionData);
 
-                $this->mailService->sendTransferMailToLoaner($transaction, $requester, $transaction->getLoaner(),
+                $this->mailService->sendTransferMailToLoaner($transaction, MailService::MAIL_DEBT_PAYED_PAYPAL,
                                                              $paymentAction);
             }
             return $this->redirectToRoute('account_debts', []);
@@ -318,7 +318,7 @@ class TransferController extends AbstractController
             return $this->redirectToRoute('account_debts', []);
         }
 
-        $dto = DebtDto::create($transaction);
+        $dto = DebtDto::create($this->transactionService->getDebtPartOfUserForTransaction($transaction, $requester));
         return $this->render('transfer/prepare.exchange.html.twig', [
             'dto'  => $dto,
             'form' => $form->createView(),
@@ -346,7 +346,7 @@ class TransferController extends AbstractController
             $isAccepted = (bool)$form->get('submit')->isClicked();
 
             if ($isAccepted) {
-                $exchangeService->exchangeTransactions($slug1, $slug2);
+                $exchangeService->exchangeTransactionParts($slug1, $slug2);
                 return $this->redirectToRoute('account_debts', []);
             } else {
                 return $this->redirectToRoute('exchange_prepare', ['slug' => $slug1]);

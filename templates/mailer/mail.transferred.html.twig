@@ -583,7 +583,7 @@
                             <h2>Hallo {{ userName }}</h2>
                             <p>{{ text }}</p>
                             {% if paymentAction.variant == "bank"%}
-                                <p>{{ loaner }} hat das Geld per Banküberweisung auf folgendes deiner Konten überwiesen:</p>
+                                <p>{{ interacter }} hat das Geld per Banküberweisung auf folgendes deiner Konten überwiesen:</p>
                                 <table>
                                     <tr>
                                         <th>Inhaber: </th>
@@ -603,7 +603,7 @@
                                     </tr>
                                 </table>
                             {% elseif paymentAction.variant == "paypal"%}
-                                <p>{{ loaner }} hat das Geld per Paypal auf folgendes deiner Konten überwiesen:</p>
+                                <p>{{ interacter }} hat das Geld per Paypal auf folgendes deiner Konten überwiesen:</p>
                                 <table>
                                     <tr>
                                         <th>Email: </th>
@@ -673,7 +673,7 @@
                                                                         <div class="text-tour"
                                                                              style="text-align: center;">
                                                                             <h3>Kreditgeber</h3>
-                                                                            <span class="price">{{ loaner }}</span>
+                                                                            <span class="price">{{ interacter }}</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -694,50 +694,10 @@
                             <tr>
                                 <td class="bg_white email-section">
                                     <div class="heading-section" style="text-align: center; padding: 0 30px;">
-                                        <h2>Was möchtest du jetzt machen?</h2>
+                                        <h2>Du möchtest wissen was sonst so bei deinen Finanzen los ist?</h2>
                                     </div>
-                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                                        <tr>
-                                            <td valign="top" width="50%" style="padding-top: 20px;">
-                                                <table role="presentation" cellspacing="0" cellpadding="10" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td>
-                                                            <img src="images/blog-1.jpg" alt=""
-                                                                 style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;">
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="text-services" style="text-align: left;">
-                                                            <h3>Schulden akzeptieren?</h3>
-                                                            <p>Dir bleibt wohl nichts anderes übrig, wenn wir ehrlich
-                                                                sind</p>
-                                                            <p><a href="#" class="btn btn-primary">Akzeptieren</a></p>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                            <td valign="top" width="50%" style="padding-top: 20px;">
-                                                <table role="presentation" cellspacing="0" cellpadding="10" border="0"
-                                                       width="100%">
-                                                    <tr>
-                                                        <td>
-                                                            <img src="images/blog-2.jpg" alt=""
-                                                                 style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;">
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="text-services" style="text-align: left;">
-                                                            <h3>Dem Ganzen widersprechen?</h3>
-                                                            <p>Muss wohl um viel Geld gehen. Dann kann man das schon mal
-                                                                in Erwägung ziehen</p>
-                                                            <p><a href="#" class="btn btn-primary">Ablehnen</a></p>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                    Dann schau am besten direkt vorbei:
+                                    <a href="https://www.wh-company.de">DEBES</a>
                                 </td>
                             </tr><!-- end: tr -->
 

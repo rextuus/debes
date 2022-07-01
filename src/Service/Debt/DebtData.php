@@ -5,11 +5,13 @@ namespace App\Service\Debt;
 use App\Entity\Debt;
 use App\Entity\Loan;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
 use App\Entity\User;
+use App\Service\Transaction\TransactionPartDataInterface;
 use DateTime;
 use DateTimeInterface;
 
-class DebtData
+class DebtData implements TransactionPartDataInterface
 {
     /**
      * @var float
@@ -203,11 +205,11 @@ class DebtData
     /**
      * initFrom
      *
-     * @param Debt $debt
+     * @param TransactionPartInterface $debt
      *
      * @return $this
      */
-    public function initFrom(Debt $debt): DebtData
+    public function initFrom(TransactionPartInterface $debt): DebtData
     {
         $this->setCreated($debt->getCreated());
         $this->setAmount($debt->getAmount());
@@ -216,7 +218,7 @@ class DebtData
         $this->setPaid($debt->getPaid());
         $this->setTransaction($debt->getTransaction());
         $this->setEdited($debt->getEdited());
-        $this->setState(Transaction::STATE_READY);
+        $this->setState($debt->getState());
 
         return $this;
     }

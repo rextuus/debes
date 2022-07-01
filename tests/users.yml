@@ -1,0 +1,58 @@
+App\Entity\User:
+  user1:
+    username: 'user1'
+    firstName: '<firstName()>'
+    lastName: '<lastName()>'
+    email: '<email()>'
+    password: '<password()>'
+  user2:
+    username: 'user2'
+    firstName: '<firstName()>'
+    lastName: '<lastName()>'
+    email: '<email()>'
+    password: '<password()>'
+  exchangeUser1:
+    username: 'exchangeUser1'
+    firstName: '<firstName()>'
+    lastName: '<lastName()>'
+    email: '<email()>'
+    password: '<password()>'
+  exchangeUser2:
+    username: 'exchangeUser2'
+    firstName: '<firstName()>'
+    lastName: '<lastName()>'
+    email: '<email()>'
+    password: '<password()>'
+  exchangeUser3:
+    username: 'exchangeUser3'
+    firstName: '<firstName()>'
+    lastName: '<lastName()>'
+    email: '<email()>'
+    password: '<password()>'
+  exchangeUser4:
+    username: 'exchangeUser4'
+    firstName: '<firstName()>'
+    lastName: '<lastName()>'
+    email: '<email()>'
+    password: '<password()>'
+  exchangeUser5:
+    username: 'exchangeUser5'
+    firstName: '<firstName()>'
+    lastName: '<lastName()>'
+    email: '<email()>'
+    password: '<password()>'
+  exchangeUser6:
+    username: 'exchangeUser6'
+    firstName: '<firstName()>'
+    lastName: '<lastName()>'
+    email: '<email()>'
+    password: '<password()>'
+  exchangeUser7:
+    username: 'exchangeUser7'
+    firstName: '<firstName()>'
+    lastName: '<lastName()>'
+    email: '<email()>'
+    password: '<password()>'
+
+
+

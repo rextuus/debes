@@ -1,0 +1,9 @@
+App\Entity\Loan:
+  loan1:
+    amount: 11.11
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+
+
+

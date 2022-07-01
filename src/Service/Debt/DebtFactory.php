@@ -4,6 +4,8 @@ namespace App\Service\Debt;
 
 use App\Entity\Debt;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
+use App\Service\Transaction\TransactionPartDataInterface;
 
 class DebtFactory
 {
@@ -30,7 +32,7 @@ class DebtFactory
      *
      * @return void
      */
-    public function mapData(Debt $debt, DebtData $data): void
+    public function mapData(TransactionPartInterface $debt, TransactionPartDataInterface $data): void
     {
         if ($data instanceof  DebtCreateData){
             $debt->setCreated($data->getCreated());

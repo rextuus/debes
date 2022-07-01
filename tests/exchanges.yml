@@ -1,0 +1,10 @@
+App\Entity\Exchange:
+  exchange1:
+    created: '<dateTimeBetween("-200 days", "now")>'
+    remainingAmount: 10.00
+    amount: 100.00
+    transaction: '@transactionExchange1'
+    debt: '@debt1'
+    loan: '@loan2'
+
+

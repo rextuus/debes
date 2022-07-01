@@ -10,6 +10,7 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        public: true
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -34,4 +35,12 @@ services:
         tags:
             - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Transaction' }
             - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Transaction' }
+
+    user.repository.test:
+        public: true
+        alias: 'App\Repository\UserRepository'
+
+    exchange.service.test:
+        public: true
+        alias: 'App\Service\Exchange\ExchangeService'
 

@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=TransactionRepository::class)
+ * @ORM\Table(name="transactions")
  */
 class Transaction
 {
@@ -46,12 +47,12 @@ class Transaction
     private $amount;
 
     /**
-     * @ORM\OneToMany(targetEntity=Debt::class, mappedBy="transaction")
+     * @ORM\OneToMany(targetEntity=Debt::class, mappedBy="transaction", cascade={"persist"})
      */
     private $debts;
 
     /**
-     * @ORM\OneToMany(targetEntity=Loan::class, mappedBy="transaction")
+     * @ORM\OneToMany(targetEntity=Loan::class, mappedBy="transaction", cascade={"persist"})
      */
     private $loans;
 
@@ -71,14 +72,14 @@ class Transaction
     private $slug;
 
     /**
-     * @ORM\OneToMany(targetEntity=Exchange::class, mappedBy="transaction")
-     */
-    private $exchanges;
-
-    /**
      * @ORM\Column(type="float")
      */
     private $initialAmount;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Exchange::class, mappedBy="transaction")
+     */
+    private $exchanges;
 
     public function __construct()
     {
@@ -255,36 +256,6 @@ class Transaction
     }
 
     /**
-     * @return Collection|Exchange[]
-     */
-    public function getExchanges(): Collection
-    {
-        return $this->exchanges;
-    }
-
-    public function addExchange(Exchange $exchange): self
-    {
-        if (!$this->exchanges->contains($exchange)) {
-            $this->exchanges[] = $exchange;
-            $exchange->setTransaction($this);
-        }
-
-        return $this;
-    }
-
-    public function removeExchange(Exchange $exchange): self
-    {
-        if ($this->exchanges->removeElement($exchange)) {
-            // set the owning side to null (unless already changed)
-            if ($exchange->getTransaction() === $this) {
-                $exchange->setTransaction(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * getDebtors
      *
      * @return array
@@ -409,6 +380,16 @@ class Transaction
     }
 
     /**
+     * isMultipleTransaction
+     *
+     * @return bool
+     */
+    public function hasMultipleSide(): bool
+    {
+        return $this->hasMultipleLoaners() || $this->hasMultipleDebtors();
+    }
+
+    /**
      * isSingleTransaction
      *
      * @return bool
@@ -416,5 +397,49 @@ class Transaction
     public function isSingleTransaction(): bool
     {
         return !$this->hasMultipleLoaners() && !$this->hasMultipleDebtors();
+    }
+
+    /**
+     * @return Collection|Exchange[]
+     */
+    public function getExchanges(): Collection
+    {
+        return $this->exchanges;
+    }
+
+    public function addExchange(Exchange $exchange): self
+    {
+        if (!$this->exchanges->contains($exchange)) {
+            $this->exchanges[] = $exchange;
+            $exchange->setTransaction($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExchange(Exchange $exchange): self
+    {
+        if ($this->exchanges->removeElement($exchange)) {
+            // set the owning side to null (unless already changed)
+            if ($exchange->getTransaction() === $this) {
+                $exchange->setTransaction(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTransactionPartByUser(User $transactionPartOwner){
+        foreach ($this->getDebts() as $debt){
+            if ($debt->getOwner() === $transactionPartOwner){
+                return $debt;
+            }
+        }
+        foreach ($this->getLoans() as $loan){
+            if ($loan->getOwner() === $transactionPartOwner){
+                return $loan;
+            }
+        }
+        return null;
     }
 }

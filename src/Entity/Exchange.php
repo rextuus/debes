@@ -29,26 +29,27 @@ class Exchange
     private $remainingAmount;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Transaction::class, inversedBy="exchanges")
-     */
-    private $transaction;
-
-    /**
      * @ORM\Column(type="float")
      */
     private $amount;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Debt::class, inversedBy="exchanges")
+     * @ORM\ManyToOne(targetEntity=Debt::class, inversedBy="exchanges", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $debt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Loan::class, inversedBy="exchanges")
+     * @ORM\ManyToOne(targetEntity=Loan::class, inversedBy="exchanges", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $loan;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Transaction::class, inversedBy="exchanges")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $transaction;
 
     public function getId(): ?int
     {

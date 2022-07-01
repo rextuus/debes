@@ -5,8 +5,10 @@ namespace App\Service\Loan;
 use App\Entity\Debt;
 use App\Entity\Loan;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
 use App\Entity\User;
 use App\Repository\LoanRepository;
+use App\Service\Transaction\TransactionPartDataInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
@@ -44,27 +46,29 @@ class LoanService
      *
      * @param LoanCreateData $loanData
      *
-     * @return void
+     * @return Loan
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function storeLoan(LoanCreateData $loanData): void
+    public function storeLoan(LoanCreateData $loanData): Loan
     {
         $loan = $this->loanFactory->createByData($loanData);
 
         $this->loanRepository->persist($loan);
+
+        return $loan;
     }
 
     /**
      * update
      *
-     * @param Loan           $loan
-     * @param LoanUpdateData $data
+     * @param TransactionPartInterface $loan
+     * @param TransactionPartDataInterface $data
      *
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function update(Loan $loan, LoanUpdateData $data): void
+    public function update(TransactionPartInterface $loan, TransactionPartDataInterface $data): void
     {
         $this->loanFactory->mapData($loan, $data);
 

@@ -1,0 +1,457 @@
+App\Entity\Debt:
+  debt1:
+    amount: 180.00
+    initialAmount: 180.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt1_2:
+    amount: 5.00
+    initialAmount: 5.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt1_3:
+    amount: 300.00
+    initialAmount: 300.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt2:
+    amount: 20.00
+    initialAmount: 20.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt2_2:
+    amount: 5.00
+    initialAmount: 5.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt2_3:
+    amount: 10.00
+    initialAmount: 10.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt2_4:
+    amount: 100.00
+    initialAmount: 100.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt3:
+    amount: 30.00
+    initialAmount: 30.00
+    paid: false
+    owner: '@exchangeUser3'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt3_2:
+    amount: 60.00
+    initialAmount: 60.00
+    paid: false
+    owner: '@exchangeUser3'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt3_3:
+    amount: 60.00
+    initialAmount: 60.00
+    paid: false
+    owner: '@exchangeUser3'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt4:
+    amount: 40.00
+    initialAmount: 40.00
+    paid: false
+    owner: '@exchangeUser4'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt4_2:
+    amount: 300.00
+    initialAmount: 300.00
+    paid: false
+    owner: '@exchangeUser4'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt5:
+    amount: 50.00
+    initialAmount: 50.00
+    paid: false
+    owner: '@exchangeUser5'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt5_2:
+    amount: 5.00
+    initialAmount: 5.00
+    paid: false
+    owner: '@exchangeUser5'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt6:
+    amount: 60.00
+    initialAmount: 60.00
+    paid: false
+    owner: '@exchangeUser6'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt6_2:
+    amount: 200.00
+    initialAmount: 200.00
+    paid: false
+    owner: '@exchangeUser6'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt7:
+    amount: 70.00
+    initialAmount: 70.00
+    paid: false
+    owner: '@exchangeUser7'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt7_2:
+    amount: 60.00
+    initialAmount: 60.00
+    paid: false
+    owner: '@exchangeUser7'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  debt7_3:
+    amount: 120.00
+    initialAmount: 120.00
+    paid: false
+    owner: '@exchangeUser7'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+
+App\Entity\Loan:
+  loan1:
+    amount: 90.00
+    initialAmount: 90.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan1_2:
+    amount: 5.00
+    initialAmount: 5.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan1_3:
+    amount: 200.00
+    initialAmount: 200.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan1_4:
+    amount: 50.00
+    initialAmount: 50.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan1_5:
+    amount: 200.00
+    initialAmount: 200.00
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan2:
+    amount: 100.00
+    initialAmount: 100.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan2_2:
+    amount: 5.00
+    initialAmount: 5.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan2_3:
+    amount: 300.00
+    initialAmount: 300.00
+    paid: false
+    owner: '@exchangeUser2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan3:
+    amount: 50.00
+    initialAmount: 50.00
+    paid: false
+    owner: '@exchangeUser3'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan4:
+    amount: 30.00
+    initialAmount: 30.00
+    paid: false
+    owner: '@exchangeUser4'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan5:
+    amount: 50.00
+    initialAmount: 50.00
+    paid: false
+    owner: '@exchangeUser5'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan5_2:
+    amount: 60.00
+    initialAmount: 60.00
+    paid: false
+    owner: '@exchangeUser5'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan5_3:
+    amount: 60.00
+    initialAmount: 60.00
+    paid: false
+    owner: '@exchangeUser5'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan6:
+    amount: 60.00
+    initialAmount: 60.00
+    paid: false
+    owner: '@exchangeUser6'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan6_2:
+    amount: 5.00
+    initialAmount: 5.00
+    paid: false
+    owner: '@exchangeUser6'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan6_3:
+    amount: 60.00
+    initialAmount: 60.00
+    paid: false
+    owner: '@exchangeUser6'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan6_4:
+    amount: 20.00
+    initialAmount: 20.00
+    paid: false
+    owner: '@exchangeUser6'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan7:
+    amount: 70.00
+    initialAmount: 70.00
+    paid: false
+    owner: '@exchangeUser7'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+  loan7_2:
+    amount: 300.00
+    initialAmount: 300.00
+    paid: false
+    owner: '@exchangeUser7'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+    state: 'accepted'
+
+App\Entity\Transaction:
+  transactionSingleLoanerMultipleDebtors:
+    state: 'accepted'
+    amount: 90.00
+    initialAmount: 90.00
+    reason: 'User1'
+    slug: 'transactionSingleLoanerMultipleDebtors'
+    debts:
+      - '@debt2'
+      - '@debt3'
+      - '@debt4'
+    loans:
+      - '@loan1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  transactionMultipleLoanersSingleDebtor:
+    state: 'accepted'
+    amount: 180.00
+    initialAmount: 180.00
+    reason: 'User1'
+    slug: 'transactionMultipleLoanersSingleDebtor'
+    debts:
+      - '@debt1'
+    loans:
+      - '@loan5'
+      - '@loan6'
+      - '@loan7'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  transactionMultipleLoanersMultipleDebtors:
+    state: 'accepted'
+    amount: 180.00
+    initialAmount: 180.00
+    reason: 'group meeting'
+    slug: 'transactionMultipleLoanersMultipleDebtors'
+    debts:
+      - '@debt5'
+      - '@debt6'
+      - '@debt7'
+    loans:
+      - '@loan2'
+      - '@loan3'
+      - '@loan4'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  transactionMultipleLoanersMultipleDebtors2:
+    state: 'accepted'
+    amount: 130.00
+    initialAmount: 130.00
+    reason: 'group meeting'
+    slug: 'transactionMultipleLoanersMultipleDebtors2'
+    debts:
+      - '@debt2_3'
+      - '@debt3_2'
+      - '@debt7_2'
+    loans:
+      - '@loan1_4'
+      - '@loan5_2'
+      - '@loan6_3'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  transactionMultipleLoanersMultipleDebtors3:
+    state: 'accepted'
+    amount: 280.00
+    initialAmount: 280.00
+    reason: 'group meeting'
+    slug: 'transactionMultipleLoanersMultipleDebtors3'
+    debts:
+      - '@debt2_4'
+      - '@debt3_3'
+      - '@debt7_3'
+    loans:
+      - '@loan1_5'
+      - '@loan5_3'
+      - '@loan6_4'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  singleTransactionLow:
+    state: 'accepted'
+    amount: 5.00
+    initialAmount: 5.00
+    reason: 'group meeting'
+    slug: 'singleTransactionLow'
+    debts:
+      - '@debt5_2'
+    loans:
+      - '@loan1_2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  singleTransactionLow2:
+    state: 'accepted'
+    amount: 5.00
+    initialAmount: 5.00
+    reason: 'group meeting'
+    slug: 'singleTransactionLow2'
+    debts:
+      - '@debt1_2'
+    loans:
+      - '@loan2_2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  singleTransactionLow3:
+    state: 'accepted'
+    amount: 5.00
+    initialAmount: 5.00
+    reason: 'group meeting'
+    slug: 'singleTransactionLow3'
+    debts:
+      - '@debt2_2'
+    loans:
+      - '@loan6_2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  singleTransactionHigh:
+    state: 'accepted'
+    amount: 200.00
+    initialAmount: 200.00
+    reason: 'group meeting'
+    slug: 'singleTransactionHigh'
+    debts:
+      - '@debt6_2'
+    loans:
+      - '@loan1_3'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  singleTransactionHigh2:
+    state: 'accepted'
+    amount: 300.00
+    initialAmount: 300.00
+    reason: 'group meeting'
+    slug: 'singleTransactionHigh2'
+    debts:
+      - '@debt1_3'
+    loans:
+      - '@loan2_3'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'
+  singleTransactionHigh3:
+    state: 'accepted'
+    amount: 300.00
+    initialAmount: 300.00
+    reason: 'group meeting'
+    slug: 'singleTransactionHigh3'
+    debts:
+      - '@debt4_2'
+    loans:
+      - '@loan7_2'
+    created: '<dateTimeBetween("-200 days", "now")>'
+    edited: '<dateTimeBetween("-200 days", "now")>'

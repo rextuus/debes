@@ -57,12 +57,12 @@ class User implements UserInterface
     private $PaymentOptions;
 
     /**
-     * @ORM\OneToMany(targetEntity=Debt::class, mappedBy="owner")
+     * @ORM\OneToMany(targetEntity=Debt::class, mappedBy="owner", cascade={"persist"})
      */
     private $debts;
 
     /**
-     * @ORM\OneToMany(targetEntity=Loan::class, mappedBy="owner")
+     * @ORM\OneToMany(targetEntity=Loan::class, mappedBy="owner", cascade={"persist"})
      */
     private $loans;
 

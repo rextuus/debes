@@ -426,7 +426,7 @@
 
             .counter-text .num {
                 display: block;
-                color: #1d1d1d;
+                color: rgb(255, 255, 255);
                 font-size: 34px;
                 font-weight: 700;
             }
@@ -493,6 +493,7 @@
                 overflow: hidden;
                 position: relative;
                 width: 100%;
+                background: {{ email.image('@images/debt.png') }};
             }
 
             .div-background.img {
@@ -508,24 +509,6 @@
             }
         </style>
     </head>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <body width="100%"
           style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: #222222;">
@@ -560,8 +543,8 @@
                     {# style="background-image: url({{ asset ('@images/debt.png') }}); background-size: cover; height: 400px;" #}
 
                     <td valign="middle" class="hero bg_white">
-                        <img src="{{ email.image('@images/handshake.png') }}" alt="Logo"
-                             style="background-size: cover; height: 400px; width: 700px">
+                        <img src="{{ email.image('@images/debt.png') }}" alt="Logo"
+                             style="background-size: cover; height: 400px; padding-bottom: 20px">
                         <div class="overlay"></div>
                         <table>
                             <tr>
@@ -610,7 +593,7 @@
                                                                         <div class="text-tour"
                                                                              style="text-align: center;">
                                                                             <h3>Geforderte Summe</h3>
-                                                                            <span class="price">{{ amount }} €</span>
+                                                                            <span class="num">{{ amount }} €</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -623,7 +606,7 @@
                                                                         <div class="text-tour"
                                                                              style="text-align: center;">
                                                                             <h3>Grund</h3>
-                                                                            <span class="price">{{ reason }}</span>
+                                                                            <span class="num">{{ reason }}</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -642,13 +625,11 @@
                                                                                          style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;"></a>
                                                                         <div class="text-tour"
                                                                              style="text-align: center;">
-                                                                            <h3>Schuldner</h3>
-                                                                            <span class="price">{{ interacter }}</span>
+                                                                            <h3>Kreditgeber</h3>
+                                                                            <span class="num">{{ interacter }}</span>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
-
-
                                                             </table>
                                                         </td>
                                                     </tr>
@@ -664,20 +645,36 @@
                             <tr>
                                 <td class="bg_white email-section">
                                     <div class="heading-section" style="text-align: center; padding: 0 30px;">
-                                        <h2>Du möchtest wissen was sonst so bei deinen Finanzen los ist?</h2>
+                                        <h2>Was möchtest du jetzt machen?</h2>
                                     </div>
-                                    Dann schau am besten direkt vorbei:
-                                    <a href="https://www.wh-company.de">DEBES</a>
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tr>
+                                            <td valign="top" width="50%" style="padding-top: 20px;">
+                                                <table role="presentation" cellspacing="0" cellpadding="10" border="0"
+                                                       width="100%">
+                                                    <tr>
+                                                        <td>
+                                                            <img src="images/blog-1.jpg" alt=""
+                                                                 style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-services" style="text-align: left;">
+                                                            <h3>Bei Debes reinschauen</h3>
+                                                            <p>Ganz ehrlich. Ich mache auch den ganzen Tag nichts anderes!</p>
+                                                            <p><a href="https://www.wh-company.de{{ path('landing') }}" class="btn btn-primary">Zu Debes</a></p>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </td>
                             </tr><!-- end: tr -->
 
 
                             <!-- 1 Column Text + Button : END -->
-                        </table>
-
-                        {% include 'mailer/footer.html.twig' %}
-
-
+                            {% include 'mailer/footer.html.twig' %}
 
         </div>
     </center>

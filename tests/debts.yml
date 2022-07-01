@@ -1,0 +1,9 @@
+App\Entity\Debt:
+  debt1:
+    amount: 19.48
+    paid: false
+    owner: '@exchangeUser1'
+    created: '<dateTimeBetween("-200 days", "now")>'
+
+
+

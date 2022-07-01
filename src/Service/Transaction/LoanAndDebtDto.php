@@ -75,7 +75,7 @@ abstract class LoanAndDebtDto
         $dto->setEdited($transactionPartInterface->getEdited());
         $dto->setState($transactionPartInterface->getState());
         $dto->setReason($transactionPartInterface->getTransaction()->getReason());
-        $dto->setTransactionId($transactionPartInterface->getId());
+        $dto->setTransactionId($transactionPartInterface->getTransaction()->getId());
         $dto->setSlug($transactionPartInterface->getTransaction()->getSlug());
         $dto->setExchangeDtos([]);
     }

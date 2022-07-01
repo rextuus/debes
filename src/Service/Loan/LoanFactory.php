@@ -4,7 +4,9 @@ namespace App\Service\Loan;
 
 use App\Entity\Loan;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
 use App\Service\Debt\DebtCreateData;
+use App\Service\Transaction\TransactionPartDataInterface;
 use DateTime;
 
 class LoanFactory
@@ -27,12 +29,13 @@ class LoanFactory
     /**
      * mapData
      *
-     * @param Loan     $loan
-     * @param LoanData $data
+     * @param TransactionPartInterface $loan
+     * @param TransactionPartDataInterface $data
      *
      * @return void
+     * @throws \Exception
      */
-    public function mapData(Loan $loan, LoanData $data): void
+    public function mapData(TransactionPartInterface $loan, TransactionPartDataInterface $data): void
     {
         if ($data instanceof  LoanCreateData) {
             $loan->setCreated($data->getCreated());

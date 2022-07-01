@@ -36,13 +36,13 @@ class Debt implements TransactionPartInterface
     private $paid;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Transaction::class, inversedBy="debts")
+     * @ORM\ManyToOne(targetEntity=Transaction::class, inversedBy="debts", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $transaction;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="debts")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="debts", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $owner;

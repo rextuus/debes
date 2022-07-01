@@ -52,6 +52,7 @@ class TransactionEntityListener
      * @param Transaction $transaction
      *
      * @return string|null
+     * @throws \Exception
      */
     private function computeSlug(Transaction $transaction): ?string
     {

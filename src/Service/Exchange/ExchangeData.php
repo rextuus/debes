@@ -5,6 +5,7 @@ namespace App\Service\Exchange;
 use App\Entity\Debt;
 use App\Entity\Loan;
 use App\Entity\Transaction;
+use App\Entity\TransactionPartInterface;
 
 /**
  * ExchangeData
@@ -96,9 +97,9 @@ class ExchangeData
     }
 
     /**
-     * @param Loan $loan
+     * @param TransactionPartInterface $loan
      */
-    public function setLoan(Loan $loan): void
+    public function setLoan(TransactionPartInterface $loan): void
     {
         $this->loan = $loan;
     }
@@ -112,9 +113,9 @@ class ExchangeData
     }
 
     /**
-     * @param Debt $debt
+     * @param TransactionPartInterface $debt
      */
-    public function setDebt(Debt $debt): void
+    public function setDebt(TransactionPartInterface $debt): void
     {
         $this->debt = $debt;
     }

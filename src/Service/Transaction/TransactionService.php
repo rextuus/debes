@@ -121,11 +121,13 @@ class TransactionService
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function update(Transaction $transaction, TransactionUpdateData $data): void
+    public function update(Transaction $transaction, TransactionUpdateData $data = null): void
     {
-        $this->transactionFactory->mapData($transaction, $data);
-
+        if (!is_null($data)){
+            $this->transactionFactory->mapData($transaction, $data);
+        }
         $this->transactionRepository->persist($transaction);
+
     }
 
     /**
@@ -145,12 +147,15 @@ class TransactionService
 
         $debtData = (new DebtCreateData())->initFromData($data);
         $debtData->setTransaction($transaction);
-        $this->debtService->storeDebt($debtData);
+        $debt = $this->debtService->storeDebt($debtData);
 
         $loanData = (new LoanCreateData())->initFromData($data, $requester);
         $loanData->setTransaction($transaction);
-        $this->loanService->storeLoan($loanData);
+        $loan = $this->loanService->storeLoan($loanData);
 
+        $transaction->addDebt($debt);
+        $transaction->addLoan($loan);
+        $this->update($transaction);
         return $transaction;
     }
 
@@ -295,6 +300,22 @@ class TransactionService
 
 
     /**
+     * acceptDebt
+     *
+     * @param Transaction $transaction
+     *
+     * @return void
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function confirmTransaction(Transaction $transaction): void
+    {
+        $transactionData = (new TransactionUpdateData())->initFrom($transaction);
+        $transactionData->setState(Transaction::STATE_CONFIRMED);
+        $this->update($transaction, $transactionData);
+    }
+
+    /**
      * declineTransaction
      *
      * @param Debt $debt
@@ -372,12 +393,14 @@ class TransactionService
         $loanData = (new LoanUpdateData())->initFrom($loan);
         $loanData->setAmount($transaction->getAmount());
         $loanData->setReason($transaction->getReason());
+        $loanData->setState($transaction->getState());
         $this->loanService->update($loan, $loanData);
 
         $debt = $transaction->getDebts()[0];
         $debtData = (new DebtUpdateData())->initFrom($debt);
         $debtData->setAmount($transaction->getAmount());
         $debtData->setReason($transaction->getReason());
+        $debtData->setState($transaction->getState());
         $this->debtService->update($debt, $debtData);
     }
 
