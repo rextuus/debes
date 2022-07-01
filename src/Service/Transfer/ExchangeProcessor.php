@@ -278,8 +278,6 @@ class ExchangeProcessor
         }
         // HIGH = multi | LOW = single
         if ($transactionPartWithHigherAmount->getTransaction()->hasMultipleSide() && $transactionPartWithLowerAmount->getTransaction()->isSingleTransaction()){
-            dump('HIGH = multi | LOW = single');
-//            $this->updateHighMultiAndLowSingleTransaction($transactionPartWithHigherAmount, $transactionPartWithLowerAmount);
             $user1 = $lowerAmountTransaction->getDebtor();
             $user2 = $lowerAmountTransaction->getLoaner();
 
@@ -344,128 +342,6 @@ class ExchangeProcessor
         }
     }
 
-    /**
-     * @deprecated is no longer used
-     * @param TransactionPartInterface $transactionPartWithHigherAmount
-     * @param TransactionPartInterface $transactionPartWithLowerAmount
-     * @return void
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    private function updateHighSingleAndLowMultipleTransaction(TransactionPartInterface $transactionPartWithHigherAmount, TransactionPartInterface $transactionPartWithLowerAmount)
-    {
-        // HIGH = single | LOW = multi
-        $multiTransaction = $transactionPartWithLowerAmount->getTransaction();
-        $singleTransaction = $transactionPartWithHigherAmount->getTransaction();
-
-        // get transactionPartners of single transaction
-        $singleTransaction->getLoaner();
-        $singleTransaction->getDebtor();
-
-        // this is the user who is corresponding part of the high single transaction
-        $singleTransactionPartner = $this->getTransactionPartnerOfSingleTransaction($singleTransaction, $transactionPartWithHigherAmount->getOwner());
-
-        // we need the transactionPart of the multi transaction that corresponds to our single transaction part
-        $multiTransactionPart = $this->getCorrespondingTransactionPartFromMultiTransaction($transactionPartWithLowerAmount, $multiTransaction, $singleTransactionPartner);
-
-        $amountToReduce = $multiTransactionPart->getAmount();
-        dump($amountToReduce);
-
-        $multiTransactionPartnerPart = $transactionPartWithLowerAmount->getTransaction()->getTransactionPartByUser($singleTransactionPartner);
-        $multiTransactionPartnerPartData = $this->getTransactionPartUpdateData($multiTransactionPartnerPart);
-        $multiTransactionPartnerPartData->setAmount($multiTransactionPartnerPart->getAmount() - $amountToReduce);
-        $multiTransactionPartnerPartData->setState(Transaction::STATE_ACCEPTED);
-        $this->updateTransactionPart($multiTransactionPartnerPart, $multiTransactionPartnerPartData);
-
-        $multiTransactionUpdateData = (new TransactionUpdateData())->initFrom($multiTransaction);
-        $multiTransactionUpdateData->setState(Transaction::STATE_PARTIAL_CLEARED);
-        $multiTransactionUpdateData->setAmount($multiTransaction->getAmount() - $amountToReduce);
-
-        $transactionPartHighUpdateData = $this->getTransactionPartUpdateData($transactionPartWithHigherAmount);
-        $transactionPartHighUpdateData->setAmount($transactionPartWithHigherAmount->getAmount() - $amountToReduce);
-        $this->updateTransactionPart($transactionPartWithHigherAmount, $transactionPartHighUpdateData);
-
-        $transactionPartLowUpdateData = $this->getTransactionPartUpdateData($transactionPartWithLowerAmount);
-        $transactionPartLowUpdateData->setAmount($transactionPartWithLowerAmount->getAmount() - $amountToReduce);
-        $this->updateTransactionPart($transactionPartWithLowerAmount, $transactionPartLowUpdateData);
-
-        $singleTransactionUpdateData = (new TransactionUpdateData())->initFrom($singleTransaction);
-        $singleTransactionUpdateData->setAmount($singleTransaction->getAmount() - $amountToReduce);
-        $singleTransactionUpdateData->setState(Transaction::STATE_ACCEPTED);
-
-        $multiTransactionPartUpdateData = $this->getTransactionPartUpdateData($multiTransactionPart);
-        $multiTransactionPartUpdateData->setAmount(0.0);
-        $multiTransactionPartUpdateData->setState(Transaction::STATE_CLEARED);
-        $this->updateTransactionPart($multiTransactionPart, $multiTransactionPartUpdateData);
-
-        $this->transactionService->update($multiTransaction, $multiTransactionUpdateData);
-        $this->transactionService->updateInclusive($singleTransaction, $singleTransactionUpdateData);
-    }
-
-    /**
-     * @deprecated is no longer used
-     * @param TransactionPartInterface $transactionPartWithHigherAmount
-     * @param TransactionPartInterface $transactionPartWithLowerAmount
-     * @return void
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    private function updateHighMultiAndLowSingleTransaction(TransactionPartInterface $transactionPartWithHigherAmount, TransactionPartInterface $transactionPartWithLowerAmount)
-    {
-        // HIGH = multi | LOW = single
-        $multiTransaction = $transactionPartWithHigherAmount->getTransaction();
-        $multiTransactionUpdateData = (new TransactionUpdateData())->initFrom($multiTransaction);
-        $multiTransactionUpdateData->setState(Transaction::STATE_PARTIAL_CLEARED);
-        $multiTransactionUpdateData->setAmount($multiTransaction->getAmount() - $transactionPartWithLowerAmount->getAmount());
-        $transactionPartHighUpdateData = $this->getTransactionPartUpdateData($transactionPartWithHigherAmount);
-        $transactionPartHighUpdateData->setAmount($transactionPartWithHigherAmount->getAmount() - $transactionPartWithLowerAmount->getAmount());
-        $this->updateTransactionPart($transactionPartWithHigherAmount, $transactionPartHighUpdateData);
-
-        $singleTransaction = $transactionPartWithLowerAmount->getTransaction();
-        $singleTransactionUpdateData = (new TransactionUpdateData())->initFrom($singleTransaction);
-        $singleTransactionUpdateData->setAmount(0.0);
-        $singleTransactionUpdateData->setState(Transaction::STATE_CLEARED);
-
-        // we have to find debt5 from multi and reduce it by 5
-        $singleTransactionPartner = $this->getTransactionPartnerOfSingleTransaction($singleTransaction, $transactionPartWithHigherAmount->getOwner());
-        $multiTransactionPart = $this->getCorrespondingTransactionPartFromMultiTransaction($transactionPartWithLowerAmount, $multiTransaction, $singleTransactionPartner);
-        $multiTransactionPartUpdateData = $this->getTransactionPartUpdateData($multiTransactionPart);
-        $multiTransactionPartUpdateData->setAmount($multiTransactionPart->getAmount() - $transactionPartWithLowerAmount->getAmount());
-        $this->updateTransactionPart($multiTransactionPart, $multiTransactionPartUpdateData);
-
-        $this->transactionService->update($multiTransaction, $multiTransactionUpdateData);
-        // using inclusive update will propagate amount, reason and state to belonging debts and loans
-        $this->transactionService->updateInclusive($singleTransaction, $singleTransactionUpdateData);
-    }
-
-    /**
-     * @deprecated is dont used anymore
-     * @param Transaction $transactionWithHigherAmount
-     * @param Transaction $transactionWithLowerAmount
-     * @return void
-     */
-    private function updateSingleTransactions(Transaction $transactionWithHigherAmount, Transaction $transactionWithLowerAmount){
-        // create updateTransactionDataSets
-        $transactionUpdateDataHigherAmount = (new TransactionUpdateData())->initFrom($transactionWithHigherAmount);
-        $transactionUpdateDataLowerAmount = (new TransactionUpdateData())->initFrom($transactionWithLowerAmount);
-
-        $difference = $transactionWithHigherAmount->getAmount() - $transactionWithLowerAmount->getAmount();
-
-        // HIGHER => original amount - difference
-        $transactionUpdateDataHigherAmount->setAmount($difference);
-        // LOWER => 0
-        $transactionUpdateDataLowerAmount->setAmount(0);
-
-        //HIGHER => ACCEPTED
-        $transactionUpdateDataHigherAmount->setState(Transaction::STATE_ACCEPTED);
-        //LOWER => CLEARED cause its 0 now
-        $transactionUpdateDataLowerAmount->setState(Transaction::STATE_CLEARED);
-
-        // using inclusive update will propagate amount, reason and state to belonging debts and loans
-        $this->transactionService->updateInclusive($transactionWithHigherAmount, $transactionUpdateDataHigherAmount);
-        $this->transactionService->updateInclusive($transactionWithLowerAmount, $transactionUpdateDataLowerAmount);
-    }
-
     private function updateTransactionPart(TransactionPartInterface $transactionPart, TransactionPartDataInterface $transactionPartData): void
     {
         if($transactionPart->isDebt()){
@@ -480,47 +356,6 @@ class ExchangeProcessor
             return (new DebtUpdateData())->initFrom($transactionPart);
         }
         return (new LoanUpdateData())->initFrom($transactionPart);
-    }
-
-    private function getTransactionPartnerOfSingleTransaction(Transaction $singleTransaction, User $partner){
-        if ($singleTransaction->getDebtor() === $partner){
-            return $singleTransaction->getLoaner();
-        }
-        return $singleTransaction->getDebtor();
-    }
-
-    private function clearLowerTransactionPart(TransactionPartInterface $transactionPartWithLowerAmount)
-    {
-        dump($transactionPartWithLowerAmount);
-        $updateData = $this->getTransactionPartUpdateData($transactionPartWithLowerAmount);
-        $updateData->setState(Transaction::STATE_CLEARED);
-        $updateData->setAmount(0.0);
-        if ($updateData instanceof DebtUpdateData){
-            $this->debtService->update($transactionPartWithLowerAmount, $updateData);
-        }
-        else{
-            $this->loanService->update($transactionPartWithLowerAmount, $updateData);
-        }
-    }
-
-    /**
-     * @param TransactionPartInterface $transactionPartOfMultiTransaction
-     * @param Transaction $multiTransaction
-     * @param User $singleTransactionPartner
-     * @return TransactionPartInterface
-     */
-    private function getCorrespondingTransactionPartFromMultiTransaction(TransactionPartInterface $transactionPartOfMultiTransaction, Transaction $multiTransaction, User $singleTransactionPartner)
-    {
-        // be aware of that getTransactionPartByUser first iterates over debts and second over loaners
-        dump($singleTransactionPartner->getId());
-        $multiTransactionPart = $multiTransaction->getTransactionPartByUser($singleTransactionPartner);
-        dump($transactionPartOfMultiTransaction->getAmount());
-        dump($multiTransactionPart->getAmount());
-        if ($transactionPartOfMultiTransaction->getTransaction()->hasMultipleDebtors()) {
-            dump('Multiple Debtors: Change multiTransactionPart');
-            $multiTransactionPart = $transactionPartOfMultiTransaction;
-        }
-        return $multiTransactionPart;
     }
 
     /**

@@ -54,7 +54,7 @@ class MultiExchangeProcessorTest extends FixtureTestCase
         // transaction5: user6 => 200€ => user1
         // transaction6: user1 => 200€ => user2
         // we search for debt1 which is part of transaction2
-        // so we expect to find loan1 and loan1_2 and loan 1_3
+        // so we expect to find loan1 and loan1_2 and loan 1_3 and loan1_4 and loan1_5
         // these are located in transaction1 and transaction4 transaction5 why this should be the only transactionIds
 
         /** @var Transaction $singleLoanerMultipleDebtorsTransaction */
@@ -63,15 +63,25 @@ class MultiExchangeProcessorTest extends FixtureTestCase
         $singleTransaction = $this->getFixtureEntityByIdent('singleTransactionLow');
         /** @var Transaction $singleTransactionHigh */
         $singleTransactionHigh = $this->getFixtureEntityByIdent('singleTransactionHigh');
+        /** @var Transaction $transactionMultipleLoanersMultipleDebtors2 */
+        $transactionMultipleLoanersMultipleDebtors2 = $this->getFixtureEntityByIdent('transactionMultipleLoanersMultipleDebtors2');
+        /** @var Transaction $transactionMultipleLoanersMultipleDebtors3 */
+        $transactionMultipleLoanersMultipleDebtors3 = $this->getFixtureEntityByIdent('transactionMultipleLoanersMultipleDebtors3');
         /** @var Debt $transactionPart */
         $transactionPart = $this->getFixtureEntityByIdent('debt1');
 
         $candidateSets = $this->exchangeProcessor->findExchangeCandidatesForTransactionPart($transactionPart);
 
         $fittingCandidates = $candidateSets->getFittingCandidates();
-        $this->assertCount(3, $fittingCandidates);
+        $this->assertCount(5, $fittingCandidates);
 
-        $expectedTransactionIds = [$singleLoanerMultipleDebtorsTransaction->getId(), $singleTransaction->getId(), $singleTransactionHigh->getId()];
+        $expectedTransactionIds = [
+            $singleLoanerMultipleDebtorsTransaction->getId(),
+            $singleTransaction->getId(),
+            $singleTransactionHigh->getId(),
+            $transactionMultipleLoanersMultipleDebtors2->getId(),
+            $transactionMultipleLoanersMultipleDebtors3->getId()
+        ];
         foreach ($fittingCandidates as $candidate){
             $this->assertContains($candidate->getTransactionId(), $expectedTransactionIds);
         }
