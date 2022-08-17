@@ -42,6 +42,11 @@ abstract class LoanAndDebtDto
     private $transactionPartners;
 
     /**
+     * @var string[]
+     */
+    private array $transactionPartnersDetails;
+
+    /**
      * @var string
      */
     private $reason;
@@ -60,6 +65,11 @@ abstract class LoanAndDebtDto
      * @var array
      */
     private $exchangeDtos;
+
+    /**
+     * @var bool
+     */
+    private $isMultiple;
 
     /**
      * create
@@ -234,4 +244,38 @@ abstract class LoanAndDebtDto
     {
         $this->exchangeDtos = $exchangeDtos;
     }
+
+    /**
+     * @return string[]
+     */
+    public function getTransactionPartnersDetails(): array
+    {
+        return $this->transactionPartnersDetails;
+    }
+
+    /**
+     * @param string[] $transactionPartnersDetails
+     */
+    public function setTransactionPartnersDetails(array $transactionPartnersDetails): void
+    {
+        $this->transactionPartnersDetails = $transactionPartnersDetails;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMultiple(): bool
+    {
+        return $this->isMultiple;
+    }
+
+    /**
+     * @param bool $isMultiple
+     */
+    public function setIsMultiple(bool $isMultiple): void
+    {
+        $this->isMultiple = $isMultiple;
+    }
+
+
 }

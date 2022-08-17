@@ -68,14 +68,15 @@ class ListDebtOrLoanExtension extends AbstractExtension
         User $owner,
         bool $debtVariant
     ): string {
+
         if ($debtVariant){
             $ready = $this->transactionService->getAllDebtTransactionsForUserAndState($owner, Transaction::STATE_READY);
             $accepted = $this->transactionService->getAllDebtTransactionsForUserAndState($owner, Transaction::STATE_ACCEPTED);
             $cleared = $this->transactionService->getAllDebtTransactionsForUserAndState($owner, Transaction::STATE_CLEARED);
         }else{
-            $ready = $this->transactionService->getAllLoanTransactionPartsForUserAndState($owner, Transaction::STATE_READY);
-            $accepted = $this->transactionService->getAllLoanTransactionPartsForUserAndState($owner, Transaction::STATE_ACCEPTED);
-            $cleared = $this->transactionService->getAllLoanTransactionPartsForUserAndState($owner, Transaction::STATE_CLEARED);
+            $ready = $this->transactionService->getAllLoanTransactionPartsForUserAndStateDtoVariant($owner, Transaction::STATE_READY);
+            $accepted = $this->transactionService->getAllLoanTransactionPartsForUserAndStateDtoVariant($owner, Transaction::STATE_ACCEPTED);
+            $cleared = $this->transactionService->getAllLoanTransactionPartsForUserAndStateDtoVariant($owner, Transaction::STATE_CLEARED);
         }
 
         return $environment->render(

@@ -121,13 +121,14 @@ class TransactionService
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function update(Transaction $transaction, TransactionUpdateData $data = null): void
+    public function update(Transaction $transaction, TransactionUpdateData $data = null): Transaction
     {
         if (!is_null($data)){
             $this->transactionFactory->mapData($transaction, $data);
         }
         $this->transactionRepository->persist($transaction);
-
+        $this->entityManager->flush();
+        return $transaction;
     }
 
     /**
@@ -183,7 +184,8 @@ class TransactionService
             $debtData->setCreated(new DateTime());
             $debtData->setReason($data->getReason());
             $debtData->setState(Transaction::STATE_READY);
-            $this->debtService->storeDebt($debtData);
+            $debt = $this->debtService->storeDebt($debtData);
+            $transaction->addDebt($debt);
         }
 
         foreach ($data->getLoanersData() as $loanData) {
@@ -192,8 +194,12 @@ class TransactionService
             $loanData->setCreated(new DateTime());
             $loanData->setReason($data->getReason());
             $loanData->setState(Transaction::STATE_READY);
-            $this->loanService->storeLoan($loanData);
+            $loan = $this->loanService->storeLoan($loanData);
+            $transaction->addLoan($loan);
         }
+
+        $transactionUpdateData = (new TransactionUpdateData())->initFrom($transaction);
+        $this->update($transaction, $transactionUpdateData);
 
         return $transaction;
     }
@@ -257,7 +263,7 @@ class TransactionService
      */
     public function getAllDebtTransactionsForUserAndState(User $owner, string $state): array
     {
-        $dtos = array();
+        $dtos = [];
         $debts = $this->debtService->getAllDebtTransactionsForUserAndState($owner, $state);
         foreach ($debts as $debt) {
             $dtos[] = $this->dtoProvider->createDebtDto($debt);
@@ -286,9 +292,9 @@ class TransactionService
      * @param User   $owner
      * @param string $state
      *
-     * @return array
+     * @return LoanDto[]
      */
-    public function getAllLoanTransactionPartsForUserAndState(User $owner, string $state): array
+    public function getAllLoanTransactionPartsForUserAndStateDtoVariant(User $owner, string $state): array
     {
         $dtos = array();
         $loans = $this->loanService->getAllLoanTransactionsForUserAndSate($owner, $state, 0.0);
@@ -296,6 +302,19 @@ class TransactionService
             $dtos[] = $this->dtoProvider->createLoanDto($loan);
         }
         return $dtos;
+    }
+
+    /**
+     * getAllLoanTransactionsForUserAndState
+     *
+     * @param User   $owner
+     * @param string $state
+     *
+     * @return Loan[]
+     */
+    public function getAllLoanTransactionsForUserAndState(User $owner, string $state): array
+    {
+        return $this->loanService->getAllLoanTransactionsForUserAndSate($owner, $state, 0.0);
     }
 
 
@@ -404,6 +423,27 @@ class TransactionService
         $this->debtService->update($debt, $debtData);
     }
 
+    public function updateInclusiveMulti(Transaction $transaction, TransactionUpdateData $transactionUpdateData)
+    {
+        $transaction = $this->update($transaction, $transactionUpdateData);
+        dump($transaction);
+        foreach ($transaction->getLoans() as $loan){
+            dump($loan->getId());
+            $loanData = (new LoanUpdateData())->initFrom($loan);
+            $loanData->setAmount($transaction->getAmount());
+            $loanData->setReason($transaction->getReason());
+            $loanData->setState($transactionUpdateData->getState());
+            $this->loanService->update($loan, $loanData);
+        }
+        foreach ($transaction->getDebts() as $debt){
+            $debtData = (new DebtUpdateData())->initFrom($debt);
+            $debtData->setAmount($transaction->getAmount());
+            $debtData->setReason($transaction->getReason());
+            $debtData->setState($transactionUpdateData->getState());
+            $this->debtService->update($debt, $debtData);
+        }
+    }
+
     /**
      * getDebtPartOfUserForTransaction
      *
@@ -438,6 +478,19 @@ class TransactionService
             }
         }
         return null;
+    }
+
+    public function getTransactionById(int $int)
+    {
+        return $this->transactionRepository->find($int);
+    }
+
+    /**
+     * @return Transaction[]
+     */
+    public function getAll(): array
+    {
+        return $this->transactionRepository->findAll();
     }
 
 

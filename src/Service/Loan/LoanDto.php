@@ -27,8 +27,20 @@ class LoanDto extends LoanAndDebtDto
 
         if (count($loan->getTransaction()->getLoaners()) > 1){
             $dto->setTransactionPartners('Mehrere Gläubiger');
+            $infos = [];
+            foreach ($loan->getTransaction()->getDebts() as $debt){
+                $info = sprintf(
+                    "%s:\t%.2f €",
+                    $debt->getOwner()->getFullName(),
+                    $debt->getInitialAmount()
+                );
+                $infos[] = $info;
+            }
+            $dto->setTransactionPartnersDetails($infos);
+            $dto->setIsMultiple(true);
         }else{
             $dto->setTransactionPartners($loan->getTransaction()->getDebtor()->getFullName());
+            $dto->setIsMultiple(false);
         }
 
         $dto->setAmount($loan->getAmount());

@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\BankAccount;
+use App\Entity\Debt;
+use App\Entity\Loan;
 use App\Entity\PaymentAction;
 use App\Entity\PaypalAccount;
 use App\Entity\Transaction;
@@ -31,6 +33,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 /**
  * Class PaymentController
@@ -273,7 +276,7 @@ class TransferController extends AbstractController
     public function prepareExchange(
         Transaction $transaction,
         Request $request,
-        ExchangeProcessor $exchangeService
+        ExchangeProcessor $exchangeProcessor
     ): Response {
         /** @var User $requester */
         $requester = $this->getUser();
@@ -285,11 +288,19 @@ class TransferController extends AbstractController
             Transaction::STATE_ACCEPTED
         );
 
+        $debt = $this->transactionService->getDebtPartOfUserForTransaction($transaction, $requester);
+        $candidates = $exchangeProcessor->findExchangeCandidatesForTransactionPart($debt);
+
+        if (empty($candidates->getAllCandidates())){
+            $this->addFlash('success', 'Article Created! Knowledge is power!');
+            return $this->redirectToRoute('account_debts', []);
+        }
+
         $data = new PrepareExchangeTransferData();
         $form = $this->createForm(
             ExchangeType::class,
             $data,
-            ['debt' => $this->transactionService->getDebtPartOfUserForTransaction($transaction, $requester)]
+            ['debt' => $debt]
         );
 
         $form->handleRequest($request);
@@ -307,11 +318,11 @@ class TransferController extends AbstractController
                 return $this->redirectToRoute(
                     'exchange_accept',
                     [
-                        'slug1' => $transaction->getSlug(),
-                        'slug2' => $loanToExchange->getTransaction()->getSlug(),
-                        'part1' => $this->transactionService->getDebtPartOfUserForTransaction($transaction,
+//                        'slug1' => $transaction->getSlug(),
+//                        'slug2' => $loanToExchange->getTransaction()->getSlug(),
+                        'debt_id' => $this->transactionService->getDebtPartOfUserForTransaction($transaction,
                                                                                               $requester)->getId(),
-                        'part2' => $loanToExchange->getId(),
+                        'loan_id' => $loanToExchange->getId(),
                     ]
                 );
             }
@@ -319,6 +330,7 @@ class TransferController extends AbstractController
         }
 
         $dto = DebtDto::create($this->transactionService->getDebtPartOfUserForTransaction($transaction, $requester));
+
         return $this->render('transfer/prepare.exchange.html.twig', [
             'dto'  => $dto,
             'form' => $form->createView(),
@@ -326,17 +338,17 @@ class TransferController extends AbstractController
     }
 
     /**
-     * @Route("/accept/exchange/{slug1}/{part1}/{slug2}/{part2}", name="exchange_accept")
+     * @Route("/accept/exchange/{debt_id}/{loan_id}", name="exchange_accept")
+     * @ParamConverter("debt", options={"id" = "debt_id"})
+     * @ParamConverter("loan", options={"id" = "loan_id"})
      */
     public function acceptExchange(
-        string $slug1,
-        string $slug2,
-        int $part1,
-        int $part2,
-        Request $request,
+        Debt              $debt,
+        Loan              $loan,
+        Request           $request,
         ExchangeProcessor $exchangeService
     ): Response {
-        $dto = $exchangeService->calculateExchange($slug1, $slug2);
+        $dto = $exchangeService->calculateExchange($debt->getTransaction(), $loan->getTransaction());
         $labels = ['label' => ['submit' => 'Verrechnen', 'decline' => 'Zurück zur Auswahl']];
         $form = $this->createForm(ChoiceType::class, null, $labels);
 
@@ -346,10 +358,10 @@ class TransferController extends AbstractController
             $isAccepted = (bool)$form->get('submit')->isClicked();
 
             if ($isAccepted) {
-                $exchangeService->exchangeTransactionParts($slug1, $slug2);
+                $exchangeService->exchangeTransactionParts($debt, $loan);
                 return $this->redirectToRoute('account_debts', []);
             } else {
-                return $this->redirectToRoute('exchange_prepare', ['slug' => $slug1]);
+                return $this->redirectToRoute('exchange_prepare', ['slug' => $debt]);
             }
         }
 

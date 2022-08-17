@@ -199,4 +199,15 @@ class LegacyImportService
             $this->transactionService->update($transaction, $data);
         }
     }
+
+    public function setAllTransactionsToAccepted(){
+
+        foreach ($this->transactionService->getAll() as $transaction){
+            $transaction = $this->transactionService->getTransactionById($transaction->getId());
+            $transactionData = new TransactionUpdateData();
+            $transactionData->initFrom($transaction);
+            $transactionData->setState(Transaction::STATE_ACCEPTED);
+            $this->transactionService->updateInclusiveMulti($transaction, $transactionData);
+        }
+    }
 }

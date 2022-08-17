@@ -99,6 +99,7 @@ class TransactionController extends AbstractController
     }
 
     // TODO CHECK IF USED
+
     /**
      * @Route("/", name="transaction_list")
      */
@@ -147,6 +148,7 @@ class TransactionController extends AbstractController
             $dto = LoanDto::create($loan);
             $labels = ['label' => ['submit' => 'Zurückziehen', 'decline' => 'Zurückziehen']];
         }
+        $dto = $this->transactionService->createDtoFromTransaction($transaction, $isDebtor);
 
         $form = $this->createForm(ChoiceType::class, null, $labels);
         $form->handleRequest($request);
@@ -212,11 +214,11 @@ class TransactionController extends AbstractController
             if ($isDebtor) {
                 if ($useTransaction) {
                     return $this->redirect($this->generateUrl('transfer_prepare',
-                                                              ['slug' => $transaction->getSlug()]));
+                        ['slug' => $transaction->getSlug()]));
                 }
-                if ($useChange){
+                if ($useChange) {
                     return $this->redirect($this->generateUrl('exchange_prepare',
-                                                              ['slug' => $transaction->getSlug()]));
+                        ['slug' => $transaction->getSlug()]));
                 }
                 return $this->redirectToRoute('account_debts', []);
             } else {
@@ -303,7 +305,8 @@ class TransactionController extends AbstractController
      */
     public function createTransaction(
         Request $request
-    ): Response {
+    ): Response
+    {
         /** @var User $requester */
         $requester = $this->getUser();
 

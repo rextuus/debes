@@ -21,6 +21,7 @@
 
     <!-- Main Stylesheets -->
     <link rel="stylesheet" href="{{ asset ('css/style.css')}}"/>
+    <link rel="stylesheet" href="{{ asset ('css/debes.css')}}"/>
 
 
     <!--[if lt IE 9]>
@@ -67,7 +68,13 @@
     </ul>
 </header>
 <!-- Header section end -->
-{% block body %} {% endblock %}
+{% block body %}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endblock %}
 <!-- Hero section -->
 
 <!-- Hero section end -->

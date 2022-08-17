@@ -36,12 +36,12 @@ class TransactionFactory
         if ($data instanceof TransactionCreateData){
             $transaction->setCreated(new DateTime());
             $transaction->setEdited($transaction->getCreated());
+            $transaction->setInitialAmount($data->getAmount());
         }else{
             $transaction->setEdited(new DateTime());
         }
 
         $transaction->setAmount($data->getAmount());
-        $transaction->setInitialAmount($data->getAmount());
         $transaction->setReason($data->getReason());
         $transaction->setState($data->getState());
     }

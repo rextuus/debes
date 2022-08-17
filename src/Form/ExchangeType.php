@@ -29,11 +29,18 @@ class ExchangeType extends AbstractType
     private $loanService;
 
     /**
-     * TransactionCreateSimpleType constructor.
+     * @var ExchangeProcessor
      */
-    public function __construct(LoanService $loanService)
+    private $exchangeProcessor;
+
+    /**
+     * @param LoanService $loanService
+     * @param ExchangeProcessor $exchangeProcessor
+     */
+    public function __construct(LoanService $loanService, ExchangeProcessor $exchangeProcessor)
     {
         $this->loanService = $loanService;
+        $this->exchangeProcessor = $exchangeProcessor;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -68,11 +75,15 @@ class ExchangeType extends AbstractType
      */
     private function prepareOptions(Debt $debt): array
     {
-        $candidates = $this->loanService->getAllExchangeLoansForDebt($debt);
-        $choices = array();
-        foreach ($candidates as $candidate) {
-            /** @var Loan $candidate */
-            $choices[(string) $candidate] = $candidate;
+        $candidates = $this->exchangeProcessor->findExchangeCandidatesForTransactionPart($debt);
+        $choices = [];
+
+        $loans = $candidates->getAllCandidates();
+        foreach ($candidates->getAllCandidatesDto() as $nr => $candidate) {
+            /** @var LoanDto $candidate */
+//            $transaction = $candidate->getTransaction();
+            $choiceName = $candidate->getAmount().' € für '.$candidate->getReason().' an '.$candidate->getTransactionPartners();
+            $choices[$choiceName] = $loans[$nr];
         }
         return $choices;
     }

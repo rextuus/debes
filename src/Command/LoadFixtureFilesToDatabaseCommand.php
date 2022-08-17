@@ -106,6 +106,8 @@ class LoadFixtureFilesToDatabaseCommand extends Command
                 $state
             );
         }
+        $this->legacyImportService->setAllTransactionsToAccepted();
+
         return 0;
     }
 
@@ -218,14 +220,14 @@ class LoadFixtureFilesToDatabaseCommand extends Command
                 $this->userService->findUserByUserName('Adam'),
             ],
             [
-                'Austausch Seite Eva hat mehr Schulden',
+                'Eva muss Adam mehr geben',
                 30.98,
                 $this->userService->findUserByUserName('Eva'),
                 $this->userService->findUserByUserName('Adam'),
                 Transaction::STATE_ACCEPTED
             ],
             [
-                'Austausch Seite Eva hat mehr Schulden',
+                'Adam bekommt mehr von Eva',
                 15.98,
                 $this->userService->findUserByUserName('Adam'),
                 $this->userService->findUserByUserName('Eva'),
@@ -241,6 +243,7 @@ class LoadFixtureFilesToDatabaseCommand extends Command
      */
     private function getMultiTransactionSet(): array
     {
+        // first debtors second loaners
         return [
             [
                 'Apfel',

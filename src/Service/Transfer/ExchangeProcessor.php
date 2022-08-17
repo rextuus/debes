@@ -13,6 +13,7 @@ use App\Service\Exchange\ExchangeCreateData;
 use App\Service\Exchange\ExchangeService;
 use App\Service\Loan\LoanService;
 use App\Service\Loan\LoanUpdateData;
+use App\Service\Transaction\DtoProvider;
 use App\Service\Transaction\TransactionPartDataInterface;
 use App\Service\Transaction\TransactionService;
 use App\Service\Transaction\TransactionUpdateData;
@@ -48,23 +49,26 @@ class ExchangeProcessor
     private $debtService;
 
     /**
-     * ExchangeProcessor constructor.
+     * @var DtoProvider
+     */
+    private $dtoProvider;
+
+    /**
      * @param TransactionService $transactionService
      * @param ExchangeService $exchangeService
      * @param LoanService $loanService
      * @param DebtService $debtService
+     * @param DtoProvider $dtoProvider
      */
-    public function __construct(
-        TransactionService $transactionService,
-        ExchangeService $exchangeService,
-        LoanService $loanService,
-        DebtService $debtService
-    ) {
+    public function __construct(TransactionService $transactionService, ExchangeService $exchangeService, LoanService $loanService, DebtService $debtService, DtoProvider $dtoProvider)
+    {
         $this->transactionService = $transactionService;
         $this->exchangeService = $exchangeService;
         $this->loanService = $loanService;
         $this->debtService = $debtService;
+        $this->dtoProvider = $dtoProvider;
     }
+
 
     /**
      * findExchangeCandidatesForTransaction
@@ -75,11 +79,52 @@ class ExchangeProcessor
      */
     public function findExchangeCandidatesForTransactionPart(Debt $debt): ExchangeCandidateSet
     {
+        $loanersOfGivenDebt = [];
+        $loans = $debt->getTransaction()->getLoans();
+        foreach ($loans as $loan){
+            $loanersOfGivenDebt[$loan->getOwner()->getId()] = $loan->getOwner()->getId();
+        }
+
         // debt comes in => we search for all Loans where debt.owner is owner
-        $candidates = $this->transactionService->getAllLoanTransactionPartsForUserAndState(
+        $candidates = $this->transactionService->getAllLoanTransactionsForUserAndState(
             $debt->getOwner(),
             Transaction::STATE_ACCEPTED
         );
+
+        // check if candidate loans transaction has a debtor t
+        $fittingCandidates = [];
+        foreach ($candidates as $candidate){
+            $candidateTransaction = $candidate->getTransaction();
+            $candidateDebts = $candidateTransaction->getDebts();
+            $debtorsOfCandidate = [];
+            foreach ($candidateDebts as $candidateDebt){
+                $debtorsOfCandidate[$candidateDebt->getOwner()->getId()] = $candidateDebt->getOwner()->getId();
+            }
+//            dump($debtorsOfCandidate);
+            $candidateIsGood = false;
+            foreach ($loanersOfGivenDebt as $loanersOfGivenDeb){
+                if (array_key_exists($loanersOfGivenDeb, $debtorsOfCandidate)){
+                    $candidateIsGood = true;
+                }
+            }
+
+            if ($candidateIsGood){
+                $fittingCandidates[] = $candidate;
+            }
+        }
+
+        $fittingDtos = [];
+        foreach ($fittingCandidates as $fittingCandidate) {
+            $fittingDtos[] = $this->dtoProvider->createLoanDto($fittingCandidate);
+        }
+
+        $exchangeCandidateSet = new ExchangeCandidateSet();
+        $exchangeCandidateSet->setFittingCandidates($fittingCandidates);
+        $exchangeCandidateSet->setFittingCandidatesDtoVersion($fittingDtos);
+        $exchangeCandidateSet->setNonFittingCandidates([]);
+        $exchangeCandidateSet->setNonFittingCandidatesDtoVersion([]);
+        return $exchangeCandidateSet;
+
         $fittingCandidates = array();
         $nonFittingCandidates = array();
 //        foreach ($candidates as $candidate) {
@@ -92,8 +137,16 @@ class ExchangeProcessor
 //        }
 
         $exchangeCandidateSet = new ExchangeCandidateSet();;
+        $exchangeCandidateSet->setFittingCandidatesDtoVersion($candidates);
+        $exchangeCandidateSet->setNonFittingCandidatesDtoVersion($nonFittingCandidates);
+
+        // get loan variant
+        $candidates = $this->transactionService->getAllLoanTransactionsForUserAndState(
+            $debt->getOwner(),
+            Transaction::STATE_ACCEPTED
+        );
         $exchangeCandidateSet->setFittingCandidates($candidates);
-        $exchangeCandidateSet->setNonFittingCandidates($nonFittingCandidates);
+        $exchangeCandidateSet->setNonFittingCandidates([]);
 
         return $exchangeCandidateSet;
     }
@@ -106,10 +159,8 @@ class ExchangeProcessor
      *
      * @return ExchangeDto
      */
-    public function calculateExchange(string $slug1, string $slug2): ExchangeDto
+    public function calculateExchange(Transaction $transaction, Transaction $transactionToExchange): ExchangeDto
     {
-        $transaction = $this->transactionService->getTransactionBySlug($slug1);
-        $transactionToExchange = $this->transactionService->getTransactionBySlug($slug2);
         $exchangeDto = (new ExchangeDto())->initFromTransactions($transaction, $transactionToExchange);
         $difference = $transaction->getAmount() - $transactionToExchange->getAmount();
         $exchangeDto->setDifference($difference);
@@ -217,6 +268,7 @@ class ExchangeProcessor
         $this->exchangeService->storeExchange($exchangeCreationDataHigher);
         $this->exchangeService->storeExchange($exchangeCreationDataLower);
     }
+    //TODO: Asicht für Multitransaktionen fixen
 
 /**
      * fillTransactionUpdateDataSets

@@ -48,6 +48,9 @@ class MailService
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     public function sendNotificationMail(Transaction $transaction, string $mailVariant, PaymentAction $paymentAction = null){
+        if($_ENV['APP_ENV'] === 'dev'){
+            return;
+        }
         $receiver = $transaction->getDebts()[0]->getOwner();
 
         $subject = '';

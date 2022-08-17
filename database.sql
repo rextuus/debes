@@ -1,9 +1,9 @@
 DROP TABLE payment_action;
 DROP TABLE bank_account;
 DROP TABLE paypal_account;
+DROP TABLE exchange;
 DROP TABLE loan;
 DROP TABLE debt;
-DROP TABLE exchange;
 DROP TABLE transactions;
 DROP TABLE user;
 

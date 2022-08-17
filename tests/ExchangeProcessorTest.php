@@ -66,7 +66,7 @@ class ExchangeProcessorTest extends FixtureTestCase
 
         $candidateSets = $this->exchangeProcessor->findExchangeCandidatesForTransactionPart($transactionToFindExchangeFor->getDebts()[0]);
 
-        $fittingCandidates = $candidateSets->getFittingCandidates();
+        $fittingCandidates = $candidateSets->getFittingCandidatesDtoVersion();
         $this->assertCount(2, $fittingCandidates);
 
         $expectedTransactionIds = [$fittingTransaction->getId(), $fittingTransaction2->getId()];

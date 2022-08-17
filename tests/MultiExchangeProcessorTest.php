@@ -72,7 +72,7 @@ class MultiExchangeProcessorTest extends FixtureTestCase
 
         $candidateSets = $this->exchangeProcessor->findExchangeCandidatesForTransactionPart($transactionPart);
 
-        $fittingCandidates = $candidateSets->getFittingCandidates();
+        $fittingCandidates = $candidateSets->getFittingCandidatesDtoVersion();
         $this->assertCount(5, $fittingCandidates);
 
         $expectedTransactionIds = [

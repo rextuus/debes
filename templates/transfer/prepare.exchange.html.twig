@@ -21,7 +21,12 @@
                                     <tr>
                                         <th scope="col">Darlehensgeber</th>
 
-                                        <td>{{ dto.transactionPartner }}</td>
+{#                                        <td>{{ dto.transactionPartners }}</td>#}
+                                        {% if dto.multiple %}
+                                        {% for detail in dto.transactionPartnersDetails %}
+                                            <th>{{ detail }}</th>
+                                        {% endfor %}
+                                        {% endif %}
                                     </tr>
 
                                     <tr>

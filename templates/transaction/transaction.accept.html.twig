@@ -11,40 +11,53 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="hs-text">
+                                {% include 'base.info.html.twig' %}
+
                                 {% if debtVariant %}
                                     <h2><span>Schuld vom</span></h2><h2> {{ dto.created }}</h2>
                                 {% else %}
                                     <h2><span>Darlehen vom</span></h2><h2> {{ dto.created }}</h2>
                                 {% endif %}
 
-                                <table class="table table-hover table-dark">
-                                    <tr>
-                                        {% if debtVariant %}
-                                            <th scope="col">Darlehensgeber</th>
-                                        {% else %}
-                                            <th scope="col">Gläubiger</th>
-                                        {% endif %}
-                                        <td>{{ dto.transactionPartners }}</td>
-                                    </tr>
+{#                                <table class="table table-hover table-dark">#}
+{#                                    <tr>#}
+{#                                        {% if debtVariant %}#}
+{#                                            <th scope="col">Darlehensgeber</th>#}
+{#                                            {% if dto.hasMultipleDebtors %}#}
+{#                                                <table class="table table-hover table-dark">#}
+{#                                                    <tr>#}
+{#                                                        {% for detail in dto.transactionPartnersDetails %}#}
+{#                                                            <th>{{ detail }}</th>#}
+{#                                                        {% endfor %}#}
+{#                                                    </tr>#}
+{#                                                </table>#}
+{#                                            {% else %}#}
+{#                                                {{ dto.transactionPartners }}#}
+{#                                            {% endif %}#}
+{#                                        {% else %}#}
+{#                                            <th scope="col">Gläubiger</th>#}
+{#                                        {% endif %}#}
+{#                                        <td>{{ dto.transactionPartners }}</td>#}
+{#                                    </tr>#}
 
-                                    <tr>
-                                        <th scope="col">Betrag</th>
-                                        <td>{{ dto.amount }} €</td>
-                                    </tr>
+{#                                    <tr>#}
+{#                                        <th scope="col">Betrag</th>#}
+{#                                        <td>{{ dto.amount }} €</td>#}
+{#                                    </tr>#}
 
-                                    <tr>
-                                        <th scope="col">Grund</th>
-                                        <td>{{ dto.reason }}</td>
-                                    </tr>
+{#                                    <tr>#}
+{#                                        <th scope="col">Grund</th>#}
+{#                                        <td>{{ dto.reason }}</td>#}
+{#                                    </tr>#}
 
 
-                                </table>
+{#                                </table>#}
 
-                                {% if debtVariant %}
-                                    <p>Akzeptierst du die Schuld?</p>
-                                {% else %}
-                                    <p>{{ dto.transactionPartners }} hat das Darlehen noch nicht akzeptiert. Möchtest du es zurückziehen?</p>
-                                {% endif %}
+{#                                {% if debtVariant %}#}
+{#                                    <p>Akzeptierst du die Schuld?</p>#}
+{#                                {% else %}#}
+{#                                    <p>{{ dto.transactionPartners }} hat das Darlehen noch nicht akzeptiert. Möchtest du es zurückziehen?</p>#}
+{#                                {% endif %}#}
 
 
                                 {% if debtVariant %}

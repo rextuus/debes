@@ -33,6 +33,7 @@ class DtoProvider
         $this->exchangeService = $exchangeService;
     }
 
+
     /**
      * createDebtDto
      *
@@ -45,9 +46,9 @@ class DtoProvider
         $debtDto = DebtDto::create($debt);
         $exchanges = $this->exchangeService->getAllExchangesBelongingToTransaction($debt->getTransaction());
         $exchangeDtos = array();
-        foreach ($exchanges as $exchange) {
-            $exchangeDtos[] = ExchangeDto::create($exchange);
-        }
+//        foreach ($exchanges as $exchange) {
+//            $exchangeDtos[] = ExchangeDto::create($exchange);
+//        }
         $debtDto->setExchangeDtos($exchangeDtos);
         return $debtDto;
     }
@@ -64,9 +65,9 @@ class DtoProvider
         $loanDto = LoanDto::create($loan);
         $exchanges = $this->exchangeService->getAllExchangesBelongingToTransaction($loan->getTransaction());
         $exchangeDtos = array();
-        foreach ($exchanges as $exchange) {
-            $exchangeDtos[] = ExchangeDto::create($exchange);
-        }
+//        foreach ($exchanges as $exchange) {
+//            $exchangeDtos[] = ExchangeDto::create($exchange);
+//        }
         $loanDto->setExchangeDtos($exchangeDtos);
         return $loanDto;
     }
@@ -80,14 +81,30 @@ class DtoProvider
      */
     public function createTransactionDto(Transaction $transaction, bool $isDebtVariant): TransactionDtos\TransactionDto
     {
-        $transactionDto = \App\Service\Transaction\TransactionDtos\TransactionDto::createFromTransaction($transaction,
-                                                                                                         $isDebtVariant);
+        $transactionDto = \App\Service\Transaction\TransactionDtos\TransactionDto::createFromTransaction(
+            $transaction,
+            $isDebtVariant
+        );
+
+
+        $exchanges = $this->exchangeService->getAllExchangesBelongingToTransaction($transaction);
+        $exchangeDtos = [];
+        foreach ($exchanges as $exchange){
+            $corresponding = $this->exchangeService->getCorrespondingExchangeTransaction($exchange );
+//            dd($corresponding->getReason());
+            $exchangeDtos[] = ExchangeDto::create($exchange, $corresponding);
+
+        }
+        $transactionDto->setExchangeDtos($exchangeDtos);
+
+        return $transactionDto;
+//        dd($exchanges);
 
         foreach ($transaction->getDebts() as $debt) {
             $exchanges = $this->exchangeService->getAllExchangesBelongingToTransactionAndPartType($transaction, $debt);
             $debtPartDto = TransactionPartBaseDto::createFromTransactionPart($debt, false);
 
-            $exchangeDtos = array();
+            $exchangeDtos = [];
             foreach ($exchanges as $exchange) {
                 $exchangeDtos[] = ExchangeDto::create($exchange);
             }

@@ -1,0 +1,66 @@
+<div class="exchange-button" id="exchangeButton" onclick="showExchanges()">Verrechnete Transaktionen:</div>
+<div class="hidden" id="test">
+<table class="table-dark">
+    <tr class="table-line">
+        <th>
+            Ursprungsbetrag:
+        </th>
+        <td>
+            {{ dto.initialAmount }} €
+        </td>
+    </tr>
+    {% for exchangeDto in dto.exchangeDtos %}
+        <tr >
+            <th>
+                {{ loop.index }}.
+            </th>
+        </tr>
+        <tr>
+            <th>
+                Datum
+            </th>
+            <td>
+                {{ exchangeDto.creationDate }}
+            </td>
+        </tr>
+        <tr>
+            {% if debtVariant %}
+                <th scope="col">Darlehensgeber</th>
+            {% else %}
+                <th scope="col">Gläubiger</th>
+            {% endif %}
+            <td>{{ exchangeDto.exchangePartner }}</td>
+        </tr>
+        <tr>
+            <th scope="col">Verrechnungs-Betrag</th>
+            <td>{{ exchangeDto.amount }} €</td>
+        </tr>
+
+        <tr>
+            <th scope="col">Grund</th>
+            <td>{{ exchangeDto.exchangeReason }}</td>
+        </tr>
+
+        <tr class="table-line">
+            <th scope="col">Verblieben</th>
+            <td>{{ exchangeDto.remainingAmount }} €</td>
+        </tr>
+    {% endfor %}
+</table>
+</div>
+<script src="{{ asset ('js/exchange.js')}}"></script>
+
+<script>
+        // jQuery(document).ready(function () {
+        //     $("div#test").click(function() {
+        //         console.log($("div#test").attr('class').split(/\s+/));
+        //         $("div#test").toggle("hidden");
+        //     });
+        //
+        // });
+    // function myFunction() {
+    //     var element = document.getElementById("test");
+    //     element.classList.toggle("hidden");
+    //     console.log(element);
+    // }
+</script>

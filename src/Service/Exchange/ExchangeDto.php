@@ -44,21 +44,36 @@ class ExchangeDto
     private $exchangeReason;
 
     /**
+     * @var string
+     */
+    private $from;
+
+    /**
+     * @var string
+     */
+    private $to;
+
+    /**
      * create
      *
      * @param Exchange $exchange
      *
      * @return ExchangeDto
      */
-    public static function create(Exchange $exchange): ExchangeDto
+    public static function create(Exchange $exchange, string $reason): ExchangeDto
     {
         $dto = new self();
+
+        $dto->setFrom($exchange->getDebt()->getOwner()->getFullName());
+        if ($exchange->getTransaction()->isSingleTransaction()){
+            $dto->setTo($exchange->getLoan()->getTransaction()->getDebtor()->getFullName());
+        }
 
         $dto->setExchangePartner($exchange->getTransaction()->getLoaner()->getFullName());
         $dto->setAmount($exchange->getAmount());
         $dto->setCreated($exchange->getCreated());
         $dto->setRemainingAmount($exchange->getRemainingAmount());
-        $dto->setExchangeReason($exchange->getTransaction()->getReason());
+        $dto->setExchangeReason($reason);
         $dto->setExchangeSlug($exchange->getTransaction()->getSlug());
 
         return $dto;
@@ -168,5 +183,37 @@ class ExchangeDto
     public function getCreationDate(): string
     {
         return $this->created->format("d.m.Y");
+    }
+
+    /**
+     * @return string
+     */
+    public function getFrom(): string
+    {
+        return $this->from;
+    }
+
+    /**
+     * @param string $from
+     */
+    public function setFrom(string $from): void
+    {
+        $this->from = $from;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTo(): string
+    {
+        return $this->to;
+    }
+
+    /**
+     * @param string $to
+     */
+    public function setTo(string $to): void
+    {
+        $this->to = $to;
     }
 }

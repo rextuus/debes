@@ -131,4 +131,9 @@ class LoanService
     {
         return $this->loanRepository->getTotalLoansForUser($user);
     }
+
+    public function getLoanBySlug(string $getSlug)
+    {
+        return $this->loanRepository->findBy(['slug' => $getSlug]);
+    }
 }

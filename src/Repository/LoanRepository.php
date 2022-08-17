@@ -90,7 +90,7 @@ class LoanRepository extends ServiceEntityRepository
      */
     public function getAllLoanTransactionsForUserAndSate(User $owner, string $state, float $amount)
     {
-        return $this->createQueryBuilder('l')
+        $qb = $this->createQueryBuilder('l')
             ->select('l')
             ->leftJoin(Transaction::class, 't', 'WITH', 'l.transaction = t.id')
             ->where('l.owner = :owner')
@@ -99,8 +99,8 @@ class LoanRepository extends ServiceEntityRepository
             ->setParameter('owner', $owner)
             ->setParameter('state', $state)
             ->setParameter('amount', $amount)
-            ->orderBy('t.created', 'ASC')
-            ->getQuery()->getResult();
+            ->orderBy('t.created', 'ASC');
+        return $qb->getQuery()->getResult();
     }
 
     /**

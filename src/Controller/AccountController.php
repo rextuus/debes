@@ -42,7 +42,7 @@ class AccountController extends AbstractController
     /**
      * @Route("/debts", name="account_debts")
      */
-    public function listDebtsForUser(TransactionService $transactionService): Response
+    public function listDebtsForUser(TransactionService $service): Response
     {
         /** @var User $requester */
         $requester = $this->getUser();

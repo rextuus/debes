@@ -100,7 +100,7 @@
 
                                     $wrapper.on('change', '.js-calculate-distribution', function (e) {
                                         e.preventDefault();
-                                        if ($wrapper.data('clicked') == 0) {
+                                        if ($wrapper.data('clicked') === 0) {
                                             distributeAmount();
                                             checkAmounts();
                                             $wrapper.data('clicked', data('clicked'));

@@ -2,7 +2,9 @@
 
 namespace App\Service\Exchange;
 
+use App\Entity\Debt;
 use App\Entity\Exchange;
+use App\Entity\Loan;
 use App\Entity\Transaction;
 use App\Entity\TransactionPartInterface;
 use App\Repository\ExchangeRepository;
@@ -93,6 +95,20 @@ class ExchangeService
     }
 
     /**
+     * @param Exchange $exchange
+     * @return Transaction
+     */
+    public function getCorrespondingExchangeTransaction(Exchange $exchange): Transaction
+    {
+        return $this->exchangeRepository->findCorrespondingExchange(
+            $exchange->getTransaction(),
+            $exchange->getDebt(),
+            $exchange->getLoan()
+        );
+    }
+
+
+    /**
      * getAllExchangesBelongingToTransactionAndPartType
      *
      * @param Transaction              $transaction
@@ -107,9 +123,14 @@ class ExchangeService
         bool $isDebt = true
     ): array {
         if ($isDebt){
-            return $this->exchangeRepository->findBy(['transaction' => $transaction, 'debt' => $transactionPart]);
-        }else{
             return $this->exchangeRepository->findBy(['transaction' => $transaction, 'loan' => $transactionPart]);
+        }else{
+            return $this->exchangeRepository->findBy(['transaction' => $transaction, 'debt' => $transactionPart]);
         }
+    }
+
+    public function findById(int $int)
+    {
+        return $this->exchangeRepository->find($int);
     }
 }

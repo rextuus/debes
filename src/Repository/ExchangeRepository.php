@@ -2,7 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Debt;
 use App\Entity\Exchange;
+use App\Entity\Loan;
+use App\Entity\Transaction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -33,6 +36,21 @@ class ExchangeRepository extends ServiceEntityRepository
     {
         $this->_em->persist($exchange);
         $this->_em->flush();
+    }
+
+    public function findCorrespondingExchange(Transaction $transaction, Debt $debt, Loan $loan)
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->select('t')
+            ->leftJoin(Transaction::class, 't', 'WITH', 'e.transaction = t.id')
+            ->where('e.debt = :debt')
+            ->andWhere('e.loan = :loan')
+            ->andWhere('e.transaction != :transaction')
+            ->setParameter('debt', $debt)
+            ->setParameter('loan', $loan)
+            ->setParameter('transaction', $transaction);
+
+            return $qb->getQuery()->getSingleResult();
     }
 
     // /**

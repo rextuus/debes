@@ -4,6 +4,7 @@ namespace App\Service\Transaction\TransactionDtos;
 
 use App\Entity\Transaction;
 use App\Service\Debt\DebtDto;
+use App\Service\Exchange\ExchangeDto;
 use DateTimeInterface;
 
 /**
@@ -78,6 +79,16 @@ class TransactionDto
      * @var bool
      */
     private $isDebtVariant;
+
+    /**
+     * @var ExchangeDto[]
+     */
+    private $exchangeDtos;
+
+    /**
+     * @var float
+     */
+    private $initialAmount;
 
     /**
      * @return bool
@@ -235,6 +246,22 @@ class TransactionDto
     }
 
     /**
+     * @return float
+     */
+    public function getInitialAmount(): float
+    {
+        return $this->initialAmount;
+    }
+
+    /**
+     * @param float $initialAmount
+     */
+    public function setInitialAmount(float $initialAmount): void
+    {
+        $this->initialAmount = $initialAmount;
+    }
+
+    /**
      * @return string
      */
     public function getTransactionPartner(): string
@@ -243,7 +270,11 @@ class TransactionDto
         if ($this->isDebtVariant){
             // multi
             if ($this->hasMultipleDebtors){
-
+                $transactionPartnerNames = '';
+                foreach ($this->getLoanDtos() as $loanDto){
+                    $transactionPartnerNames = $transactionPartnerNames.$loanDto->getOwner()->getFullName().' | ';
+                }
+                return $transactionPartnerNames;
             }
             // single
             else{
@@ -321,6 +352,22 @@ class TransactionDto
     }
 
     /**
+     * @return ExchangeDto[]
+     */
+    public function getExchangeDtos(): array
+    {
+        return $this->exchangeDtos;
+    }
+
+    /**
+     * @param ExchangeDto[] $exchangeDtos
+     */
+    public function setExchangeDtos(array $exchangeDtos): void
+    {
+        $this->exchangeDtos = $exchangeDtos;
+    }
+
+    /**
      * @return TransactionPartBaseDto|null
      */
     public function getSingleTransactionPartner(): ?TransactionPartBaseDto
@@ -373,6 +420,8 @@ class TransactionDto
         $dto->setTransactionId($transaction->getId());
         $dto->setTransactionSlug($transaction->getSlug());
         $dto->setIsDebtVariant($isDebtVariant);
+        $dto->setExchangeDtos([]);
+        $dto->setInitialAmount($transaction->getInitialAmount());
 
         return $dto;
     }
